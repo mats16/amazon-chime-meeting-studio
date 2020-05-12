@@ -1,0 +1,15 @@
+type Status
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField:"owner", provider: userPools, operations:[read] }
+    { allow: private, provider: iam }
+  ])
+{
+  id: ID!
+  status: String!
+  owner: String
+  browser_url: String
+  rtmp_url: [String]
+  startDate: AWSTimestamp
+  stopDate: AWSTimestamp
+}
