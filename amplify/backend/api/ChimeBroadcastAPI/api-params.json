@@ -1,0 +1,41 @@
+{
+    "paths": [
+        {
+            "name": "/executions",
+            "lambdaFunction": "ChimeBroadcastAPI",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH"
+                ]
+            }
+        }
+    ],
+    "resourceName": "ChimeBroadcastAPI",
+    "apiName": "ChimeBroadcastAPI",
+    "functionArns": [
+        {
+            "lambdaFunction": "ChimeBroadcastAPI"
+        }
+    ],
+    "privacy": {
+        "auth": 1,
+        "unauth": 0,
+        "authRoleName": "amplify-broadcastconsole-dev-220316-authRole",
+        "unAuthRoleName": "amplify-broadcastconsole-dev-220316-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "ChimeBroadcastAPI",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ],
+    "uuid": "798b3a34"
+}

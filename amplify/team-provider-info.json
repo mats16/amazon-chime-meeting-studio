@@ -10,6 +10,15 @@
             "StackName": "amplify-broadcastconsole-dev-220316",
             "StackId": "arn:aws:cloudformation:ap-northeast-1:983035974902:stack/amplify-broadcastconsole-dev-220316/4ff92ce0-912c-11ea-b32f-06cfba976b48",
             "AmplifyAppId": "d3j4wlsphg7wq5"
+        },
+        "categories": {
+            "auth": {
+                "broadcastconsole5b723576": {}
+            },
+            "function": {
+                "StateMachineEventHandler": {},
+                "ChimeBroadcastAPI": {}
+            }
         }
     }
 }
