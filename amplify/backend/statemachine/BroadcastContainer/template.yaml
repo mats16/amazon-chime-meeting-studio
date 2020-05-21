@@ -225,15 +225,8 @@ Resources:
       DefinitionString: !Sub |
         {
           "Comment": "A Hello World example of the Amazon States Language using Pass states",
-          "StartAt": "Update Status - start",
+          "StartAt": "Map State",
           "States": {
-            "Update Status - start": {
-              "Type": "Pass",
-              "Result": "Hello, AWS Step Functions!",
-              "ResultPath": "$.hoge.piyo",
-              "OutputPath": "$",
-              "Next": "Map State"
-            },
             "Map State": {
               "Type": "Map",
               "InputPath": "$",
@@ -307,12 +300,7 @@ Resources:
               },
               "ResultPath": "$.ecs.tasks",
               "OutputPath": "$",
-              "Next": "Update Status - finished"
-            },
-            "Update Status - finished": {
-               "Type": "Pass",
-               "Result": "Hello, AWS Step Functions!",
-               "End": true
+              "End": true
             }
           }
         }
