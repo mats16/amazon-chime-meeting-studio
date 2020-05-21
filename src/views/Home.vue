@@ -44,7 +44,7 @@
 
       <el-form-item>
         <el-button type="primary" @click="onSubmit">Broadcast</el-button>
-        <el-button @click="onClear">Clear Form</el-button>
+        <el-button @click="onClear">Clear</el-button>
       </el-form-item>
 
       <el-table
@@ -187,7 +187,6 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.validateInput()
       const myInit = {
         headers: {'Content-Type': 'application/json'},
         response: true,
