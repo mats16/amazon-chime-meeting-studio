@@ -46,61 +46,61 @@
         <el-button type="primary" @click="onSubmit">Broadcast</el-button>
         <el-button @click="onClear">Clear</el-button>
       </el-form-item>
-
-      <el-table
-        :data="tableData"
-        :default-sort = "{prop: 'startDate', order: 'descending'}"
-        stripe
-        style="width: 100%">
-        <el-table-column
-          prop="id"
-          label="ID"
-          sortable
-          width="300">
-        </el-table-column>
-        <el-table-column
-          prop="status"
-          label="Status"
-          sortable
-          width="180">
-        </el-table-column>
-        <el-table-column
-          prop="browser_url"
-          label="Browser URL"
-          sortable>
-        </el-table-column>
-        <el-table-column
-          prop="startDate"
-          label="startDate"
-          sortable>
-        </el-table-column>
-        <el-table-column
-          prop="stopDate"
-          label="stopDate"
-          sortable>
-        </el-table-column>
-        <el-table-column
-          fixed="right"
-          label="Operations"
-          width="120">
-          <template slot-scope="scope">
-            <el-button @click="stopExecution(scope.row)" type="danger" size="small">Stop</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
     </el-form>
+
+    <el-table
+      :data="tableData"
+      :default-sort = "{prop: 'startDate', order: 'descending'}"
+      stripe
+      style="width: 100%">
+      <el-table-column
+        prop="id"
+        label="ID"
+        sortable
+        width="300">
+      </el-table-column>
+      <el-table-column
+        prop="status"
+        label="Status"
+        sortable
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="browser_url"
+        label="Browser URL"
+        sortable>
+      </el-table-column>
+      <el-table-column
+        prop="startDate"
+        label="startDate"
+        sortable>
+      </el-table-column>
+      <el-table-column
+        prop="stopDate"
+        label="stopDate"
+        sortable>
+      </el-table-column>
+      <el-table-column
+        fixed="right"
+        label="Operations"
+        width="120">
+        <template slot-scope="scope">
+          <el-button @click="stopExecution(scope.row)" type="danger" size="small">Stop</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script>
 import { API, DataStore } from 'aws-amplify';
-import { Status } from "../models";
+import { Status, AccountSettings } from "../models";
 
 export default {
   name: 'Home',
   data() {
     return {
+      currentSettings: undefined,
       form: {
         src: {
           type: 'chime',
@@ -118,6 +118,11 @@ export default {
     }
   },
   created: async function () {
+    this.currentSettings = (await DataStore.query(AccountSettings))[0]
+    if (this.currentSettings) {
+     this.form.dst.twitch_stream_key = this.currentSettings.twitch_stream_key
+     this.form.dst.youtube_stream_key = this.currentSettings.youtube_stream_key
+    }
     this.updateTableData();
     this.subscription = DataStore.observe(Status).subscribe(msg => {
       console.log(msg.model, msg.opType, msg.element);

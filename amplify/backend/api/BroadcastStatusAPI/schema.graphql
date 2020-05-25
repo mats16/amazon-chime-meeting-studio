@@ -1,7 +1,7 @@
 type Status
   @model
   @auth(rules: [
-    { allow: owner, ownerField:"owner", provider: userPools, operations:[read] }
+    { allow: owner, ownerField: "owner", provider: userPools, operations: [read] }
     { allow: private, provider: iam }
   ])
 {
@@ -12,4 +12,16 @@ type Status
   rtmp_url: [String]
   startDate: AWSTimestamp
   stopDate: AWSTimestamp
+}
+
+type AccountSettings
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "owner", provider: userPools, operations: [create, read, update, delete] }
+  ])
+{
+  id: ID!
+  owner: String
+  twitch_stream_key: String
+  youtube_stream_key: String
 }
