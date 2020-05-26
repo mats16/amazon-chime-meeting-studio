@@ -233,9 +233,6 @@ export default {
       if (this.dstCustom) {
         input.dst_url.push(this.form.dst.url1);
       }
-      //if (this.form.recordingEnabled) {
-      //  input.dst_url.push(`s3://${Storage._config.AWSS3.bucket}/${this.username}/`);
-      //}
       return input
     }
   },
