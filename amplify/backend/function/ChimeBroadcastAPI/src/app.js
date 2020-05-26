@@ -9,15 +9,19 @@ See the License for the specific language governing permissions and limitations 
 
 /* Amplify Params - DO NOT EDIT
 	ENV
-	REGION
+  REGION
+  STORAGE_RECORDINGSTORE_BUCKETNAME
+  STATEMACHINE_BROADCASTCONTAINER_ARN
 Amplify Params - DO NOT EDIT */
 
 var express = require('express')
 var bodyParser = require('body-parser')
 var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 const AWS = require('aws-sdk');
+const uuid4 = require('uuid4');
 
 const stepfunctions = new AWS.StepFunctions({apiVersion: '2016-11-23'});
+const bucket_name = process.env['STORAGE_RECORDINGSTORE_BUCKETNAME'];
 const statemachine_arn = process.env['STATEMACHINE_BROADCASTCONTAINER_ARN'];
 const aws_partitionname = statemachine_arn.split(':')[1]
 const region = statemachine_arn.split(':')[3]
@@ -38,14 +42,23 @@ app.use(function(req, res, next) {
 
 
 app.post('/executions/new', function(req, res) {
+  const execution_name = uuid4();
+  // check auth identity
+  const user_identity_id = req.apiGateway.event.requestContext.identity.cognitoIdentityId
   const user_name = req.apiGateway.event.requestContext.identity.cognitoAuthenticationProvider.split(':')[2]
+  const input = {
+    owner: user_name,
+    src_url: req.body.src_url,
+    dst_url: req.body.dst_url,
+    recordingEnabled: req.body.recordingEnabled,
+  }
+  if (input.recordingEnabled) {
+    input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/`)
+  }
   const params = {
+    input: JSON.stringify(input),
+    name: execution_name,
     stateMachineArn: statemachine_arn,
-    input: JSON.stringify({
-      owner: user_name,
-      browser_url: req.body.browser_url,
-      rtmp_url: req.body.rtmp_url,
-    }),
   };
   stepfunctions.startExecution(params, function(err, data) {
     if (err) {

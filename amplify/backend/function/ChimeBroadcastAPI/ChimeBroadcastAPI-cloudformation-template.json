@@ -17,6 +17,10 @@
 		"statemachineBroadcastContainerName": {
 			"Type": "String",
 			"Default": "statemachineBroadcastContainerName"
+		},
+		"storageRecordingStoreBucketName": {
+			"Type": "String",
+			"Default": "storageRecordingStoreBucketName"
 		}
 	},
 	"Conditions": {
@@ -66,6 +70,9 @@
 						},
 						"STATEMACHINE_BROADCASTCONTAINER_ARN": {
 							"Ref": "statemachineBroadcastContainerArn"
+						},
+						"STORAGE_RECORDINGSTORE_BUCKETNAME": {
+							"Ref": "storageRecordingStoreBucketName"
 						}
 					}
 				},
@@ -79,7 +86,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-broadcastconsole-dev-220316-deployment",
-					"S3Key": "amplify-builds/ChimeBroadcastAPI-7967544d496b4e6b6b6f-build.zip"
+					"S3Key": "amplify-builds/ChimeBroadcastAPI-4237644231466572364c-build.zip"
 				}
 			}
 		},
@@ -193,6 +200,46 @@
 							"Resource": {
 								"Fn::Sub": "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${statemachineBroadcastContainerName}:*"
 							}
+						}
+					]
+				}
+			}
+		},
+		"AmplifyResourcesPolicy": {
+			"DependsOn": [
+				"LambdaExecutionRole"
+			],
+			"Type": "AWS::IAM::Policy",
+			"Properties": {
+				"PolicyName": "amplify-lambda-execution-policy",
+				"Roles": [
+					{
+						"Ref": "LambdaExecutionRole"
+					}
+				],
+				"PolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Action": [
+								"s3:GetObject",
+								"s3:ListBucket"
+							],
+							"Resource": [
+								{
+									"Fn::Join": [
+										"",
+										[
+											"arn:aws:s3:::",
+											{
+												"Ref": "storageRecordingStoreBucketName"
+											},
+											"/*"
+										]
+									]
+								}
+							]
 						}
 					]
 				}

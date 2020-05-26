@@ -8,8 +8,9 @@ type Status
   id: ID!
   status: String!
   owner: String
-  browser_url: String
-  rtmp_url: [String]
+  src_url: String
+  dst_url: [String]
+  recordingEnabled: Boolean!
   startDate: AWSTimestamp
   stopDate: AWSTimestamp
 }

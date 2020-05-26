@@ -8,8 +8,9 @@ export declare class Status {
   readonly id: string;
   readonly status: string;
   readonly owner?: string;
-  readonly browser_url?: string;
-  readonly rtmp_url?: string[];
+  readonly src_url?: string;
+  readonly dst_url?: string[];
+  readonly recordingEnabled: boolean;
   readonly startDate?: number;
   readonly stopDate?: number;
   constructor(init: ModelInit<Status>);

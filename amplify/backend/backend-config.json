@@ -69,6 +69,13 @@
                         "Arn",
                         "Name"
                     ]
+                },
+                {
+                    "category": "storage",
+                    "resourceName": "RecordingStore",
+                    "attributes": [
+                        "BucketName"
+                    ]
                 }
             ]
         }
@@ -85,7 +92,21 @@
         "BroadcastContainer": {
             "service": "Step Functions",
             "providerPlugin": "awscloudformation",
-            "dependsOn": []
+            "dependsOn": [
+                {
+                    "category": "storage",
+                    "resourceName": "RecordingStore",
+                    "attributes": [
+                        "BucketName"
+                    ]
+                }
+            ]
+        }
+    },
+    "storage": {
+        "RecordingStore": {
+            "service": "S3",
+            "providerPlugin": "awscloudformation"
         }
     }
 }

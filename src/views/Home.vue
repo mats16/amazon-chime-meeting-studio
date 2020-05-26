@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <el-form ref="form" :model="form" label-width="150px">
+    <el-form ref="form" :model="form" label-width="180px">
       <!--<el-alert title="error alert" type="error" show-icon v-if="this.invalid.src"></el-alert>-->
 
       <el-form-item label="Source Type">
@@ -36,14 +36,21 @@
         <el-input v-model="form.dst.youtube_stream_key" placeholder="1a1a-2b2b-3c3c-4d4d"></el-input>
       </el-form-item>
 
-      <el-form-item label="Custome RTMP URL" v-if="dstCustom">
-        <el-input v-model="form.dst.url" placeholder="a.rtmp.youtube.com/live2/stream-key">
-          <template slot="prepend">rtmp://</template>
+      <el-form-item label="Custome URL" v-if="dstCustom">
+        <el-input v-model="form.dst.url1" placeholder="rtmp://a.rtmp.youtube.com/live2/stream-key">
         </el-input>
       </el-form-item>
 
+      <el-form-item label="Recording with Transcribe">
+      <el-switch
+        v-model="form.recordingEnabled"
+        active-text="Enabled"
+        inactive-text="Disabled">
+      </el-switch>
+      </el-form-item>
+
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">Broadcast</el-button>
+        <el-button type="primary" @click="onSubmit">Submit</el-button>
         <el-button @click="onClear">Clear</el-button>
       </el-form-item>
     </el-form>
@@ -64,10 +71,18 @@
         label="Status"
         sortable
         width="180">
+        <template slot-scope="scope">
+          <el-tag
+            size="medium"
+            :type="scope.row.status === 'RUNNING' ? 'primary' : scope.row.status === 'SUCCEEDED' ? 'success' : scope.row.status === 'FAILED' ? 'danger' : scope.row.status === 'ABORTED' ? 'warning' : 'info'"
+            disable-transitions>
+            {{ scope.row.status }}
+          </el-tag>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="browser_url"
-        label="Browser URL"
+        prop="src_url"
+        label="Source URL"
         sortable>
       </el-table-column>
       <el-table-column
@@ -81,11 +96,19 @@
         sortable>
       </el-table-column>
       <el-table-column
+        prop="recordingEnabled"
+        label="Recording"
+        sortable>
+        <template slot-scope="scope">
+          <el-button v-if="scope.row.recordingEnabled" @click="onDownload(scope.row.id)">Download</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column
         fixed="right"
         label="Operations"
         width="120">
         <template slot-scope="scope">
-          <el-button @click="stopExecution(scope.row)" type="danger" size="small">Stop</el-button>
+          <el-button @click="stopExecution(scope.row)" type="danger">Stop</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -93,13 +116,16 @@
 </template>
 
 <script>
-import { API, DataStore } from 'aws-amplify';
+import { Auth, API, DataStore, Storage } from 'aws-amplify';
+import { Predicates } from 'aws-amplify'; // test
 import { Status, AccountSettings } from "../models";
 
 export default {
   name: 'Home',
   data() {
     return {
+      signedIn: false,
+      username: '',
       currentSettings: undefined,
       form: {
         src: {
@@ -111,10 +137,23 @@ export default {
           type: [],
           twitch_stream_key: '',
           youtube_stream_key: '',
-          url: ''
-        }
+          url1: '',
+          url2: ''
+        },
+        recordingEnabled: true
       },
       tableData: []
+    }
+  },
+  async beforeCreate() {
+    // Auth.currentAuthenticatedUser()でユーザ情報を取得する。
+    // 取得できなければ認証ステータスをfalseに設定する
+    try {
+      let cognitoUser = await Auth.currentAuthenticatedUser()
+      this.signedIn = true
+      this.username = cognitoUser.username
+    } catch (err) {
+      this.signedIn = false
     }
   },
   created: async function () {
@@ -168,29 +207,50 @@ export default {
         return false
       }
     },
+    dstRecording: function () {
+      if (this.form.dst.type.includes('recording')) {
+        return true
+      } else {
+        return false
+      }
+    },
     input: function () {
-      const input = {rtmp_url: []}
+      const input = {recordingEnabled: this.form.recordingEnabled}
       if (this.srcChime) {
         const meeting_pin = this.form.src.meeting_pin.replace(/\s+/g, "")
-        input.browser_url = `https://app.chime.aws/portal/${meeting_pin}`
+        input.src_url = `https://app.chime.aws/portal/${meeting_pin}`;
       } else if (this.srcCustom) {
-        input.browser_url = `https://${this.form.src.url}`
+        input.src_url = `https://${this.form.src.url}`;
       }
-
+      input.dst_url = []
       if (this.dstTwitch) {
-        input.rtmp_url.push('rtmp://live.twitch.tv/app/' + this.form.dst.twitch_stream_key)
+        input.dst_url.push('rtmp://live.twitch.tv/app/' + this.form.dst.twitch_stream_key);
       }
       if (this.dstYoutube) {
-        input.rtmp_url.push(`rtmp://a.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}`)
-        input.rtmp_url.push(`rtmp://b.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}?backup=1`)
+        input.dst_url.push(`rtmp://a.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}`);
+        input.dst_url.push(`rtmp://b.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}?backup=1`);
       }
       if (this.dstCustom) {
-        input.rtmp_url.push(`rtmp://${this.form.dst.url}`)
+        input.dst_url.push(this.form.dst.url1);
       }
+      //if (this.form.recordingEnabled) {
+      //  input.dst_url.push(`s3://${Storage._config.AWSS3.bucket}/${this.username}/`);
+      //}
       return input
     }
   },
   methods: {
+    onDownload(id) {
+      Storage.get(`${id}/${id}.mp4`, { level: 'private', expires: 10 })
+        .then(result => {
+          //const url = URL.createObjectURL(new Blob([result]));
+          const link = document.createElement('a')
+          link.href = result
+          link.download = `${id}.mp4`
+          link.click()
+        })
+        .catch(err => console.log(err));
+    },
     onSubmit() {
       const myInit = {
         headers: {'Content-Type': 'application/json'},
@@ -206,6 +266,7 @@ export default {
       });
     },
     onClear() {
+      DataStore.delete(Status, Predicates.ALL); // test
       this.form = {
         src: {
           type: 'chime',
@@ -216,7 +277,8 @@ export default {
           type: [],
           twitch_stream_key: '',
           youtube_stream_key: '',
-          url: ''
+          url1: '',
+          url2: ''
         }
       }
     },

@@ -1,10 +1,13 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: StateMaschine for ECS RunTask
+Description: StateMaschine for Amazon ECS RunTask
 
 Parameters:
   env:
     Type: String
+  storageRecordingStoreBucketName:
+    Type: String
+    Default: storageRecordingStoreBucketName
   vpcCidrBlock:
     Type: String
     Description: The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range.
@@ -184,6 +187,16 @@ Resources:
             Principal:
               Service: ecs-tasks.amazonaws.com
             Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3-PutObject-Policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::${storageRecordingStoreBucketName}/*'
 
   EcsTaskDef: 
     Type: AWS::ECS::TaskDefinition
@@ -230,11 +243,11 @@ Resources:
             "Map State": {
               "Type": "Map",
               "InputPath": "$",
-              "ItemsPath": "$.rtmp_url",
+              "ItemsPath": "$.dst_url",
               "MaxConcurrency": 10,
               "Parameters": {
-                "browser_url.$": "$.browser_url",
-                "rtmp_url.$": "$$.Map.Item.Value"
+                "src_url.$": "$.src_url",
+                "dst_url.$": "$$.Map.Item.Value"
               },
               "Iterator": {
                 "StartAt": "ECS RunTask",
@@ -266,14 +279,18 @@ Resources:
                         "ContainerOverrides": [
                           {
                             "Name": "broadcast",
-                            "Environment":[  
+                            "Environment":[
                               {  
-                                 "Name": "BROWSER_URL",
-                                 "Value.$": "$.browser_url"
+                                 "Name": "JOB_NAME",
+                                 "Value.$": "$$.Execution.Name"
                               },
                               {  
-                                 "Name": "RTMP_URL",
-                                 "Value.$": "$.rtmp_url"
+                                 "Name": "SRC_URL",
+                                 "Value.$": "$.src_url"
+                              },
+                              {  
+                                 "Name": "DST_URL",
+                                 "Value.$": "$.dst_url"
                               }
                            ]
                           }

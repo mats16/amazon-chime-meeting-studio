@@ -16,21 +16,23 @@ const authType = 'AWS_IAM';
 
 // クエリ
 const createStatus = gql(`
-    mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $browser_url: String!, $rtmp_url: [String!], $startDate: AWSTimestamp!) {
+    mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $src_url: String!, $dst_url: [String!], $recordingEnabled: Boolean!, $startDate: AWSTimestamp!) {
         createStatus(input: {
             id: $id
             status: $status
             owner: $owner
-            browser_url: $browser_url
-            rtmp_url: $rtmp_url
+            src_url: $src_url
+            dst_url: $dst_url
+            recordingEnabled: $recordingEnabled
             startDate: $startDate
         }) {
             __typename
             id
             status
             owner
-            browser_url
-            rtmp_url
+            src_url
+            dst_url
+            recordingEnabled
             startDate
             _version
             _deleted
@@ -39,13 +41,14 @@ const createStatus = gql(`
     }
 `);
 const updateStatus = gql(`
-    mutation UpdateStatus($id: ID!, $status: String!, $owner: String, $browser_url: String, $rtmp_url: [String], $startDate: AWSTimestamp, $stopDate: AWSTimestamp, $_version: Int!) {
+    mutation UpdateStatus($id: ID!, $status: String!, $owner: String, $src_url: String, $dst_url: [String], $recordingEnabled: Boolean, $startDate: AWSTimestamp, $stopDate: AWSTimestamp, $_version: Int!) {
         updateStatus(input: {
             id: $id
             status: $status
             owner: $owner
-            browser_url: $browser_url
-            rtmp_url: $rtmp_url
+            src_url: $src_url
+            dst_url: $dst_url
+            recordingEnabled: $recordingEnabled
             startDate: $startDate
             stopDate: $stopDate
             _version: $_version
@@ -54,8 +57,9 @@ const updateStatus = gql(`
             id
             status
             owner
-            browser_url
-            rtmp_url
+            src_url
+            dst_url
+            recordingEnabled
             startDate
             stopDate
             _version
@@ -68,8 +72,9 @@ const getStatus = gql(`
     query GetStatus($id: ID!) {
         getStatus(id: $id) {
             owner
-            browser_url
-            rtmp_url
+            src_url
+            dst_url
+            recordingEnabled
             startDate
             _version
         }
@@ -99,8 +104,9 @@ exports.handler = async (event) => {
         variables = {
             ...variables,
             owner: input.owner,
-            browser_url: input.browser_url,
-            rtmp_url: input.rtmp_url,
+            recordingEnabled: input.recordingEnabled,
+            src_url: input.src_url,
+            dst_url: input.dst_url,
             startDate: startDate
         }
     } else {

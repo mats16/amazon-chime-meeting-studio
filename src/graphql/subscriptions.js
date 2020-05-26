@@ -52,8 +52,9 @@ export const onCreateStatus = /* GraphQL */ `
       id
       status
       owner
-      browser_url
-      rtmp_url
+      src_url
+      dst_url
+      recordingEnabled
       startDate
       stopDate
       _version
@@ -70,8 +71,9 @@ export const onUpdateStatus = /* GraphQL */ `
       id
       status
       owner
-      browser_url
-      rtmp_url
+      src_url
+      dst_url
+      recordingEnabled
       startDate
       stopDate
       _version
@@ -88,8 +90,9 @@ export const onDeleteStatus = /* GraphQL */ `
       id
       status
       owner
-      browser_url
-      rtmp_url
+      src_url
+      dst_url
+      recordingEnabled
       startDate
       stopDate
       _version

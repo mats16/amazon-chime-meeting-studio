@@ -24,18 +24,25 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "browser_url": {
-                    "name": "browser_url",
+                "src_url": {
+                    "name": "src_url",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
-                "rtmp_url": {
-                    "name": "rtmp_url",
+                "dst_url": {
+                    "name": "dst_url",
                     "isArray": true,
                     "type": "String",
                     "isRequired": false,
+                    "attributes": []
+                },
+                "recordingEnabled": {
+                    "name": "recordingEnabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": true,
                     "attributes": []
                 },
                 "startDate": {
@@ -145,5 +152,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "72bf1749c87e632be262062bce9de113"
+    "version": "6813a9573891d1f95d08dccd79d48d7c"
 };

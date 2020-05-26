@@ -1,3 +1,9 @@
 {
-    "permissions": {}
+    "permissions": {
+        "storage": {
+            "RecordingStore": [
+                "read"
+            ]
+        }
+    }
 }
