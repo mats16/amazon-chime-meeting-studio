@@ -67,6 +67,11 @@ export const createStatus = /* GraphQL */ `
       src_url
       dst_url
       recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionStatus
+      transcriptFileUri
+      broadcastEnabled
       startDate
       stopDate
       _version
@@ -89,6 +94,11 @@ export const updateStatus = /* GraphQL */ `
       src_url
       dst_url
       recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionStatus
+      transcriptFileUri
+      broadcastEnabled
       startDate
       stopDate
       _version
@@ -111,6 +121,11 @@ export const deleteStatus = /* GraphQL */ `
       src_url
       dst_url
       recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionStatus
+      transcriptFileUri
+      broadcastEnabled
       startDate
       stopDate
       _version

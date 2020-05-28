@@ -49,11 +49,17 @@ app.post('/executions/new', function(req, res) {
   const input = {
     owner: user_name,
     src_url: req.body.src_url,
-    dst_url: req.body.dst_url,
+    dst_url: [],
     recordingEnabled: req.body.recordingEnabled,
+    transcriptionEnabled: req.body.transcriptionEnabled,
+    broadcastEnabled: req.body.broadcastEnabled,
   }
   if (input.recordingEnabled) {
-    input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/`)
+    input.recordingFileUri = `s3://${bucket_name}/private/${user_identity_id}/${execution_name}.mp4`
+    input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}.mp4`)
+  }
+  if (input.broadcastEnabled) {
+    input.dst_url.push(...req.body.dst_url)
   }
   const params = {
     input: JSON.stringify(input),

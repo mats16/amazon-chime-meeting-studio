@@ -10,17 +10,42 @@
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item label="Meeting PIN" v-if="srcChime">
+      <el-form-item label="Meeting PIN" v-if="form.src.type === 'chime'">
         <el-input v-model="form.src.meeting_pin" minlength=10 maxlength=10 placeholder="1234567890"></el-input>
       </el-form-item>
 
-      <el-form-item label="Custome URL" v-if="srcCustom">
+      <el-form-item label="Custome URL" v-if="form.src.type === 'custom'">
         <el-input v-model="form.src.url" placeholder="www.example.com">
           <template slot="prepend">https://</template>
         </el-input>
       </el-form-item>
 
-      <el-form-item label="Destination Type">
+      <el-form-item label="Recording">
+      <el-switch
+        v-model="form.recordingEnabled"
+        active-text="Enabled"
+        inactive-text="Disabled">
+      </el-switch>
+      </el-form-item>
+
+      <el-form-item label="Transcription">
+      <el-switch
+        v-model="form.transcriptionEnabled"
+        :disabled="!(form.recordingEnabled)"
+        active-text="Enabled"
+        inactive-text="Disabled">
+      </el-switch>
+      </el-form-item>
+
+      <el-form-item label="Broadcast">
+      <el-switch
+        v-model="form.broadcastEnabled"
+        active-text="Enabled"
+        inactive-text="Disabled">
+      </el-switch>
+      </el-form-item>
+
+      <el-form-item label="Destination Type" v-if="form.broadcastEnabled">
         <el-checkbox-group v-model="form.dst.type">
           <el-checkbox label="twitch">Twitch</el-checkbox>
           <el-checkbox label="youtube">YouTube</el-checkbox>
@@ -28,25 +53,17 @@
         </el-checkbox-group>
       </el-form-item>
 
-      <el-form-item label="Twitch Stream Key" v-if="dstTwitch">
+      <el-form-item label="Twitch Stream Key" v-if="form.broadcastEnabled && form.dst.type.includes('twitch')">
         <el-input v-model="form.dst.twitch_stream_key" placeholder="live_123456789_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"></el-input>
       </el-form-item>
 
-      <el-form-item label="YouTube Stream Key" v-if="dstYoutube">
+      <el-form-item label="YouTube Stream Key" v-if="form.broadcastEnabled && form.dst.type.includes('youtube')">
         <el-input v-model="form.dst.youtube_stream_key" placeholder="1a1a-2b2b-3c3c-4d4d"></el-input>
       </el-form-item>
 
-      <el-form-item label="Custome URL" v-if="dstCustom">
+      <el-form-item label="Custome URL" v-if="form.broadcastEnabled && form.dst.type.includes('custom')">
         <el-input v-model="form.dst.url1" placeholder="rtmp://a.rtmp.youtube.com/live2/stream-key">
         </el-input>
-      </el-form-item>
-
-      <el-form-item label="Recording with Transcribe">
-      <el-switch
-        v-model="form.recordingEnabled"
-        active-text="Enabled"
-        inactive-text="Disabled">
-      </el-switch>
       </el-form-item>
 
       <el-form-item>
@@ -57,7 +74,7 @@
 
     <el-table
       :data="tableData"
-      :default-sort = "{prop: 'startDate', order: 'descending'}"
+      :default-sort = "{prop: '_lastChangedAt', order: 'descending'}"
       stripe
       style="width: 100%">
       <el-table-column
@@ -66,51 +83,87 @@
         sortable
         width="300">
       </el-table-column>
+
+      <el-table-column
+        prop="src_url"
+        label="Source"
+        sortable>
+        <template slot-scope="scope">
+          {{ scope.row.src_url.replace('https://app.chime.aws/portal/', 'Chime: ') }}
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        prop="_lastChangedAt"
+        label="lastChangedAt"
+        sortable>
+      </el-table-column>
+
       <el-table-column
         prop="status"
         label="Status"
-        sortable
-        width="180">
+        sortable>
         <template slot-scope="scope">
           <el-tag
-            size="medium"
             :type="scope.row.status === 'RUNNING' ? 'primary' : scope.row.status === 'SUCCEEDED' ? 'success' : scope.row.status === 'FAILED' ? 'danger' : scope.row.status === 'ABORTED' ? 'warning' : 'info'"
             disable-transitions>
             {{ scope.row.status }}
           </el-tag>
+          <el-tooltip class="item" effect="dark" content="Stop execution" placement="top" v-if="scope.row.status === 'RUNNING'">
+            <el-button
+              :disabled="!(scope.row.status === 'RUNNING')"
+              type="danger" size="small" plain
+              @click="stopExecution(scope.row)">
+              Stop
+            </el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="src_url"
-        label="Source URL"
-        sortable>
-      </el-table-column>
-      <el-table-column
-        prop="startDate"
-        label="startDate"
-        sortable>
-      </el-table-column>
-      <el-table-column
-        prop="stopDate"
-        label="stopDate"
-        sortable>
-      </el-table-column>
+
       <el-table-column
         prop="recordingEnabled"
         label="Recording"
         sortable>
         <template slot-scope="scope">
-          <el-button v-if="scope.row.recordingEnabled" @click="onDownload(scope.row.id)">Download</el-button>
+          <el-button
+            v-if="(scope.row.recordingEnabled)"
+            :type="!(scope.row.recordingEnabled) ? 'info' :  scope.row.status === 'RUNNING' ? 'primary' : scope.row.status === 'SUCCEEDED' ? 'success' : scope.row.status === 'FAILED' ? 'danger' : scope.row.status === 'ABORTED' ? 'warning' : 'info'"
+            :disabled="(scope.row.status === 'FAILED') || (scope.row.status === 'ABORTED')"
+            :loading="(scope.row.status === 'RUNNING')"
+            size="small" plain
+            @click="onOpenStorageFile(`${scope.row.id}.mp4`)">
+            {{ (scope.row.status === 'SUCCEEDED') ? 'Open File' : scope.row.status }}
+          </el-button>
         </template>
       </el-table-column>
+
+      <el-table-column
+        prop="transcriptionStatus"
+        label="Transcription"
+        sortable
+        width="180">
+        <template slot-scope="scope">
+          <el-button
+            v-if="scope.row.transcriptionEnabled && (scope.row.status !== 'FAILED') && (scope.row.status !== 'ABORTED')"
+            :type="!(scope.row.transcriptionEnabled) ? 'info' : scope.row.transcriptionStatus === 'IN_PROGRESS' ? 'primary' : scope.row.transcriptionStatus === 'COMPLETED' ? 'success' : scope.row.transcriptionStatus === 'FAILED' ? 'danger' : 'info'"
+            :disabled="!(scope.row.transcriptionEnabled) || (scope.row.transcriptionStatus === 'FAILED')"
+            :loading="(scope.row.transcriptionStatus === 'IN_PROGRESS') || (scope.row.transcriptionStatus === null)"
+            size="small" plain
+            @click="onOpenUri(`${scope.row.transcriptFileUri}`)">
+            {{ (scope.row.transcriptionStatus === 'COMPLETED') ? 'Open File' : (scope.row.transcriptionStatus === null) ? 'WAITING' : scope.row.transcriptionStatus }}
+          </el-button>
+        </template>
+      </el-table-column>
+      <!--
       <el-table-column
         fixed="right"
         label="Operations"
         width="120">
         <template slot-scope="scope">
-          <el-button @click="stopExecution(scope.row)" type="danger">Stop</el-button>
+          <el-button @click="stopExecution(scope.row)" type="danger" plain :disabled="scope.row.status === 'RUNNING' ? false : true">Stop</el-button>
         </template>
       </el-table-column>
+      -->
     </el-table>
   </div>
 </template>
@@ -140,7 +193,9 @@ export default {
           url1: '',
           url2: ''
         },
-        recordingEnabled: true
+        recordingEnabled: true,
+        transcriptionEnabled: true,
+        broadcastEnabled: false
       },
       tableData: []
     }
@@ -169,84 +224,52 @@ export default {
     });
   },
   computed: {
-    status: function () {
-      return DataStore.query(Status)
-    },
-    srcChime: function () {
-      if (this.form.src.type === 'chime') {
-        return true
-      } else {
-        return false
-      }
-    },
-    srcCustom: function () {
-      if (this.form.src.type === 'custom') {
-        return true
-      } else {
-        return false
-      }
-    },
-    dstTwitch: function () {
-      if (this.form.dst.type.includes('twitch')) {
-        return true
-      } else {
-        return false
-      }
-    },
-    dstYoutube: function () {
-      if (this.form.dst.type.includes('youtube')) {
-        return true
-      } else {
-        return false
-      }
-    },
-    dstCustom: function () {
-      if (this.form.dst.type.includes('custom')) {
-        return true
-      } else {
-        return false
-      }
-    },
-    dstRecording: function () {
-      if (this.form.dst.type.includes('recording')) {
-        return true
-      } else {
-        return false
-      }
-    },
     input: function () {
-      const input = {recordingEnabled: this.form.recordingEnabled}
-      if (this.srcChime) {
+      const input = {
+        recordingEnabled: this.form.recordingEnabled,
+        transcriptionEnabled: this.form.transcriptionEnabled,
+        broadcastEnabled: this.form.broadcastEnabled
+      }
+      if (!input.recordingEnabled) {
+        input.transcriptionEnabled = false
+      }
+      if (this.form.src.type === 'chime') {
         const meeting_pin = this.form.src.meeting_pin.replace(/\s+/g, "")
         input.src_url = `https://app.chime.aws/portal/${meeting_pin}`;
-      } else if (this.srcCustom) {
+      } else if (this.form.src.type === 'custom') {
         input.src_url = `https://${this.form.src.url}`;
       }
       input.dst_url = []
-      if (this.dstTwitch) {
+      if (this.form.dst.type.includes('twitch')) {
         input.dst_url.push('rtmp://live.twitch.tv/app/' + this.form.dst.twitch_stream_key);
       }
-      if (this.dstYoutube) {
+      if (this.form.dst.type.includes('youtube')) {
         input.dst_url.push(`rtmp://a.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}`);
         input.dst_url.push(`rtmp://b.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}?backup=1`);
       }
-      if (this.dstCustom) {
+      if (this.form.dst.type.includes('custom')) {
         input.dst_url.push(this.form.dst.url1);
       }
       return input
     }
   },
   methods: {
-    onDownload(id) {
-      Storage.get(`${id}/${id}.mp4`, { level: 'private', expires: 10 })
+    onOpenStorageFile(fileName) {
+      Storage.get(fileName, { level: 'private', expires: 60 * 5 })
         .then(result => {
-          //const url = URL.createObjectURL(new Blob([result]));
+          console.log(result)
           const link = document.createElement('a')
           link.href = result
-          link.download = `${id}.mp4`
+          link.target = '_blank'
           link.click()
         })
         .catch(err => console.log(err));
+    },
+    onOpenUri(uri) {
+      const link = document.createElement('a')
+      link.href = uri
+      link.target = '_blank'
+      link.click()
     },
     onSubmit() {
       const myInit = {

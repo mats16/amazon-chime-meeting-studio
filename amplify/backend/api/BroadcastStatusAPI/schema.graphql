@@ -6,11 +6,16 @@ type Status
   ])
 {
   id: ID!
-  status: String!
+  status: String
   owner: String
   src_url: String
-  dst_url: [String]
-  recordingEnabled: Boolean!
+  dst_url: [AWSURL]
+  recordingEnabled: Boolean
+  recordingFileUri: AWSURL
+  transcriptionEnabled: Boolean
+  transcriptionStatus: String
+  transcriptFileUri: AWSURL
+  broadcastEnabled: Boolean
   startDate: AWSTimestamp
   stopDate: AWSTimestamp
 }

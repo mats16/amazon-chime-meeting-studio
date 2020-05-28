@@ -217,7 +217,7 @@ Resources:
           Essential: "true"
           Environment:
             - Name: AUDIO_DELAYS
-              Value: 1800
+              Value: 1850
             - Name: THREAD_NUM
               Value: 4
           LogConfiguration:

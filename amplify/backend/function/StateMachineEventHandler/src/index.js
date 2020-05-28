@@ -14,9 +14,19 @@ const url = process.env['API_BROADCASTSTATUSAPI_GRAPHQLAPIENDPOINTOUTPUT'];
 const region = process.env['REGION'];
 const authType = 'AWS_IAM';
 
+const client = new AWSAppSyncClient({
+    url: url,
+    region: region,
+    auth: {
+      type: authType,
+      credentials: aws.config.credentials
+    },
+    disableOffline: true,
+});
+
 // クエリ
 const createStatus = gql(`
-    mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $src_url: String!, $dst_url: [String!], $recordingEnabled: Boolean!, $startDate: AWSTimestamp!) {
+    mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $src_url: String, $dst_url: [AWSURL], $recordingEnabled: Boolean, $transcriptionEnabled: Boolean, $broadcastEnabled: Boolean, $startDate: AWSTimestamp) {
         createStatus(input: {
             id: $id
             status: $status
@@ -24,6 +34,8 @@ const createStatus = gql(`
             src_url: $src_url
             dst_url: $dst_url
             recordingEnabled: $recordingEnabled
+            transcriptionEnabled: $transcriptionEnabled
+            broadcastEnabled: $broadcastEnabled
             startDate: $startDate
         }) {
             __typename
@@ -33,6 +45,8 @@ const createStatus = gql(`
             src_url
             dst_url
             recordingEnabled
+            transcriptionEnabled
+            broadcastEnabled
             startDate
             _version
             _deleted
@@ -41,15 +55,10 @@ const createStatus = gql(`
     }
 `);
 const updateStatus = gql(`
-    mutation UpdateStatus($id: ID!, $status: String!, $owner: String, $src_url: String, $dst_url: [String], $recordingEnabled: Boolean, $startDate: AWSTimestamp, $stopDate: AWSTimestamp, $_version: Int!) {
+    mutation UpdateStatus($id: ID!, $status: String!, $stopDate: AWSTimestamp, $_version: Int!) {
         updateStatus(input: {
             id: $id
             status: $status
-            owner: $owner
-            src_url: $src_url
-            dst_url: $dst_url
-            recordingEnabled: $recordingEnabled
-            startDate: $startDate
             stopDate: $stopDate
             _version: $_version
         }) {
@@ -60,6 +69,8 @@ const updateStatus = gql(`
             src_url
             dst_url
             recordingEnabled
+            transcriptionEnabled
+            broadcastEnabled
             startDate
             stopDate
             _version
@@ -71,11 +82,6 @@ const updateStatus = gql(`
 const getStatus = gql(`
     query GetStatus($id: ID!) {
         getStatus(id: $id) {
-            owner
-            src_url
-            dst_url
-            recordingEnabled
-            startDate
             _version
         }
     }
@@ -84,15 +90,6 @@ const getStatus = gql(`
 exports.handler = async (event) => {
     const {name: execution_id, status, startDate, stopDate} = event.detail
     const input = JSON.parse(event.detail.input);
-    const client = new AWSAppSyncClient({
-        url: url,
-        region: region,
-        auth: {
-          type: authType,
-          credentials: aws.config.credentials
-        },
-        disableOffline: true,
-    });
 
     let mutation = ''
     let variables = {
@@ -104,9 +101,11 @@ exports.handler = async (event) => {
         variables = {
             ...variables,
             owner: input.owner,
-            recordingEnabled: input.recordingEnabled,
             src_url: input.src_url,
             dst_url: input.dst_url,
+            recordingEnabled: input.recordingEnabled,
+            transcriptionEnabled: input.transcriptionEnabled,
+            broadcastEnabled: input.broadcastEnabled,
             startDate: startDate
         }
     } else {

@@ -14,7 +14,7 @@ export const schema = {
                     "name": "status",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
+                    "isRequired": false,
                     "attributes": []
                 },
                 "owner": {
@@ -34,7 +34,7 @@ export const schema = {
                 "dst_url": {
                     "name": "dst_url",
                     "isArray": true,
-                    "type": "String",
+                    "type": "AWSURL",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -42,7 +42,42 @@ export const schema = {
                     "name": "recordingEnabled",
                     "isArray": false,
                     "type": "Boolean",
-                    "isRequired": true,
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "recordingFileUri": {
+                    "name": "recordingFileUri",
+                    "isArray": false,
+                    "type": "AWSURL",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "transcriptionEnabled": {
+                    "name": "transcriptionEnabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "transcriptionStatus": {
+                    "name": "transcriptionStatus",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "transcriptFileUri": {
+                    "name": "transcriptFileUri",
+                    "isArray": false,
+                    "type": "AWSURL",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "broadcastEnabled": {
+                    "name": "broadcastEnabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
                     "attributes": []
                 },
                 "startDate": {
@@ -152,5 +187,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "6813a9573891d1f95d08dccd79d48d7c"
+    "version": "547db3f60e56d457bdabdff1f60f5baa"
 };

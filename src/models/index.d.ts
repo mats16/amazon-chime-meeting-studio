@@ -6,11 +6,16 @@ import { ModelInit, MutableModel, PersistentModelConstructor } from "@aws-amplif
 
 export declare class Status {
   readonly id: string;
-  readonly status: string;
+  readonly status?: string;
   readonly owner?: string;
   readonly src_url?: string;
   readonly dst_url?: string[];
-  readonly recordingEnabled: boolean;
+  readonly recordingEnabled?: boolean;
+  readonly recordingFileUri?: string;
+  readonly transcriptionEnabled?: boolean;
+  readonly transcriptionStatus?: string;
+  readonly transcriptFileUri?: string;
+  readonly broadcastEnabled?: boolean;
   readonly startDate?: number;
   readonly stopDate?: number;
   constructor(init: ModelInit<Status>);
