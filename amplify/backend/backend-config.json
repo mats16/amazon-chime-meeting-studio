@@ -106,6 +106,13 @@
                         "GraphQLAPIIdOutput",
                         "GraphQLAPIEndpointOutput"
                     ]
+                },
+                {
+                    "category": "storage",
+                    "resourceName": "RecordingStore",
+                    "attributes": [
+                        "BucketName"
+                    ]
                 }
             ]
         }

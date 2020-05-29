@@ -7,7 +7,7 @@ Amplify Params - DO NOT EDIT */
 
 require('isomorphic-fetch')
 const gql = require('graphql-tag');
-const path = require('path');
+//const path = require('path');
 const AWS = require('aws-sdk');
 const transcribeservice = new AWS.TranscribeService();
 const AWSAppSyncClient = require('aws-appsync').default;
@@ -56,7 +56,7 @@ exports.handler = async (event) => {
   console.log('Received S3 event:', JSON.stringify(event, null, 2));
   const bucket = event.Records[0].s3.bucket.name;
   const key = event.Records[0].s3.object.key;
-  const execution_id = path.parse(key).name;
+  const execution_id = key.split('/')[2]
 
   const variables = {
     id: execution_id,

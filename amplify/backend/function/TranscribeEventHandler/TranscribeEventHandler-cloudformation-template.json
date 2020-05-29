@@ -17,6 +17,10 @@
 		"apiBroadcastStatusAPIGraphQLAPIEndpointOutput": {
 			"Type": "String",
 			"Default": "apiBroadcastStatusAPIGraphQLAPIEndpointOutput"
+		},
+		"storageRecordingStoreBucketName": {
+			"Type": "String",
+			"Default": "storageRecordingStoreBucketName"
 		}
 	},
 	"Conditions": {
@@ -108,6 +112,9 @@
 						},
 						"API_BROADCASTSTATUSAPI_GRAPHQLAPIENDPOINTOUTPUT": {
 							"Ref": "apiBroadcastStatusAPIGraphQLAPIEndpointOutput"
+						},
+						"STORAGE_RECORDINGSTORE_BUCKETNAME": {
+							"Ref": "storageRecordingStoreBucketName"
 						}
 					}
 				},
@@ -121,7 +128,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-broadcastconsole-dev-220316-deployment",
-					"S3Key": "amplify-builds/TranscribeEventHandler-4f694b51563435377244-build.zip"
+					"S3Key": "amplify-builds/TranscribeEventHandler-5435335a794838325668-build.zip"
 				}
 			}
 		},
@@ -245,6 +252,28 @@
 											":apis/",
 											{
 												"Ref": "apiBroadcastStatusAPIGraphQLAPIIdOutput"
+											},
+											"/*"
+										]
+									]
+								}
+							]
+						},
+						{
+							"Effect": "Allow",
+							"Action": [
+								"s3:PutObject",
+								"s3:GetObject",
+								"s3:ListBucket"
+							],
+							"Resource": [
+								{
+									"Fn::Join": [
+										"",
+										[
+											"arn:aws:s3:::",
+											{
+												"Ref": "storageRecordingStoreBucketName"
 											},
 											"/*"
 										]

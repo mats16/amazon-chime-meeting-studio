@@ -26,13 +26,14 @@ const client = new AWSAppSyncClient({
 
 // クエリ
 const createStatus = gql(`
-    mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $src_url: String, $dst_url: [AWSURL], $recordingEnabled: Boolean, $transcriptionEnabled: Boolean, $broadcastEnabled: Boolean, $startDate: AWSTimestamp) {
+    mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $src_url: String, $dst_url: [AWSURL], $recordingFileUri: AWSURL, $recordingEnabled: Boolean, $transcriptionEnabled: Boolean, $broadcastEnabled: Boolean, $startDate: AWSTimestamp) {
         createStatus(input: {
             id: $id
             status: $status
             owner: $owner
             src_url: $src_url
             dst_url: $dst_url
+            recordingFileUri: $recordingFileUri
             recordingEnabled: $recordingEnabled
             transcriptionEnabled: $transcriptionEnabled
             broadcastEnabled: $broadcastEnabled
@@ -68,6 +69,7 @@ const updateStatus = gql(`
             owner
             src_url
             dst_url
+            recordingFileUri
             recordingEnabled
             transcriptionEnabled
             broadcastEnabled
@@ -104,6 +106,7 @@ exports.handler = async (event) => {
             src_url: input.src_url,
             dst_url: input.dst_url,
             recordingEnabled: input.recordingEnabled,
+            recordingFileUri: input.recordingFileUri,
             transcriptionEnabled: input.transcriptionEnabled,
             broadcastEnabled: input.broadcastEnabled,
             startDate: startDate

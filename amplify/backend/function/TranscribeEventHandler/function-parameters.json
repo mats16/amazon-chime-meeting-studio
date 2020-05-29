@@ -4,6 +4,13 @@
             "BroadcastStatusAPI": [
                 "create"
             ]
+        },
+        "storage": {
+            "RecordingStore": [
+                "create",
+                "read",
+                "update"
+            ]
         }
     }
 }

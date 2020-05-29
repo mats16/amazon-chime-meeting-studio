@@ -125,15 +125,17 @@
         label="Recording"
         sortable>
         <template slot-scope="scope">
-          <el-button
-            v-if="(scope.row.recordingEnabled)"
-            :type="!(scope.row.recordingEnabled) ? 'info' :  scope.row.status === 'RUNNING' ? 'primary' : scope.row.status === 'SUCCEEDED' ? 'success' : scope.row.status === 'FAILED' ? 'danger' : scope.row.status === 'ABORTED' ? 'warning' : 'info'"
-            :disabled="(scope.row.status === 'FAILED') || (scope.row.status === 'ABORTED')"
-            :loading="(scope.row.status === 'RUNNING')"
-            size="small" plain
-            @click="onOpenStorageFile(`${scope.row.id}.mp4`)">
-            {{ (scope.row.status === 'SUCCEEDED') ? 'Open File' : scope.row.status }}
-          </el-button>
+          <el-tooltip class="item" effect="dark" content="Open recording file" placement="top">
+            <el-button
+              v-if="(scope.row.recordingEnabled)"
+              :type="!(scope.row.recordingEnabled) ? 'info' :  scope.row.status === 'RUNNING' ? 'primary' : scope.row.status === 'SUCCEEDED' ? 'success' : scope.row.status === 'FAILED' ? 'danger' : scope.row.status === 'ABORTED' ? 'warning' : 'info'"
+              :disabled="(scope.row.status === 'FAILED')"
+              :loading="(scope.row.status === 'RUNNING')"
+              size="small" plain
+              @click="onOpenStorageFile(`${scope.row.recordingFileUri}`)">
+              {{ scope.row.status }}
+            </el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -144,12 +146,12 @@
         width="180">
         <template slot-scope="scope">
           <el-button
-            v-if="scope.row.transcriptionEnabled && (scope.row.status !== 'FAILED') && (scope.row.status !== 'ABORTED')"
+            v-if="scope.row.transcriptionEnabled && (scope.row.status !== 'FAILED')"
             :type="!(scope.row.transcriptionEnabled) ? 'info' : scope.row.transcriptionStatus === 'IN_PROGRESS' ? 'primary' : scope.row.transcriptionStatus === 'COMPLETED' ? 'success' : scope.row.transcriptionStatus === 'FAILED' ? 'danger' : 'info'"
             :disabled="!(scope.row.transcriptionEnabled) || (scope.row.transcriptionStatus === 'FAILED')"
             :loading="(scope.row.transcriptionStatus === 'IN_PROGRESS') || (scope.row.transcriptionStatus === null)"
             size="small" plain
-            @click="onOpenUri(`${scope.row.transcriptFileUri}`)">
+            @click="onOpenStorageFile(`${scope.row.transcriptFileUri}`)">
             {{ (scope.row.transcriptionStatus === 'COMPLETED') ? 'Open File' : (scope.row.transcriptionStatus === null) ? 'WAITING' : scope.row.transcriptionStatus }}
           </el-button>
         </template>
@@ -239,9 +241,11 @@ export default {
       } else if (this.form.src.type === 'custom') {
         input.src_url = `https://${this.form.src.url}`;
       }
-      input.dst_url = []
+      if (this.form.dst.type.length > 0) {
+        input.dst_url = []
+      }
       if (this.form.dst.type.includes('twitch')) {
-        input.dst_url.push('rtmp://live.twitch.tv/app/' + this.form.dst.twitch_stream_key);
+        input.dst_url.push(`rtmp://live.twitch.tv/app/${this.form.dst.twitch_stream_key}`);
       }
       if (this.form.dst.type.includes('youtube')) {
         input.dst_url.push(`rtmp://a.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}`);
@@ -254,8 +258,9 @@ export default {
     }
   },
   methods: {
-    onOpenStorageFile(fileName) {
-      Storage.get(fileName, { level: 'private', expires: 60 * 5 })
+    onOpenStorageFile(s3uri) {
+      const file = s3uri.split('/').slice(5).join('/')
+      Storage.get(file, { level: 'private', expires: 60 * 5 })
         .then(result => {
           console.log(result)
           const link = document.createElement('a')

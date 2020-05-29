@@ -5,8 +5,11 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
+    "amazon-s3-uri": "0.0.3",
     "aws-appsync": "^3.0.3",
     "graphql-tag": "^2.10.3",
-    "isomorphic-fetch": "^2.2.1"
+    "isomorphic-fetch": "^2.2.1",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.8"
   }
 }
