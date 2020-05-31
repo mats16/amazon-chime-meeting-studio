@@ -1,8 +1,8 @@
 <template>
   <div class="transcript">
-    <el-form ref="form" :model="form" label-width="180px">
+    <el-form ref="form" :model="form" label-width="120px">
       <div v-for="n of transcriptResults.speaker_labels.speakers" :key="n">
-        <el-form-item :label="`Speaker_${n-1}`">
+        <el-form-item :label="`Speaker: spk_${n-1}`">
           <el-input v-model="form[`spk_${n-1}`]"></el-input>
         </el-form-item>
       </div>
@@ -16,6 +16,9 @@
         prop="speaker_label"
         label="Speaker"
         width="150">
+        <template slot-scope="scope">
+          {{ (form[scope.row.speaker_label]) ? form[scope.row.speaker_label] : scope.row.speaker_label }}
+        </template>
       </el-table-column>
 
       <el-table-column

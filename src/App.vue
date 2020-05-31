@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>Amazon Chime Broadcast Console</h1>
+    <h1>Amazon Chime Meeting Studio</h1>
     <amplify-authenticator username-alias="email">
       <amplify-sign-up slot="sign-up" username-alias="email" :form-fields.prop="formFields"></amplify-sign-up>
       <div class="amplify-sign-out">
