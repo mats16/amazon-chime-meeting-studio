@@ -9,13 +9,27 @@
     </el-form>
     <el-table
       :data="speakerLabeledTranscript"
-      :default-sort = "{prop: 'start_time', order: 'descending'}"
+      :default-sort = "{prop: 'start_time', order: 'ascending'}"
       stripe
+      height="800"
       style="width: 100%">
+
+      <el-table-column
+        prop="start_time"
+        label="Start"
+        width="80">
+      </el-table-column>
+
+      <el-table-column
+        prop="end_time"
+        label="End"
+        width="80">
+      </el-table-column>
+
       <el-table-column
         prop="speaker_label"
         label="Speaker"
-        width="150">
+        width="120">
         <template slot-scope="scope">
           {{ (form[scope.row.speaker_label]) ? form[scope.row.speaker_label] : scope.row.speaker_label }}
         </template>
@@ -84,8 +98,8 @@ export default {
         } else {
           speakerLabeledTranscript.push({
             speaker_label: segmentSpeakerLabel,
-            start_time: segmentStartTime,
-            end_time: segmentEndTime,
+            start_time: Number(segmentStartTime),
+            end_time: Number(segmentEndTime),
             transcript: transcriptList.join(' ')
           })
           segmentIndex += 1
@@ -96,8 +110,8 @@ export default {
       const {speaker_label: segmentSpeakerLabel, start_time: segmentStartTime, end_time: segmentEndTime} = speakerLabelsSegments[segmentIndex]
       speakerLabeledTranscript.push({
         speaker_label: segmentSpeakerLabel,
-        start_time: segmentStartTime,
-        end_time: segmentEndTime,
+        start_time: Number(segmentStartTime),
+        end_time: Number(segmentEndTime),
         transcript: transcriptList.join(' ')
       })
       this.speakerLabeledTranscript = speakerLabeledTranscript
