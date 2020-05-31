@@ -151,7 +151,7 @@
             :disabled="!(scope.row.transcriptionEnabled) || (scope.row.transcriptionStatus === 'FAILED')"
             :loading="(scope.row.transcriptionStatus === 'IN_PROGRESS') || (scope.row.transcriptionStatus === null)"
             size="small" plain
-            @click="onOpenStorageFile(`${scope.row.transcriptFileUri}`)">
+            @click="onOpenTranscript(`${scope.row.transcriptFileUri}`)">
             {{ (scope.row.transcriptionStatus === 'COMPLETED') ? 'Open File' : (scope.row.transcriptionStatus === null) ? 'WAITING' : scope.row.transcriptionStatus }}
           </el-button>
         </template>
@@ -173,6 +173,7 @@
 <script>
 import { Auth, API, DataStore, Storage } from 'aws-amplify';
 import { Predicates } from 'aws-amplify'; // test
+import AmazonS3URI from 'amazon-s3-uri'
 import { Status, AccountSettings } from "../models";
 
 export default {
@@ -270,9 +271,12 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    onOpenUri(uri) {
+    onOpenTranscript(s3uri) {
+      const {key}= AmazonS3URI(s3uri)
+      const accessLevel = key.split('/')[0]
+      const file = key.split('/').slice(2).join('/')
       const link = document.createElement('a')
-      link.href = uri
+      link.href = `/transcript?level=${accessLevel}&file=${file}`
       link.target = '_blank'
       link.click()
     },

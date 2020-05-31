@@ -59,41 +59,45 @@ const getStatus = gql(`
 
 exports.handler = async (event) => {
     console.log(event)
-    const {TranscriptionJobName, TranscriptionJobStatus} = event.detail
+    const {TranscriptionJobName: transcriptionJobName, TranscriptionJobStatus: transcriptionJobStatus} = event.detail
+    // TranscriptFileUri, MediaFileUri を確認する
+    const transcriptionJob = await transcribeservice.getTranscriptionJob({ TranscriptionJobName: transcriptionJobName }).promise()
+        .catch((err) => console.log(JSON.stringify(err)));
+    const transcriptFileUri = transcriptionJob.TranscriptionJob.Transcript.TranscriptFileUri;
+    const mediaFileUri = transcriptionJob.TranscriptionJob.Media.MediaFileUri
+    const { bucket: mediaFileBucket, key: mediaFileKey } = AmazonS3URI(mediaFileUri);
+    const executionId = mediaFileKey.split('/')[2];
+    // for GraphQL
     const variables = {
-        id: TranscriptionJobName,
-        transcriptionStatus: TranscriptionJobStatus
+        id: executionId,
+        transcriptionStatus: transcriptionJobStatus
     }
-    // AppSync 側の _version を確認する
-    const res_old_status = await client.query({variables: variables, query: getStatus})
-        .catch((err) => console.log(JSON.stringify(err)))
-    const old_status = res_old_status.data.getStatus;
-    variables._version = old_status._version
-    const recordingFileUri = old_status.recordingFileUri
-
-    if (TranscriptionJobStatus === 'COMPLETED') {
-        // 終了している場合は TranscriptFileUri を確認する
-        const data = await transcribeservice.getTranscriptionJob({ TranscriptionJobName: TranscriptionJobName }).promise()
-            .catch((err) => console.log(JSON.stringify(err)));
-        const TranscriptFileUri = data.TranscriptionJob.Transcript.TranscriptFileUri;
+    if (transcriptionJobStatus === 'COMPLETED') {
         // Transcibe の S3 から取得
-        const transcript_text = await request(TranscriptFileUri)
+        const transcriptText = await request(transcriptFileUri)
             .catch((err) => console.log(JSON.stringify(err)));
          // S3 にコピー
-        const { bucket, key } = AmazonS3URI(recordingFileUri);
-        const prefix = key.split('/').slice(0,-1).join('/');
-        const file_name = AmazonS3URI(TranscriptFileUri).uri.pathname.split('/').pop()
+        const prefix = mediaFileKey.split('/').slice(0,-1).join('/');
+        const fileName = AmazonS3URI(transcriptFileUri).uri.pathname.split('/').pop()
         const params = {
-            Body: transcript_text, 
-            Bucket: bucket, 
-            Key: `${prefix}/${file_name}`
+            Body: transcriptText, 
+            Bucket: mediaFileBucket, 
+            Key: `${prefix}/${fileName}`
         };
         await s3.putObject(params).promise()
+            .then(() => {
+                variables.transcriptFileUri = `s3://${mediaFileBucket}/${prefix}/${fileName}`;
+            })
             .catch((err) => console.log(JSON.stringify(err)));
-        variables.transcriptFileUri = `s3://${bucket}/${prefix}/${file_name}`;
     }
+    // AppSync 側の _version を確認する
+    await client.query({ variables: variables, query: getStatus })
+        .then((data) => {
+            variables._version = data.data.getStatus._version;
+        })
+        .catch((err) => console.log(JSON.stringify(err)))
     // AppSync の transcriptionStatus を更新する
-    await client.mutate({variables: variables, mutation: updateStatus})
+    await client.mutate({ variables: variables, mutation: updateStatus })
         .then((data) => console.log(JSON.stringify(data)))
         .catch((err) => console.log(JSON.stringify(err)))
 

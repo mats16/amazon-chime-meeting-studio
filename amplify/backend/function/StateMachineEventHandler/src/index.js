@@ -113,31 +113,22 @@ exports.handler = async (event) => {
         }
     } else {
         mutation = updateStatus
-        // AppSync 側のバージョンを確認する
-        try {
-            res = await client.query({
-                variables: variables,
-                query: getStatus
-            });
-            const old_status = res.data.getStatus
-            variables = {
-                ...old_status,
-                ...variables,
-                stopDate: stopDate}
-        } catch (err) {
-            console.log(JSON.stringify(err));
-        }
+        // AppSync 側の _version を確認する
+        await client.query({ variables: variables, query: getStatus })
+            .then((data) => {
+                const old_status = res.data.getStatus;
+                variables = {
+                    ...old_status,
+                    ...variables,
+                    stopDate: stopDate};
+            })
+            .catch((err) => console.log(JSON.stringify(err)))
     }
 
-    try {
-        res = await client.mutate({
-            variables: variables,
-            mutation: mutation
-        });
-        console.log(JSON.stringify(res));
-    } catch (err) {
-        console.log(JSON.stringify(err));
-    }
+
+    await client.mutate({variables: variables, mutation: mutation})
+        .then((data) => console.log(JSON.stringify(data)))
+        .catch((err) => console.log(JSON.stringify(err)))
 
     const response = {
         statusCode: 200,

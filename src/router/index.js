@@ -22,6 +22,11 @@ const routes = [
     path: '/account',
     name: 'Account',
     component: loadView('Account')
+  },
+  {
+    path: '/transcript',
+    name: 'Transcript',
+    component: loadView('Transcript')
   }
 ]
 

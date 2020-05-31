@@ -54,12 +54,13 @@ const getStatus = gql(`
 
 exports.handler = async (event) => {
   console.log('Received S3 event:', JSON.stringify(event, null, 2));
+  const transcriptionJobName = event.Records[0].responseElements['x-amz-request-id']
   const bucket = event.Records[0].s3.bucket.name;
   const key = event.Records[0].s3.object.key;
-  const execution_id = key.split('/')[2]
-
+  const executionId = key.split('/')[2]
+  // for GraphQL
   const variables = {
-    id: execution_id,
+    id: executionId,
   }
   try {
     // AppSync 側のバージョンを確認する
@@ -80,7 +81,7 @@ exports.handler = async (event) => {
       Media: { /* required */
         MediaFileUri: media_file_uri
       },
-      TranscriptionJobName: execution_id, /* required */
+      TranscriptionJobName: transcriptionJobName, /* required */
       //JobExecutionSettings: {
       //  AllowDeferredExecution: true || false,
       //  DataAccessRoleArn: 'STRING_VALUE'
