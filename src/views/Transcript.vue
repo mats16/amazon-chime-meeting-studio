@@ -1,5 +1,12 @@
 <template>
   <div class="transcript">
+    <el-form ref="form" :model="form" label-width="180px">
+      <div v-for="n of transcriptResults.speaker_labels.speakers" :key="n">
+        <el-form-item :label="`Speaker_${n-1}`">
+          <el-input v-model="form[`spk_${n-1}`]"></el-input>
+        </el-form-item>
+      </div>
+    </el-form>
     <el-table
       :data="speakerLabeledTranscript"
       :default-sort = "{prop: 'start_time', order: 'descending'}"
@@ -28,6 +35,9 @@ export default {
   name: 'Transcript',
   data() {
     return {
+      form: {
+        spk_0: ''
+      },
       transcriptResults: {
         items: [],
         speaker_labels: [],
