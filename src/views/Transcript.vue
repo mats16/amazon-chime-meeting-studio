@@ -38,9 +38,7 @@ export default {
   name: 'Transcript',
   data() {
     return {
-      form: {
-        spk_0: ''
-      },
+      form: {},
       transcriptResults: {
         items: [],
         speaker_labels: [],
@@ -66,44 +64,44 @@ export default {
       })
       .catch(err => console.log(err));
   },
-  created: async function () {
-    console.log('created')
-  },
   computed: {},
   methods: {
     genSpeakerLabeledTranscript(transcriptResults) {
       const speakerLabeledTranscript = []
       const speakerLabelsSegments = transcriptResults.speaker_labels.segments
-      let speakerLabelsIndex = 0
+      let segmentIndex = 0
       const transcriptList = []
       const items = transcriptResults.items;
       while(items.length) {
         const item = items.shift()
-        const end_time = item.end_time
-        const content = item.alternatives[0].content
-        if (typeof end_time === 'undefined') {
-          transcriptList.push(content)
-        } else if (Number(end_time) <= Number(speakerLabelsSegments[speakerLabelsIndex].end_time)) {
-          transcriptList.push(content)
+        const itemEndTime = item.end_time
+        const itemContent = item.alternatives[0].content
+        const {speaker_label: segmentSpeakerLabel, start_time: segmentStartTime, end_time: segmentEndTime} = speakerLabelsSegments[segmentIndex]
+        if (typeof itemEndTime === 'undefined') {
+          transcriptList.push(itemContent)
+        } else if (Number(itemEndTime) <= Number(segmentEndTime)) {
+          transcriptList.push(itemContent)
         } else {
-          const speaker_label = speakerLabelsSegments[speakerLabelsIndex].speaker_label
           speakerLabeledTranscript.push({
-            speaker_label: speaker_label,
+            speaker_label: segmentSpeakerLabel,
+            start_time: segmentStartTime,
+            end_time: segmentEndTime,
             transcript: transcriptList.join(' ')
           })
-          speakerLabelsIndex += 1
+          segmentIndex += 1
           transcriptList.length = 0
-          transcriptList.push(content)
+          transcriptList.push(itemContent)
         }
       }
-      const speaker_label = transcriptResults.speaker_labels.segments[speakerLabelsIndex].speaker_label
+      const {speaker_label: segmentSpeakerLabel, start_time: segmentStartTime, end_time: segmentEndTime} = speakerLabelsSegments[segmentIndex]
       speakerLabeledTranscript.push({
-        speaker_label: speaker_label,
+        speaker_label: segmentSpeakerLabel,
+        start_time: segmentStartTime,
+        end_time: segmentEndTime,
         transcript: transcriptList.join(' ')
       })
       this.speakerLabeledTranscript = speakerLabeledTranscript
     }
   }
 }
-// s3://broadcastconsole-recordingstore220316-dev/private/ap-northeast-1:673eca4e-6ba3-49f7-ae07-5871c4027f18/2a99f774-ba73-49bf-9201-3d73c7074dcc/asrOutput.json
 </script>
