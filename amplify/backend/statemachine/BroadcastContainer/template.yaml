@@ -211,7 +211,7 @@ Resources:
       ExecutionRoleArn: !Ref TaskExecutionRole
       ContainerDefinitions: 
         - Name: broadcast
-          Image: mats16/bcast:latest
+          Image: mats16/bcast:beta
           Cpu: 4000
           MemoryReservation: 16000
           Essential: "true"
@@ -220,6 +220,10 @@ Resources:
               Value: 1900
             - Name: THREAD_NUM
               Value: 4
+            - Name: AUDIO_CODEC
+              Value: flac  # for Transcribe
+            - Name: AUDIO_SAMPLERATE
+              Value: 16000  # for Transcribe
           LogConfiguration:
             LogDriver: awslogs
             Options:

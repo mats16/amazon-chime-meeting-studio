@@ -116,7 +116,7 @@ exports.handler = async (event) => {
         // AppSync 側の _version を確認する
         await client.query({ variables: variables, query: getStatus })
             .then((data) => {
-                const old_status = res.data.getStatus;
+                const old_status = data.data.getStatus;
                 variables = {
                     ...old_status,
                     ...variables,
