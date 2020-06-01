@@ -278,7 +278,7 @@
 								    "Rules" : [
 										{
 											"Name" : "suffix",
-											"Value" : ".mp4"
+											"Value" : ".flac"
 										}
 									]
 								}

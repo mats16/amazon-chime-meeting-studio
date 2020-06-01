@@ -31,7 +31,6 @@
       <el-form-item label="Transcription">
       <el-switch
         v-model="form.transcriptionEnabled"
-        :disabled="!(form.recordingEnabled)"
         active-text="Enabled"
         inactive-text="Disabled">
       </el-switch>
@@ -203,26 +202,28 @@ export default {
       tableData: []
     }
   },
-  async beforeCreate() {
+  beforeCreate() {
     // Auth.currentAuthenticatedUser()でユーザ情報を取得する。
     // 取得できなければ認証ステータスをfalseに設定する
-    try {
-      let cognitoUser = await Auth.currentAuthenticatedUser()
-      this.signedIn = true
-      this.username = cognitoUser.username
-    } catch (err) {
-      this.signedIn = false
-    }
+    Auth.currentAuthenticatedUser()
+      .then((cognitoUser) => {
+        this.signedIn = true;
+        this.username = cognitoUser.username;
+      })
+      .catch(() => {
+        this.signedIn = false;
+      })
   },
-  created: async function () {
-    this.currentSettings = (await DataStore.query(AccountSettings))[0]
-    if (this.currentSettings) {
-     this.form.dst.twitch_stream_key = this.currentSettings.twitch_stream_key
-     this.form.dst.youtube_stream_key = this.currentSettings.youtube_stream_key
-    }
-    this.updateTableData();
-    this.subscription = DataStore.observe(Status).subscribe(msg => {
-      console.log(msg.model, msg.opType, msg.element);
+  created: function () {
+    DataStore.query(AccountSettings)
+      .then((data) => {
+        this.currentSettings = data[0]
+        this.form.dst.twitch_stream_key = this.currentSettings.twitch_stream_key
+        this.form.dst.youtube_stream_key = this.currentSettings.youtube_stream_key
+      })
+    this.updateTableData()
+    this.subscription = DataStore.observe(Status).subscribe(() => {
+      //console.log(msg.model, msg.opType, msg.element);
       this.updateTableData();
     });
   },
@@ -232,9 +233,6 @@ export default {
         recordingEnabled: this.form.recordingEnabled,
         transcriptionEnabled: this.form.transcriptionEnabled,
         broadcastEnabled: this.form.broadcastEnabled
-      }
-      if (!input.recordingEnabled) {
-        input.transcriptionEnabled = false
       }
       if (this.form.src.type === 'chime') {
         const meeting_pin = this.form.src.meeting_pin.replace(/\s+/g, "")

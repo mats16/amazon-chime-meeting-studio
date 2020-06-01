@@ -86,7 +86,7 @@ exports.handler = async (event) => {
       //  AllowDeferredExecution: true || false,
       //  DataAccessRoleArn: 'STRING_VALUE'
       //},
-      MediaFormat: 'mp4',
+      MediaFormat: 'flac',
       //MediaSampleRateHertz: 44100,
       Settings: {
       //  ShowAlternatives: true || false,

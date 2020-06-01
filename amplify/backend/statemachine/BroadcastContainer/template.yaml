@@ -220,10 +220,10 @@ Resources:
               Value: 1900
             - Name: THREAD_NUM
               Value: 4
-            - Name: AUDIO_CODEC
-              Value: flac  # for Transcribe
-            - Name: AUDIO_SAMPLERATE
-              Value: 16000  # for Transcribe
+            #- Name: AUDIO_CODEC
+            #  Value: flac  # for Transcribe
+            #- Name: AUDIO_SAMPLERATE
+            #  Value: 16000  # for Transcribe
           LogConfiguration:
             LogDriver: awslogs
             Options:

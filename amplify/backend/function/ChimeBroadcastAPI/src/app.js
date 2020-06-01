@@ -55,8 +55,11 @@ app.post('/executions/new', function(req, res) {
     broadcastEnabled: req.body.broadcastEnabled,
   }
   if (input.recordingEnabled) {
-    input.recordingFileUri = `s3://${bucket_name}/private/${user_identity_id}/${execution_name}/chime_0.mp4`
-    input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/chime_0.mp4`)
+    input.recordingFileUri = `s3://${bucket_name}/private/${user_identity_id}/${execution_name}/Meeting.mp4`
+    input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/Meeting.mp4`)
+  }
+  if (input.transcriptionEnabled) {
+    input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/Meeting_AudioOnly.flac`)
   }
   if (input.broadcastEnabled) {
     input.dst_url.push(...req.body.dst_url)
