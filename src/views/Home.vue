@@ -36,6 +36,12 @@
       </el-switch>
       </el-form-item>
 
+      <!--
+      <el-form-item label="Max Speaker Labels">
+        <el-input-number v-model="form.transcriptionMaxSpeakerLabels" :min="1" :max="10" :disabled="!(form.transcriptionEnabled)"></el-input-number>
+      </el-form-item>
+      -->
+
       <el-form-item label="Broadcast">
       <el-switch
         v-model="form.broadcastEnabled"
@@ -197,7 +203,8 @@ export default {
         },
         recordingEnabled: true,
         transcriptionEnabled: true,
-        broadcastEnabled: false
+        broadcastEnabled: false,
+        transcriptionMaxSpeakerLabels: 4
       },
       tableData: []
     }
@@ -234,6 +241,9 @@ export default {
         transcriptionEnabled: this.form.transcriptionEnabled,
         broadcastEnabled: this.form.broadcastEnabled
       }
+      //if (this.form.transcriptionEnabled) {
+      //  input.transcriptionMaxSpeakerLabels = transcriptionMaxSpeakerLabels
+      //}
       if (this.form.src.type === 'chime') {
         const meeting_pin = this.form.src.meeting_pin.replace(/\s+/g, "")
         input.src_url = `https://app.chime.aws/portal/${meeting_pin}`;

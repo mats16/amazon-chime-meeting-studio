@@ -59,6 +59,7 @@ app.post('/executions/new', function(req, res) {
     input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/Meeting.mp4`)
   }
   if (input.transcriptionEnabled) {
+    //input.transcriptionMaxSpeakerLabels = req.body.transcriptionMaxSpeakerLabels
     input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/Meeting_AudioOnly.flac`)
   }
   if (input.broadcastEnabled) {

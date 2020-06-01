@@ -241,7 +241,7 @@ Resources:
     Properties:
       DefinitionString: !Sub |
         {
-          "Comment": "A Hello World example of the Amazon States Language using Pass states",
+          "Comment": "Run Recording/Broadcast Containers",
           "StartAt": "Map State",
           "States": {
             "Map State": {
@@ -254,9 +254,9 @@ Resources:
                 "dst_url.$": "$$.Map.Item.Value"
               },
               "Iterator": {
-                "StartAt": "ECS RunTask",
+                "StartAt": "ecsRunTask",
                 "States": {
-                  "ECS RunTask": {
+                  "ecsRunTask": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::ecs:runTask.sync",
                     "TimeoutSeconds": 14400,
@@ -308,11 +308,11 @@ Resources:
                     } ],
                     "Catch": [ {
                        "ErrorEquals": [ "States.Timeout" ],
-                       "Next": "ECS StopTask"
+                       "Next": "ecsStopTask"
                     } ],
                     "End": true
                   },
-                  "ECS StopTask": {
+                  "ecsStopTask": {
                      "Type": "Pass",
                      "Result": "Hello, AWS Step Functions!",
                      "End": true

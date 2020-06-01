@@ -62,18 +62,16 @@ exports.handler = async (event) => {
   const variables = {
     id: executionId,
   }
-  try {
-    // AppSync 側のバージョンを確認する
-    res = await client.query({
-        variables: variables,
-        query: getStatus
-    });
-    const old_status = res.data.getStatus
-    variables.transcriptionEnabled = old_status.transcriptionEnabled
-    variables._version = old_status._version
-  } catch (err) {
+  // AppSync 側のバージョンを確認する
+  await client.query({ variables: variables, query: getStatus })
+    .then((data) => {
+      const old_status = data.data.getStatus;
+      variables.transcriptionEnabled = old_status.transcriptionEnabled;
+      variables._version = old_status._version;
+    })
+    .catch((err) => {
       console.log(JSON.stringify(err));
-  }
+    });
   if (variables.transcriptionEnabled) {
     const media_file_uri = `https://s3.${region}.amazonaws.com/${bucket}/${key}`
     const params = {
@@ -83,8 +81,8 @@ exports.handler = async (event) => {
       },
       TranscriptionJobName: transcriptionJobName, /* required */
       //JobExecutionSettings: {
-      //  AllowDeferredExecution: true || false,
-      //  DataAccessRoleArn: 'STRING_VALUE'
+      //  AllowDeferredExecution: true,
+      //  DataAccessRoleArn: dataAccessRoleArn
       //},
       MediaFormat: 'flac',
       //MediaSampleRateHertz: 44100,
@@ -98,23 +96,22 @@ exports.handler = async (event) => {
       //  VocabularyName: 'STRING_VALUE'
       }
     };
-    try {
-      const data = await transcribeservice.startTranscriptionJob(params).promise();
-      console.log(data);
-      variables.transcriptionStatus = data.TranscriptionJob.TranscriptionJobStatus
-    } catch (err) {
-      console.log(JSON.stringify(err));
-      variables.transcriptionStatus = 'ERROR'
-    }
-    // AppSync のステータスを更新
-    try {
-      res = await client.mutate({
-        variables: variables,
-        mutation: updateStatus
-      });
-      console.log(JSON.stringify(res));
-    } catch (err) {
-      console.log(JSON.stringify(err));
-    }
+    console.log(params)
+    await transcribeservice.startTranscriptionJob(params).promise()
+      .then((data) => {
+        console.log(data);
+        variables.transcriptionStatus = data.TranscriptionJob.TranscriptionJobStatus;
+      })
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+        variables.transcriptionStatus = 'ERROR';
+      })
+    await client.mutate({ variables: variables, mutation: updateStatus })
+      .then((data) => {
+        console.log(JSON.stringify(data));
+      })
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+      })
   }
 };
