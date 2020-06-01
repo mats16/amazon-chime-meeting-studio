@@ -132,7 +132,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-broadcastconsole-dev-220316-deployment",
-					"S3Key": "amplify-builds/StateMachineEventHandler-634c6553383366746d6b-build.zip"
+					"S3Key": "amplify-builds/StateMachineEventHandler-4931464e6237357a4b39-build.zip"
 				}
 			}
 		},
