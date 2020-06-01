@@ -259,7 +259,7 @@ Resources:
                   "ECS RunTask": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::ecs:runTask.sync",
-                    "TimeoutSeconds": 86400,
+                    "TimeoutSeconds": 14400,
                     "Parameters": {
                       "LaunchType": "FARGATE",
                       "PlatformVersion": "1.3.0",

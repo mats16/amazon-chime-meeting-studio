@@ -87,7 +87,7 @@ exports.handler = async (event) => {
       //  DataAccessRoleArn: 'STRING_VALUE'
       //},
       MediaFormat: 'mp4',
-      MediaSampleRateHertz: 44100,
+      //MediaSampleRateHertz: 44100,
       Settings: {
       //  ShowAlternatives: true || false,
       //  MaxAlternatives: 'NUMBER_VALUE',
