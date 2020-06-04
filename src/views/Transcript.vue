@@ -11,19 +11,24 @@
       :data="speakerLabeledTranscript"
       :default-sort = "{prop: 'start_time', order: 'ascending'}"
       stripe
-      height="800"
       style="width: 100%">
 
       <el-table-column
         prop="start_time"
         label="Start"
         width="80">
+        <template slot-scope="scope">
+          {{ timeConvert(scope.row.start_time) }}
+        </template>
       </el-table-column>
 
       <el-table-column
         prop="end_time"
         label="End"
         width="80">
+        <template slot-scope="scope">
+          {{ timeConvert(scope.row.end_time) }}
+        </template>
       </el-table-column>
 
       <el-table-column
@@ -115,6 +120,14 @@ export default {
         transcript: transcriptList.join(' ')
       })
       this.speakerLabeledTranscript = speakerLabeledTranscript
+    },
+    timeConvert(time) {
+      const sec = Math.floor(time % 60) % 60;
+      const minute = Math.floor(time / 60);
+      //const minute = Math.floor(time / 60) % 60;
+      //const hour = Math.floor(time / 3600);
+      //return `${hour}:${minute}:${sec}`
+      return `${minute}:${sec}`
     }
   }
 }

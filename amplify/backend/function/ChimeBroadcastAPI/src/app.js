@@ -8,28 +8,84 @@ See the License for the specific language governing permissions and limitations 
 
 
 /* Amplify Params - DO NOT EDIT
+	API_BROADCASTSTATUSAPI_GRAPHQLAPIENDPOINTOUTPUT
+	API_BROADCASTSTATUSAPI_GRAPHQLAPIIDOUTPUT
+	API_BROADCASTSTATUSAPI_STATUSTABLE_ARN
+	API_BROADCASTSTATUSAPI_STATUSTABLE_NAME
 	ENV
-  REGION
-  STORAGE_RECORDINGSTORE_BUCKETNAME
-  STATEMACHINE_BROADCASTCONTAINER_ARN
+	REGION
+	STORAGE_RECORDINGSTORE_BUCKETNAME
 Amplify Params - DO NOT EDIT */
 
-var express = require('express')
-var bodyParser = require('body-parser')
-var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const express = require('express');
+const bodyParser = require('body-parser');
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
+
+require('isomorphic-fetch');
+const gql = require('graphql-tag');
 const AWS = require('aws-sdk');
-const uuid4 = require('uuid4');
+const AWSAppSyncClient = require('aws-appsync').default;
+
+const region = process.env['REGION'];
+const gqlEndpoint = process.env['API_BROADCASTSTATUSAPI_GRAPHQLAPIENDPOINTOUTPUT'];
+const bucketName = process.env['STORAGE_RECORDINGSTORE_BUCKETNAME'];
+const stateMachineArn = process.env['STATEMACHINE_BROADCASTCONTAINER_ARN'];
+
+const awsPartitionName = stateMachineArn.split(':')[1];
+const accountId = stateMachineArn.split(':')[4];
+const statemachineName = stateMachineArn.split(':')[6];
 
 const stepfunctions = new AWS.StepFunctions({apiVersion: '2016-11-23'});
-const bucket_name = process.env['STORAGE_RECORDINGSTORE_BUCKETNAME'];
-const statemachine_arn = process.env['STATEMACHINE_BROADCASTCONTAINER_ARN'];
-const aws_partitionname = statemachine_arn.split(':')[1]
-const region = statemachine_arn.split(':')[3]
-const account_id = statemachine_arn.split(':')[4]
-const statemachine_name = statemachine_arn.split(':')[6]
+const appsyncClient = new AWSAppSyncClient({
+  url: gqlEndpoint,
+  region: region,
+  auth: {
+    type: 'AWS_IAM',
+    credentials: AWS.config.credentials
+  },
+  disableOffline: true,
+});
+
+const createStatus = gql(`
+  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String, $startDate: AWSTimestamp) {
+    createStatus(input: {
+      id: $id
+      status: $status
+      owner: $owner
+      src_url: $src_url
+      recordingEnabled: $recordingEnabled
+      recordingFileUri: $recordingFileUri
+      transcriptionEnabled: $transcriptionEnabled
+      transcriptionStatus: $transcriptionStatus
+      transcriptionMediaFileUri: $transcriptionMediaFileUri
+      broadcastEnabled: $broadcastEnabled
+      broadcastRtmpUri: $broadcastRtmpUri
+      startDate: $startDate
+    }) {
+      __typename
+      id
+      status
+      owner
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      startDate
+      stopDate
+      _version
+      _deleted
+      _lastChangedAt
+    }
+  }
+`);
 
 // declare a new express app
-var app = express()
+const app = express()
 app.use(bodyParser.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
@@ -42,50 +98,68 @@ app.use(function(req, res, next) {
 
 
 app.post('/executions/new', function(req, res) {
-  const execution_name = uuid4();
-  // check auth identity
-  const user_identity_id = req.apiGateway.event.requestContext.identity.cognitoIdentityId
-  const user_name = req.apiGateway.event.requestContext.identity.cognitoAuthenticationProvider.split(':')[2]
-  const input = {
-    owner: user_name,
-    src_url: req.body.src_url,
-    dst_url: [],
-    recordingEnabled: req.body.recordingEnabled,
-    transcriptionEnabled: req.body.transcriptionEnabled,
-    broadcastEnabled: req.body.broadcastEnabled,
+  const { requestId, requestTimeEpoch, identity } = req.apiGateway.event.requestContext
+  const cognitoIdentityId = identity.cognitoIdentityId  // for S3 path
+  const cognitoUsername = identity.cognitoAuthenticationProvider.split(':')[2]  // for AppSync Permission
+  const { src_url, recordingEnabled, transcriptionEnabled, broadcastEnabled, broadcastRtmpUri } = req.body
+  const recordingFileUri = `s3://${bucketName}/private/${cognitoIdentityId}/${requestId}/Meeting.mp4`
+  const transcriptionMediaFileUri = `s3://${bucketName}/private/${cognitoIdentityId}/${requestId}/Meeting_AudioOnly.flac`
+
+  const stateMachineInput = {
+    src_url: src_url,
+    dst_url: [],  // only for StateMachine
+    recordingEnabled: recordingEnabled,
+    transcriptionEnabled: transcriptionEnabled,
+    broadcastEnabled: broadcastEnabled,
   }
-  if (input.recordingEnabled) {
-    input.recordingFileUri = `s3://${bucket_name}/private/${user_identity_id}/${execution_name}/Meeting.mp4`
-    input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/Meeting.mp4`)
+  if (stateMachineInput.recordingEnabled) {
+    stateMachineInput.recordingFileUri = recordingFileUri  // for AppSync Status
+    stateMachineInput.dst_url.push(recordingFileUri)  // for StateMachine
   }
-  if (input.transcriptionEnabled) {
-    //input.transcriptionMaxSpeakerLabels = req.body.transcriptionMaxSpeakerLabels
-    input.dst_url.push(`s3://${bucket_name}/private/${user_identity_id}/${execution_name}/Meeting_AudioOnly.flac`)
+  if (stateMachineInput.transcriptionEnabled) {
+    stateMachineInput.transcriptionMediaFileUri = transcriptionMediaFileUri  // for AppSync Status
+    stateMachineInput.dst_url.push(transcriptionMediaFileUri)  // for StateMachine
   }
-  if (input.broadcastEnabled) {
-    input.dst_url.push(...req.body.dst_url)
+  if (stateMachineInput.broadcastEnabled) {
+    stateMachineInput.broadcastRtmpUri = broadcastRtmpUri.join(',')  // for AppSync Status
+    stateMachineInput.dst_url.push(...broadcastRtmpUri)  // for StateMachine
   }
-  const params = {
-    input: JSON.stringify(input),
-    name: execution_name,
-    stateMachineArn: statemachine_arn,
-  };
-  stepfunctions.startExecution(params, function(err, data) {
-    if (err) {
-      console.log(err, err.stack);
-      res.sendStatus(err.statusCode)
-      res.json(err);
-    } else {
-      console.log(data);
-      res.json(data);
-    };
-  });
+  // Update AppSync Status
+  const gqlVariables = {
+    id: requestId,
+    status: 'SUBMITTED',
+    owner: cognitoUsername,
+    startDate: requestTimeEpoch,
+    ...stateMachineInput
+  }
+
+  appsyncClient.mutate({variables: gqlVariables, mutation: createStatus})
+    .then((data) => {
+      console.log(JSON.stringify(data))
+      // StateMachine の実行
+      const params = {
+        stateMachineArn: stateMachineArn,
+        name: requestId,
+        input: JSON.stringify(stateMachineInput),
+      };
+      stepfunctions.startExecution(params).promise()
+        .then((data) => {
+          console.log(data);
+          res.json(data);
+        })
+        .catch((err) => {
+          console.log(err, err.stack);
+          res.sendStatus(err.statusCode);
+          res.json(err);
+        })
+    })
+    .catch((err) => console.log(JSON.stringify(err)))
 });
 
 app.get('/executions/:id', function(req, res) {
   if (req.query.stop) {
     const params = {
-      executionArn: `arn:${aws_partitionname}:states:${region}:${account_id}:execution:${statemachine_name}:${req.params.id}`,
+      executionArn: `arn:${awsPartitionName}:states:${region}:${accountId}:execution:${statemachineName}:${req.params.id}`,
       cause: 'Stopped by user via Broadcast Console API',
       error: 'stop'
     };

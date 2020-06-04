@@ -9,13 +9,14 @@ export declare class Status {
   readonly status?: string;
   readonly owner?: string;
   readonly src_url?: string;
-  readonly dst_url?: string[];
   readonly recordingEnabled?: boolean;
   readonly recordingFileUri?: string;
   readonly transcriptionEnabled?: boolean;
   readonly transcriptionStatus?: string;
+  readonly transcriptionMediaFileUri?: string;
   readonly transcriptFileUri?: string;
   readonly broadcastEnabled?: boolean;
+  readonly broadcastRtmpUri?: string;
   readonly startDate?: number;
   readonly stopDate?: number;
   constructor(init: ModelInit<Status>);

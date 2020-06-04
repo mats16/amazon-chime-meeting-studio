@@ -76,6 +76,14 @@
                     "attributes": [
                         "BucketName"
                     ]
+                },
+                {
+                    "category": "api",
+                    "resourceName": "BroadcastStatusAPI",
+                    "attributes": [
+                        "GraphQLAPIIdOutput",
+                        "GraphQLAPIEndpointOutput"
+                    ]
                 }
             ]
         },

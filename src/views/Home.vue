@@ -93,7 +93,7 @@
         prop="src_url"
         label="Source"
         sortable>
-        <template slot-scope="scope">
+        <template slot-scope="scope" v-if="(scope.row.src_url)">
           {{ scope.row.src_url.replace('https://app.chime.aws/portal/', 'Chime: ') }}
         </template>
       </el-table-column>
@@ -229,8 +229,8 @@ export default {
         this.form.dst.youtube_stream_key = this.currentSettings.youtube_stream_key
       })
     this.updateTableData()
-    this.subscription = DataStore.observe(Status).subscribe(() => {
-      //console.log(msg.model, msg.opType, msg.element);
+    this.subscription = DataStore.observe(Status).subscribe((msg) => {
+      console.log(msg.model, msg.opType, msg.element);
       this.updateTableData();
     });
   },
@@ -251,17 +251,17 @@ export default {
         input.src_url = `https://${this.form.src.url}`;
       }
       if (this.form.dst.type.length > 0) {
-        input.dst_url = []
+        input.broadcastRtmpUri = []
       }
       if (this.form.dst.type.includes('twitch')) {
-        input.dst_url.push(`rtmp://live.twitch.tv/app/${this.form.dst.twitch_stream_key}`);
+        input.broadcastRtmpUri.push(`rtmp://live.twitch.tv/app/${this.form.dst.twitch_stream_key}`);
       }
       if (this.form.dst.type.includes('youtube')) {
-        input.dst_url.push(`rtmp://a.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}`);
-        input.dst_url.push(`rtmp://b.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}?backup=1`);
+        input.broadcastRtmpUri.push(`rtmp://a.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}`);
+        input.broadcastRtmpUri.push(`rtmp://b.rtmp.youtube.com/live2/${this.form.dst.youtube_stream_key}?backup=1`);
       }
       if (this.form.dst.type.includes('custom')) {
-        input.dst_url.push(this.form.dst.url1);
+        input.broadcastRtmpUri.push(this.form.dst.url1);
       }
       return input
     }

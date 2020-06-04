@@ -18,6 +18,14 @@
 			"Type": "String",
 			"Default": "statemachineBroadcastContainerName"
 		},
+		"apiBroadcastStatusAPIGraphQLAPIIdOutput": {
+			"Type": "String",
+			"Default": "apiBroadcastStatusAPIGraphQLAPIIdOutput"
+		},
+		"apiBroadcastStatusAPIGraphQLAPIEndpointOutput": {
+			"Type": "String",
+			"Default": "apiBroadcastStatusAPIGraphQLAPIEndpointOutput"
+		},
 		"storageRecordingStoreBucketName": {
 			"Type": "String",
 			"Default": "storageRecordingStoreBucketName"
@@ -71,6 +79,38 @@
 						"STATEMACHINE_BROADCASTCONTAINER_ARN": {
 							"Ref": "statemachineBroadcastContainerArn"
 						},
+						"API_BROADCASTSTATUSAPI_GRAPHQLAPIIDOUTPUT": {
+							"Ref": "apiBroadcastStatusAPIGraphQLAPIIdOutput"
+						},
+						"API_BROADCASTSTATUSAPI_GRAPHQLAPIENDPOINTOUTPUT": {
+							"Ref": "apiBroadcastStatusAPIGraphQLAPIEndpointOutput"
+						},
+						"API_BROADCASTSTATUSAPI_STATUSTABLE_NAME": {
+							"Fn::ImportValue": {
+								"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:StatusTable:Name"
+							}
+						},
+						"API_BROADCASTSTATUSAPI_STATUSTABLE_ARN": {
+							"Fn::Join": [
+								"",
+								[
+									"arn:aws:dynamodb:",
+									{
+										"Ref": "AWS::Region"
+									},
+									":",
+									{
+										"Ref": "AWS::AccountId"
+									},
+									":table/",
+									{
+										"Fn::ImportValue": {
+											"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:StatusTable:Name"
+										}
+									}
+								]
+							]
+						},
 						"STORAGE_RECORDINGSTORE_BUCKETNAME": {
 							"Ref": "storageRecordingStoreBucketName"
 						}
@@ -86,7 +126,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-broadcastconsole-dev-220316-deployment",
-					"S3Key": "amplify-builds/ChimeBroadcastAPI-444e48745456585a4676-build.zip"
+					"S3Key": "amplify-builds/ChimeBroadcastAPI-3574457a507549466a30-build.zip"
 				}
 			}
 		},
@@ -223,6 +263,36 @@
 						{
 							"Effect": "Allow",
 							"Action": [
+								"appsync:Create*",
+								"appsync:StartSchemaCreation",
+								"appsync:GraphQL"
+							],
+							"Resource": [
+								{
+									"Fn::Join": [
+										"",
+										[
+											"arn:aws:appsync:",
+											{
+												"Ref": "AWS::Region"
+											},
+											":",
+											{
+												"Ref": "AWS::AccountId"
+											},
+											":apis/",
+											{
+												"Ref": "apiBroadcastStatusAPIGraphQLAPIIdOutput"
+											},
+											"/*"
+										]
+									]
+								}
+							]
+						},
+						{
+							"Effect": "Allow",
+							"Action": [
 								"s3:GetObject",
 								"s3:ListBucket"
 							],
@@ -236,6 +306,59 @@
 												"Ref": "storageRecordingStoreBucketName"
 											},
 											"/*"
+										]
+									]
+								}
+							]
+						},
+						{
+							"Effect": "Allow",
+							"Action": [
+								"dynamodb:Put*",
+								"dynamodb:Create*",
+								"dynamodb:BatchWriteItem"
+							],
+							"Resource": [
+								{
+									"Fn::Join": [
+										"",
+										[
+											"arn:aws:dynamodb:",
+											{
+												"Ref": "AWS::Region"
+											},
+											":",
+											{
+												"Ref": "AWS::AccountId"
+											},
+											":table/",
+											{
+												"Fn::ImportValue": {
+													"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:StatusTable:Name"
+												}
+											}
+										]
+									]
+								},
+								{
+									"Fn::Join": [
+										"",
+										[
+											"arn:aws:dynamodb:",
+											{
+												"Ref": "AWS::Region"
+											},
+											":",
+											{
+												"Ref": "AWS::AccountId"
+											},
+											":table/",
+											{
+												"Fn::ImportValue": {
+													"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:StatusTable:Name"
+												}
+											},
+											"/index/*"
 										]
 									]
 								}

@@ -31,13 +31,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "dst_url": {
-                    "name": "dst_url",
-                    "isArray": true,
-                    "type": "AWSURL",
-                    "isRequired": false,
-                    "attributes": []
-                },
                 "recordingEnabled": {
                     "name": "recordingEnabled",
                     "isArray": false,
@@ -66,6 +59,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "transcriptionMediaFileUri": {
+                    "name": "transcriptionMediaFileUri",
+                    "isArray": false,
+                    "type": "AWSURL",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "transcriptFileUri": {
                     "name": "transcriptFileUri",
                     "isArray": false,
@@ -77,6 +77,13 @@ export const schema = {
                     "name": "broadcastEnabled",
                     "isArray": false,
                     "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "broadcastRtmpUri": {
+                    "name": "broadcastRtmpUri",
+                    "isArray": false,
+                    "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -187,5 +194,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "547db3f60e56d457bdabdff1f60f5baa"
+    "version": "da924e13f5c3f64a42f20fae2206d724"
 };

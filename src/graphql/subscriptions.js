@@ -53,13 +53,14 @@ export const onCreateStatus = /* GraphQL */ `
       status
       owner
       src_url
-      dst_url
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
       transcriptionStatus
+      transcriptionMediaFileUri
       transcriptFileUri
       broadcastEnabled
+      broadcastRtmpUri
       startDate
       stopDate
       _version
@@ -77,13 +78,14 @@ export const onUpdateStatus = /* GraphQL */ `
       status
       owner
       src_url
-      dst_url
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
       transcriptionStatus
+      transcriptionMediaFileUri
       transcriptFileUri
       broadcastEnabled
+      broadcastRtmpUri
       startDate
       stopDate
       _version
@@ -101,13 +103,14 @@ export const onDeleteStatus = /* GraphQL */ `
       status
       owner
       src_url
-      dst_url
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
       transcriptionStatus
+      transcriptionMediaFileUri
       transcriptFileUri
       broadcastEnabled
+      broadcastRtmpUri
       startDate
       stopDate
       _version

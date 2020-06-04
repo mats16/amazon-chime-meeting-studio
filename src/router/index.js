@@ -24,6 +24,11 @@ const routes = [
     component: loadView('Account')
   },
   {
+    path: '/vocabulary',
+    name: 'CustomVocabulary',
+    component: loadView('CustomVocabulary')
+  },
+  {
     path: '/transcript',
     name: 'Transcript',
     component: loadView('Transcript')
