@@ -24,34 +24,12 @@
         </el-input>
       </el-form-item>
 
-      <el-form-item label="Recording">
-      <el-switch
-        v-model="form.recordingEnabled"
-        active-text="Enabled"
-        inactive-text="Disabled">
-      </el-switch>
-      </el-form-item>
-
-      <el-form-item label="Transcription">
-      <el-switch
-        v-model="form.transcriptionEnabled"
-        active-text="Enabled"
-        inactive-text="Disabled">
-      </el-switch>
-      </el-form-item>
-
-      <!--
-      <el-form-item label="Max Speaker Labels">
-        <el-input-number v-model="form.transcriptionMaxSpeakerLabels" :min="1" :max="10" :disabled="!(form.transcriptionEnabled)"></el-input-number>
-      </el-form-item>
-      -->
-
       <el-form-item label="Broadcast">
-      <el-switch
-        v-model="form.broadcastEnabled"
-        active-text="Enabled"
-        inactive-text="Disabled">
-      </el-switch>
+        <el-switch
+          v-model="form.broadcastEnabled"
+          active-text="Enabled"
+          inactive-text="Disabled">
+        </el-switch>
       </el-form-item>
 
       <el-form-item label="Broadcast Type" prop="broadcastType" v-if="form.broadcastEnabled">
@@ -75,6 +53,36 @@
         </el-input>
       </el-form-item>
 
+      <el-form-item label="Recording">
+        <el-switch
+          v-model="form.recordingEnabled"
+          active-text="Enabled"
+          inactive-text="Disabled">
+        </el-switch>
+      </el-form-item>
+
+      <el-form-item label="Transcription">
+        <el-switch
+          v-model="form.transcriptionEnabled"
+          active-text="Enabled"
+          inactive-text="Disabled">
+        </el-switch>
+      </el-form-item>
+
+      <el-form-item label="File Access Level" v-if="form.recordingEnabled || form.transcriptionEnabled">
+        <el-switch
+          v-model="form.filePrivateAccess"
+          active-text="Private"
+          inactive-text="Sharing">
+        </el-switch>
+      </el-form-item>
+
+      <!--
+      <el-form-item label="Max Speaker Labels">
+        <el-input-number v-model="form.transcriptionMaxSpeakerLabels" :min="1" :max="10" :disabled="!(form.transcriptionEnabled)"></el-input-number>
+      </el-form-item>
+      -->
+
       <el-form-item>
         <el-button type="primary" @click="submitForm('form')">Submit</el-button>
         <el-button @click="onClear">Clear</el-button>
@@ -89,7 +97,8 @@
 
       <el-table-column
         prop="id"
-        label="ID">
+        label="ID"
+        width="85">
         <template slot-scope="scope">
           {{ scope.row.id.split('-')[0] }}
         </template>
@@ -263,7 +272,7 @@
 
 <script>
 import { Auth, API, DataStore, Storage } from 'aws-amplify';
-import { Predicates } from 'aws-amplify'; // test
+//import { Predicates } from 'aws-amplify'; // test
 import AmazonS3URI from 'amazon-s3-uri'
 import { Status, AccountSettings } from "../models";
 
@@ -279,13 +288,14 @@ export default {
         src_type: 'chime',
         src_url: '',
         meeting_pin: '',
-        recordingEnabled: true,
-        transcriptionEnabled: true,
         broadcastEnabled: false,
         broadcastType: [],
         twitch_stream_key: '',
         youtube_stream_key: '',
         broadcast_url: '',
+        recordingEnabled: true,
+        transcriptionEnabled: true,
+        filePrivateAccess: false,
         //transcriptionMaxSpeakerLabels: 4
       },
       rules: {
@@ -341,9 +351,10 @@ export default {
     input: function () {
       const input = {
         description: this.form.description,
+        broadcastEnabled: this.form.broadcastEnabled,
         recordingEnabled: this.form.recordingEnabled,
         transcriptionEnabled: this.form.transcriptionEnabled,
-        broadcastEnabled: this.form.broadcastEnabled
+        filePrivateAccess: this.form.filePrivateAccess,
       }
       if (this.form.src_type === 'chime') {
         const meeting_pin = this.form.meeting_pin.replace(/\s+/g, "")
@@ -374,10 +385,10 @@ export default {
     },
     onOpenStorageFile(s3uri) {
       const { key }= AmazonS3URI(s3uri)
+      const accessLevel = key.split('/')[0]
       const file = key.split('/').slice(2).join('/')
-      Storage.get(file, { level: 'private', expires: 60 * 5 })
+      Storage.get(file, { level: accessLevel, expires: 60 * 5 })
         .then(result => {
-          console.log(result)
           const link = document.createElement('a')
           link.href = result
           link.target = '_blank'
@@ -413,7 +424,7 @@ export default {
         } else {
           console.log('error submit!!');
           return false;
-        };
+        }
       });
 
 

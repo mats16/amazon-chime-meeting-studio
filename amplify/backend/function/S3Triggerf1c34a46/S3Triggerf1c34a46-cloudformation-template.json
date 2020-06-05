@@ -77,7 +77,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-broadcastconsole-dev-220316-deployment",
-					"S3Key": "amplify-builds/S3Triggerf1c34a46-50636f4c576b31684274-build.zip"
+					"S3Key": "amplify-builds/S3Triggerf1c34a46-733742304f3175736369-build.zip"
 				}
 			}
 		},

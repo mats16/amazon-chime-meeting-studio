@@ -96,7 +96,7 @@ exports.handler = async (event) => {
 
   if (transcriptionEnabled) {
     const mediaFileUri = `https://s3.${region}.amazonaws.com/${bucket}/${key}`;
-    variables.transcriptionMediaFileUri = mediaFileUri;
+    //variables.transcriptionMediaFileUri = mediaFileUri;
     const params = {
       LanguageCode: 'ja-JP', /* required */
       Media: { /* required */

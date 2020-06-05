@@ -103,9 +103,10 @@ app.post('/executions/new', function(req, res) {
   const { requestId, requestTimeEpoch, identity } = req.apiGateway.event.requestContext
   const cognitoIdentityId = identity.cognitoIdentityId  // for S3 path
   const cognitoUsername = identity.cognitoAuthenticationProvider.split(':')[2]  // for AppSync Permission
-  const { description, src_url, recordingEnabled, transcriptionEnabled, broadcastEnabled, broadcastRtmpUri } = req.body
-  const recordingFileUri = `s3://${bucketName}/private/${cognitoIdentityId}/${requestId}/Meeting.mp4`
-  const transcriptionMediaFileUri = `s3://${bucketName}/private/${cognitoIdentityId}/${requestId}/Meeting_AudioOnly.flac`
+  const { description, src_url, recordingEnabled, transcriptionEnabled, broadcastEnabled, broadcastRtmpUri, filePrivateAccess } = req.body
+  const fileAccessLevel = (filePrivateAccess) ? 'private' : 'protected';
+  const recordingFileUri = `s3://${bucketName}/${fileAccessLevel}/${cognitoIdentityId}/${requestId}/Meeting.mp4`
+  const transcriptionMediaFileUri = `s3://${bucketName}/${fileAccessLevel}/${cognitoIdentityId}/${requestId}/Meeting_AudioOnly.flac`
 
   const stateMachineInput = {
     description: description,
