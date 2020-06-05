@@ -131,8 +131,8 @@
 				"Runtime": "nodejs12.x",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "amplify-broadcastconsole-dev-220316-deployment",
-					"S3Key": "amplify-builds/StateMachineEventHandler-302f727337644a727a2b-build.zip"
+					"S3Bucket": "amplify-chimestudio-dev-152645-deployment",
+					"S3Key": "amplify-builds/StateMachineEventHandler-345841542b766f66372f-build.zip"
 				}
 			}
 		},

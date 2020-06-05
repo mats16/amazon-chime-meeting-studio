@@ -8,7 +8,6 @@ Amplify Params - DO NOT EDIT */
 
 require('isomorphic-fetch');
 const gql = require('graphql-tag');
-//const path = require('path');
 const request  = require('request-promise-native');
 const AmazonS3URI = require('amazon-s3-uri')
 const AWSAppSyncClient = require('aws-appsync').default;
