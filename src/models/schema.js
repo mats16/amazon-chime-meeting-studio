@@ -21,7 +21,7 @@ export const schema = {
                     "name": "owner",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
+                    "isRequired": false,
                     "attributes": []
                 },
                 "description": {
@@ -128,10 +128,6 @@ export const schema = {
                                     "read"
                                 ],
                                 "identityClaim": "cognito:username"
-                            },
-                            {
-                                "allow": "private",
-                                "provider": "iam"
                             }
                         ]
                     }

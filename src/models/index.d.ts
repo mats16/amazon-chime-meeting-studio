@@ -7,7 +7,7 @@ import { ModelInit, MutableModel, PersistentModelConstructor } from "@aws-amplif
 export declare class Status {
   readonly id: string;
   readonly status?: string;
-  readonly owner: string;
+  readonly owner?: string;
   readonly description?: string;
   readonly src_url?: string;
   readonly recordingEnabled?: boolean;
