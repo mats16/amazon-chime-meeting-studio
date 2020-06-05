@@ -44,11 +44,16 @@ const updateStatus = async function (variables) {
         id
         status
         owner
+        description
         src_url
-        recordingFileUri
         recordingEnabled
+        recordingFileUri
         transcriptionEnabled
+        transcriptionStatus
+        transcriptionMediaFileUri
+        transcriptFileUri
         broadcastEnabled
+        broadcastRtmpUri
         startDate
         stopDate
         _version

@@ -48,6 +48,7 @@ const updateStatus = async function (variables) {
         id
         status
         owner
+        description
         src_url
         recordingEnabled
         recordingFileUri

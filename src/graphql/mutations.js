@@ -64,6 +64,7 @@ export const createStatus = /* GraphQL */ `
       id
       status
       owner
+      description
       src_url
       recordingEnabled
       recordingFileUri
@@ -92,6 +93,7 @@ export const updateStatus = /* GraphQL */ `
       id
       status
       owner
+      description
       src_url
       recordingEnabled
       recordingFileUri
@@ -120,6 +122,7 @@ export const deleteStatus = /* GraphQL */ `
       id
       status
       owner
+      description
       src_url
       recordingEnabled
       recordingFileUri

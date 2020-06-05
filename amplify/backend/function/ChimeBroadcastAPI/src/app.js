@@ -47,11 +47,12 @@ const appsyncClient = new AWSAppSyncClient({
 });
 
 const createStatus = gql(`
-  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String, $startDate: AWSTimestamp) {
+  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $description: String, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String, $startDate: AWSTimestamp) {
     createStatus(input: {
       id: $id
       status: $status
       owner: $owner
+      description: $description
       src_url: $src_url
       recordingEnabled: $recordingEnabled
       recordingFileUri: $recordingFileUri
@@ -66,6 +67,7 @@ const createStatus = gql(`
       id
       status
       owner
+      description
       src_url
       recordingEnabled
       recordingFileUri
@@ -101,11 +103,12 @@ app.post('/executions/new', function(req, res) {
   const { requestId, requestTimeEpoch, identity } = req.apiGateway.event.requestContext
   const cognitoIdentityId = identity.cognitoIdentityId  // for S3 path
   const cognitoUsername = identity.cognitoAuthenticationProvider.split(':')[2]  // for AppSync Permission
-  const { src_url, recordingEnabled, transcriptionEnabled, broadcastEnabled, broadcastRtmpUri } = req.body
+  const { description, src_url, recordingEnabled, transcriptionEnabled, broadcastEnabled, broadcastRtmpUri } = req.body
   const recordingFileUri = `s3://${bucketName}/private/${cognitoIdentityId}/${requestId}/Meeting.mp4`
   const transcriptionMediaFileUri = `s3://${bucketName}/private/${cognitoIdentityId}/${requestId}/Meeting_AudioOnly.flac`
 
   const stateMachineInput = {
+    description: description,
     src_url: src_url,
     dst_url: [],  // only for StateMachine
     recordingEnabled: recordingEnabled,
@@ -117,6 +120,7 @@ app.post('/executions/new', function(req, res) {
     stateMachineInput.dst_url.push(recordingFileUri)  // for StateMachine
   }
   if (stateMachineInput.transcriptionEnabled) {
+    stateMachineInput.transcriptionStatus = 'WAITING'
     stateMachineInput.transcriptionMediaFileUri = transcriptionMediaFileUri  // for AppSync Status
     stateMachineInput.dst_url.push(transcriptionMediaFileUri)  // for StateMachine
   }

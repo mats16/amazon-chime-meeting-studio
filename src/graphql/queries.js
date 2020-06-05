@@ -78,6 +78,7 @@ export const getStatus = /* GraphQL */ `
       id
       status
       owner
+      description
       src_url
       recordingEnabled
       recordingFileUri
@@ -108,6 +109,7 @@ export const listStatuss = /* GraphQL */ `
         id
         status
         owner
+        description
         src_url
         recordingEnabled
         recordingFileUri
@@ -147,6 +149,7 @@ export const syncStatuses = /* GraphQL */ `
         id
         status
         owner
+        description
         src_url
         recordingEnabled
         recordingFileUri
