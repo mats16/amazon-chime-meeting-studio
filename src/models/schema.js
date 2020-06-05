@@ -21,7 +21,7 @@ export const schema = {
                     "name": "owner",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": false,
+                    "isRequired": true,
                     "attributes": []
                 },
                 "description": {

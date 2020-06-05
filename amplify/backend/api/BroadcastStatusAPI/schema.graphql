@@ -6,7 +6,7 @@ type Status @model
 {
   id: ID!
   status: String
-  owner: String
+  owner: String!
   description: String
   src_url: String
   recordingEnabled: Boolean
