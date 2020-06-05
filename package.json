@@ -12,7 +12,7 @@
     "@aws-amplify/datastore": "^2.1.0",
     "@aws-amplify/ui-vue": "^0.2.5",
     "amazon-s3-uri": "0.0.3",
-    "aws-amplify": "^3.0.11",
+    "aws-amplify": "^3.0.16",
     "aws-amplify-vue": "^2.1.1",
     "core-js": "^3.6.4",
     "element-ui": "^2.13.1",

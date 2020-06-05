@@ -1,7 +1,7 @@
 type Status @model
   @auth(rules: [
+    { allow: private, provider: iam }
     { allow: owner, ownerField: "owner", provider: userPools, operations: [read] }
-    #{ allow: private, provider: iam }
   ])
 {
   id: ID!
