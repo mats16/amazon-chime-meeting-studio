@@ -1,6 +1,6 @@
 projects:
   BroadcastStatusAPI:
-    schemaPath: src/graphql/schema.json
+    schemaPath: amplify/backend/api/BroadcastStatusAPI/build/schema.graphql
     includes:
       - ''
     excludes:

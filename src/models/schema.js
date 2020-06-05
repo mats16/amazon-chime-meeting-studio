@@ -14,7 +14,7 @@ export const schema = {
                     "name": "status",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
+                    "isRequired": false,
                     "attributes": []
                 },
                 "owner": {
@@ -24,16 +24,72 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "browser_url": {
-                    "name": "browser_url",
+                "description": {
+                    "name": "description",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
-                "rtmp_url": {
-                    "name": "rtmp_url",
-                    "isArray": true,
+                "src_url": {
+                    "name": "src_url",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "recordingEnabled": {
+                    "name": "recordingEnabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "recordingFileUri": {
+                    "name": "recordingFileUri",
+                    "isArray": false,
+                    "type": "AWSURL",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "transcriptionEnabled": {
+                    "name": "transcriptionEnabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "transcriptionStatus": {
+                    "name": "transcriptionStatus",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "transcriptionMediaFileUri": {
+                    "name": "transcriptionMediaFileUri",
+                    "isArray": false,
+                    "type": "AWSURL",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "transcriptFileUri": {
+                    "name": "transcriptFileUri",
+                    "isArray": false,
+                    "type": "AWSURL",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "broadcastEnabled": {
+                    "name": "broadcastEnabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "broadcastRtmpUri": {
+                    "name": "broadcastRtmpUri",
+                    "isArray": false,
                     "type": "String",
                     "isRequired": false,
                     "attributes": []
@@ -81,9 +137,69 @@ export const schema = {
                     }
                 }
             ]
+        },
+        "AccountSettings": {
+            "name": "AccountSettings",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "owner": {
+                    "name": "owner",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "twitch_stream_key": {
+                    "name": "twitch_stream_key",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "youtube_stream_key": {
+                    "name": "youtube_stream_key",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            },
+            "syncable": true,
+            "pluralName": "AccountSettings",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "provider": "userPools",
+                                "ownerField": "owner",
+                                "allow": "owner",
+                                "operations": [
+                                    "create",
+                                    "read",
+                                    "update",
+                                    "delete"
+                                ],
+                                "identityClaim": "cognito:username"
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     },
     "enums": {},
     "nonModels": {},
-    "version": "7bb5cc3f6f021884eb46c82be181c241"
+    "version": "5be6e822704b7227017c400d055507b5"
 };

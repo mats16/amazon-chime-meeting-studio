@@ -11,13 +11,16 @@
     "@aws-amplify/core": "^3.2.7",
     "@aws-amplify/datastore": "^2.1.0",
     "@aws-amplify/ui-vue": "^0.2.5",
+    "amazon-s3-uri": "0.0.3",
     "aws-amplify": "^3.0.11",
     "aws-amplify-vue": "^2.1.1",
     "core-js": "^3.6.4",
     "element-ui": "^2.13.1",
+    "request-promise-native": "^1.0.8",
     "vue": "^2.6.11",
     "vue-material": "^1.0.0-beta-13",
-    "vue-router": "^3.1.6"
+    "vue-router": "^3.1.6",
+    "vuejs-spreadsheet": "^2.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",

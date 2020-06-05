@@ -1,10 +1,13 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: StateMaschine for ECS RunTask
+Description: StateMaschine for Amazon ECS RunTask
 
 Parameters:
   env:
     Type: String
+  storageRecordingStoreBucketName:
+    Type: String
+    Default: storageRecordingStoreBucketName
   vpcCidrBlock:
     Type: String
     Description: The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range.
@@ -184,6 +187,16 @@ Resources:
             Principal:
               Service: ecs-tasks.amazonaws.com
             Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3-PutObject-Policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::${storageRecordingStoreBucketName}/*'
 
   EcsTaskDef: 
     Type: AWS::ECS::TaskDefinition
@@ -198,15 +211,19 @@ Resources:
       ExecutionRoleArn: !Ref TaskExecutionRole
       ContainerDefinitions: 
         - Name: broadcast
-          Image: mats16/bcast:latest
+          Image: mats16/bcast:beta
           Cpu: 4000
           MemoryReservation: 16000
           Essential: "true"
           Environment:
             - Name: AUDIO_DELAYS
-              Value: 1800
+              Value: 1900
             - Name: THREAD_NUM
               Value: 4
+            #- Name: AUDIO_CODEC
+            #  Value: flac  # for Transcribe
+            #- Name: AUDIO_SAMPLERATE
+            #  Value: 16000  # for Transcribe
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -224,25 +241,25 @@ Resources:
     Properties:
       DefinitionString: !Sub |
         {
-          "Comment": "A Hello World example of the Amazon States Language using Pass states",
+          "Comment": "Run Recording/Broadcast Containers",
           "StartAt": "Map State",
           "States": {
             "Map State": {
               "Type": "Map",
               "InputPath": "$",
-              "ItemsPath": "$.rtmp_url",
+              "ItemsPath": "$.dst_url",
               "MaxConcurrency": 10,
               "Parameters": {
-                "browser_url.$": "$.browser_url",
-                "rtmp_url.$": "$$.Map.Item.Value"
+                "src_url.$": "$.src_url",
+                "dst_url.$": "$$.Map.Item.Value"
               },
               "Iterator": {
-                "StartAt": "ECS RunTask",
+                "StartAt": "ecsRunTask",
                 "States": {
-                  "ECS RunTask": {
+                  "ecsRunTask": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::ecs:runTask.sync",
-                    "TimeoutSeconds": 86400,
+                    "TimeoutSeconds": 14400,
                     "Parameters": {
                       "LaunchType": "FARGATE",
                       "PlatformVersion": "1.3.0",
@@ -266,14 +283,18 @@ Resources:
                         "ContainerOverrides": [
                           {
                             "Name": "broadcast",
-                            "Environment":[  
+                            "Environment":[
                               {  
-                                 "Name": "BROWSER_URL",
-                                 "Value.$": "$.browser_url"
+                                 "Name": "JOB_NAME",
+                                 "Value.$": "$$.Execution.Name"
                               },
                               {  
-                                 "Name": "RTMP_URL",
-                                 "Value.$": "$.rtmp_url"
+                                 "Name": "SRC_URL",
+                                 "Value.$": "$.src_url"
+                              },
+                              {  
+                                 "Name": "DST_URL",
+                                 "Value.$": "$.dst_url"
                               }
                            ]
                           }
@@ -287,11 +308,11 @@ Resources:
                     } ],
                     "Catch": [ {
                        "ErrorEquals": [ "States.Timeout" ],
-                       "Next": "ECS StopTask"
+                       "Next": "ecsStopTask"
                     } ],
                     "End": true
                   },
-                  "ECS StopTask": {
+                  "ecsStopTask": {
                      "Type": "Pass",
                      "Result": "Hello, AWS Step Functions!",
                      "End": true

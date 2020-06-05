@@ -1,15 +1,44 @@
-type Status
-  @model
+type Status @model
   @auth(rules: [
-    { allow: owner, ownerField:"owner", provider: userPools, operations:[read] }
+    { allow: owner, ownerField: "owner", provider: userPools, operations: [read] }
     { allow: private, provider: iam }
   ])
 {
   id: ID!
-  status: String!
+  status: String
   owner: String
-  browser_url: String
-  rtmp_url: [String]
+  description: String
+  src_url: String
+  recordingEnabled: Boolean
+  recordingFileUri: AWSURL
+  transcriptionEnabled: Boolean
+  transcriptionStatus: String
+  transcriptionMediaFileUri: AWSURL
+  transcriptFileUri: AWSURL
+  broadcastEnabled: Boolean
+  broadcastRtmpUri: String
   startDate: AWSTimestamp
   stopDate: AWSTimestamp
 }
+
+type AccountSettings @model
+  @auth(rules: [
+    { allow: owner, ownerField: "owner", provider: userPools, operations: [create, read, update, delete] }
+  ])
+{
+  id: ID!
+  owner: String
+  twitch_stream_key: String
+  youtube_stream_key: String
+}
+
+#type Vocabulary @model
+#  @key(name: "vocabularyId", fields: ["listId", "row"]) {
+#  id: ID!
+#  listId: String!
+#  row: String!
+#  phrase: String
+#  ipa: String
+#  soundsLike: String
+#  displayAs: String
+#}

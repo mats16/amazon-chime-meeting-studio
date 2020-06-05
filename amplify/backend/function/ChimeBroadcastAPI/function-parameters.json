@@ -1,3 +1,17 @@
 {
-    "permissions": {}
+    "permissions": {
+        "api": {
+            "BroadcastStatusAPI": [
+                "create"
+            ]
+        },
+        "storage": {
+            "RecordingStore": [
+                "read"
+            ],
+            "Status:@model(appsync)": [
+                "create"
+            ]
+        }
+    }
 }
