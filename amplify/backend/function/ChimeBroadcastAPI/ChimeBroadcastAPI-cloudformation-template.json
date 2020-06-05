@@ -125,7 +125,7 @@
 				"Runtime": "nodejs12.x",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "amplify-broadcastconsole-dev-220316-deployment",
+					"S3Bucket": "amplify-chimestudio-dev-152645-deployment",
 					"S3Key": "amplify-builds/ChimeBroadcastAPI-776c5442656667475233-build.zip"
 				}
 			}

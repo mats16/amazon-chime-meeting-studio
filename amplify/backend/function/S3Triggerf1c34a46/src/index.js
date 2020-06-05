@@ -35,7 +35,6 @@ const getStatus = gql(`
 `);
 
 const updateStatus = async function (variables) {
-  // Query
   const updateStatus = gql(`
     mutation UpdateStatus($id: ID!, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $_version: Int!) {
       updateStatus(input: {

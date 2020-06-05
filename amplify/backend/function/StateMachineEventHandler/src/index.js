@@ -24,7 +24,6 @@ const client = new AWSAppSyncClient({
 });
 
 const updateStatus = async function (variables) {
-  // Query
   const getStatus = gql(`
     query GetStatus($id: ID!) {
       getStatus(id: $id) {
