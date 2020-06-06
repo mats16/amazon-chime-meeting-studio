@@ -8,12 +8,8 @@ export const createAccountSettings = /* GraphQL */ `
   ) {
     createAccountSettings(input: $input, condition: $condition) {
       id
-      owner
       twitch_stream_key
       youtube_stream_key
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -26,12 +22,8 @@ export const updateAccountSettings = /* GraphQL */ `
   ) {
     updateAccountSettings(input: $input, condition: $condition) {
       id
-      owner
       twitch_stream_key
       youtube_stream_key
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -44,12 +36,8 @@ export const deleteAccountSettings = /* GraphQL */ `
   ) {
     deleteAccountSettings(input: $input, condition: $condition) {
       id
-      owner
       twitch_stream_key
       youtube_stream_key
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -74,11 +62,6 @@ export const createStatus = /* GraphQL */ `
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
-      startDate
-      stopDate
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -103,11 +86,6 @@ export const updateStatus = /* GraphQL */ `
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
-      startDate
-      stopDate
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -132,11 +110,6 @@ export const deleteStatus = /* GraphQL */ `
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
-      startDate
-      stopDate
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }

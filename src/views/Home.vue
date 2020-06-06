@@ -91,7 +91,7 @@
 
     <el-table
       :data="tableData"
-      :default-sort = "{prop: '_lastChangedAt', order: 'descending'}"
+      :default-sort = "{prop: 'updatedAt', order: 'descending'}"
       stripe
       style="width: 100%">
 
@@ -119,12 +119,12 @@
       </el-table-column>
 
       <el-table-column
-        prop="_lastChangedAt"
-        label="lastChangedAt"
+        prop="updatedAt"
+        label="updatedAt"
         sortable
         width="145">
         <template slot-scope="scope">
-          {{ convertToDate(scope.row._lastChangedAt) }}
+          {{ convertToDate(scope.row.updatedAt) }}
         </template>
       </el-table-column>
 
@@ -271,16 +271,16 @@
 </template>
 
 <script>
-import { Auth, API, DataStore, Storage } from 'aws-amplify';
-//import { Predicates } from 'aws-amplify'; // test
+import { Auth, API, graphqlOperation, Storage } from 'aws-amplify';
 import AmazonS3URI from 'amazon-s3-uri'
-import { Status, AccountSettings } from "../models";
+import * as queries from '../graphql/queries';
+//import * as mutations from '../graphql/mutations';
+import * as subscriptions from '../graphql/subscriptions';
 
 export default {
   name: 'Home',
   data() {
     return {
-      signedIn: false,
       username: '',
       currentSettings: undefined,
       form: {
@@ -322,30 +322,43 @@ export default {
       tableData: []
     }
   },
-  beforeCreate() {
-    // Auth.currentAuthenticatedUser()でユーザ情報を取得する。
-    // 取得できなければ認証ステータスをfalseに設定する
-    Auth.currentAuthenticatedUser()
-      .then((cognitoUser) => {
-        this.signedIn = true;
-        this.username = cognitoUser.username;
-      })
-      .catch(() => {
-        this.signedIn = false;
-      })
-  },
-  created: function () {
-    DataStore.query(AccountSettings)
+  async created () {
+    this.username = (await Auth.currentAuthenticatedUser()).username;
+    await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.username}))
       .then((data) => {
-        this.currentSettings = data[0]
-        this.form.twitch_stream_key = this.currentSettings.twitch_stream_key
-        this.form.youtube_stream_key = this.currentSettings.youtube_stream_key
+        this.currentSettings = data.data.getAccountSettings;
+        this.form.twitch_stream_key = this.currentSettings.twitch_stream_key;
+        this.form.youtube_stream_key = this.currentSettings.youtube_stream_key;
       })
-    this.updateTableData()
-    this.subscription = DataStore.observe(Status).subscribe((msg) => {
-      console.log(msg.model, msg.opType, msg.element);
-      this.updateTableData();
+      .catch((err) => console.log(JSON.stringify(err)));
+    // Todo: use delta sync
+    await API.graphql(graphqlOperation(queries.listStatuss))
+      .then((data) => {
+        this.tableData = data.data.listStatuss.items
+      });
+    this.subscriptionCreate = API.graphql(graphqlOperation(subscriptions.onCreateStatus, {owner: this.username})).subscribe({
+      next: (eventData) => {
+        console.log(eventData)
+        const data = eventData.value.data.onCreateStatus;
+        this.tableData.push(data);
+      }
     });
+    this.subscriptionUpdate = API.graphql(graphqlOperation(subscriptions.onUpdateStatus, {owner: this.username})).subscribe({
+      next: (eventData) => {
+        console.log(eventData)
+        const data = eventData.value.data.onUpdateStatus;
+        const index = this.tableData.findIndex(x => x.id === data.id);
+        if (index === -1) {
+          this.tableData.push(data);
+        } else {
+          this.$set(this.tableData, index, data);
+        }
+      }
+    });
+  },
+  beforeDestroy() {
+    this.subscriptionCreate.unsubscribe();
+    this.subscriptionUpdate.unsubscribe();
   },
   computed: {
     input: function () {
@@ -430,7 +443,6 @@ export default {
 
     },
     onClear() {
-      //DataStore.delete(Status, Predicates.ALL); // test
       this.form = {
         src_type: 'chime',
         src_url: '',
@@ -440,9 +452,6 @@ export default {
         youtube_stream_key: '',
         broadcast_url: ''
       }
-    },
-    async updateTableData() {
-      this.tableData = await DataStore.query(Status)
     },
     stopExecution(row) {
       API.get('ChimeBroadcastAPI', `/executions/${row.id}?stop=1`)

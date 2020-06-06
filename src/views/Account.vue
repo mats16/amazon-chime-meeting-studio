@@ -18,8 +18,9 @@
 </template>
 
 <script>
-import { DataStore } from 'aws-amplify';
-import { AccountSettings } from "../models";
+import { Auth, API, graphqlOperation } from 'aws-amplify';
+import * as queries from '../graphql/queries';
+import * as mutations from '../graphql/mutations';
 
 export default {
   name: 'Account',
@@ -32,8 +33,13 @@ export default {
       }
     }
   },
-  created: async function () {
-    this.currentSettings = (await DataStore.query(AccountSettings))[0]
+  async created () {
+    this.username = (await Auth.currentAuthenticatedUser()).username;
+    await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.username}))
+      .then((data) => {
+        this.currentSettings = data.data.getAccountSettings
+      })
+      .catch((err) => console.log(JSON.stringify(err)));
     if (this.currentSettings) {
      this.form.twitch_stream_key = this.currentSettings.twitch_stream_key
      this.form.youtube_stream_key = this.currentSettings.youtube_stream_key
@@ -41,19 +47,23 @@ export default {
   },
   methods: {
     async onSubmit() {
-      let newSettings = {}
-      if (typeof this.currentSettings === "undefined") {
-        newSettings = new AccountSettings({
-           twitch_stream_key: this.form.twitch_stream_key,
-           youtube_stream_key: this.form.youtube_stream_key
-        })
-      } else {
-        newSettings = AccountSettings.copyOf(this.currentSettings, updated => {
-          updated.twitch_stream_key = this.form.twitch_stream_key,
-          updated.youtube_stream_key = this.form.youtube_stream_key
-        })
+      const input = {
+        id: this.username,
+        ...this.form
       }
-      this.currentSettings = await DataStore.save(newSettings)
+      if (this.currentSettings) {
+        await API.graphql(graphqlOperation(mutations.createAccountSettings, {input: input}))
+          .then((data) => {
+            this.currentSettings = data.data.createAccountSettings
+          })
+          .catch((err) => console.log(JSON.stringify(err)));
+      } else {
+        await API.graphql(graphqlOperation(mutations.updateAccountSettings, {input: input}))
+          .then((data) => {
+            this.currentSettings = data.data.updateAccountSettings
+          })
+          .catch((err) => console.log(JSON.stringify(err)));
+      }
     }
   }
 }
