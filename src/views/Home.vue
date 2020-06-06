@@ -120,7 +120,7 @@
 
       <el-table-column
         prop="updatedAt"
-        label="updatedAt"
+        label="Last Update"
         sortable
         width="145">
         <template slot-scope="scope">
