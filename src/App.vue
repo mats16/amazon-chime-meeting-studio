@@ -1,8 +1,7 @@
 <template>
   <div id="app">
     <h2>Amazon Chime Meeting Studio</h2>
-    <amplify-authenticator username-alias="email">
-      <amplify-sign-up slot="sign-up" username-alias="email" :form-fields.prop="formFields"></amplify-sign-up>
+    <div v-if="signedIn">
       <div class="amplify-sign-out">
         <amplify-sign-out></amplify-sign-out>
       </div>
@@ -15,15 +14,25 @@
         </el-menu>
       </div>
       <router-view/>
-    </amplify-authenticator>
+    </div>
+    <div v-else>
+      <amplify-authenticator username-alias="email">
+        <amplify-sign-up slot="sign-up" username-alias="email" :form-fields.prop="formFields"></amplify-sign-up>
+      </amplify-authenticator>
+    </div>
   </div>
 </template>
 
 <script>
+import { Auth } from 'aws-amplify'
+import { AmplifyEventBus } from 'aws-amplify-vue'
+
 export default {
   name: 'App',
   data() {
     return {
+      signedIn: false,
+      username: '',
       formFields: [
         {
           type: 'email',
@@ -39,6 +48,27 @@ export default {
         },
       ]
     }
+  },
+  created () {
+    Auth.currentAuthenticatedUser()
+      .then((cognitoUser) => {
+        this.signedIn = true
+        this.username = cognitoUser.username
+      })
+      .catch(() => {
+        this.signedIn = false
+      });
+    AmplifyEventBus.$on('authState', async  info => {
+      if (info === 'signedIn') {
+        Auth.currentAuthenticatedUser()
+          .then((cognitoUser) => {
+            this.signedIn = true
+            this.username = cognitoUser.username
+          });
+      } else {
+        this.signedIn = false
+      }
+    });
   }
 }
 </script>

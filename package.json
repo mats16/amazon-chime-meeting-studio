@@ -8,9 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@aws-amplify/core": "^3.2.7",
-    "@aws-amplify/datastore": "^2.1.0",
-    "@aws-amplify/ui-vue": "^0.2.5",
+    "@aws-amplify/ui-vue": "^0.2.7",
     "amazon-s3-uri": "0.0.3",
     "aws-amplify": "^3.0.16",
     "aws-amplify-vue": "^2.1.1",

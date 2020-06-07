@@ -397,7 +397,7 @@ export default {
       return `${dateTime.toLocaleDateString()} ${dateTime.toLocaleTimeString()}`;
     },
     onOpenStorageFile(s3uri) {
-      const { key }= AmazonS3URI(s3uri)
+      const { key } = AmazonS3URI(s3uri)
       const accessLevel = key.split('/')[0]
       const file = key.split('/').slice(2).join('/')
       Storage.get(file, { level: accessLevel, expires: 60 * 5 })
@@ -410,7 +410,7 @@ export default {
         .catch(err => console.log(err));
     },
     onOpenTranscript(s3uri) {
-      const { key }= AmazonS3URI(s3uri)
+      const { key } = AmazonS3URI(s3uri)
       const accessLevel = key.split('/')[0]
       const file = key.split('/').slice(2).join('/')
       const link = document.createElement('a')
