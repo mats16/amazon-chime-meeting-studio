@@ -6,11 +6,13 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import locale from 'element-ui/lib/locale/lang/ja';
 
-import Amplify from 'aws-amplify';
+import Amplify, * as AmplifyModules from 'aws-amplify'
+import { AmplifyPlugin } from 'aws-amplify-vue'
 import '@aws-amplify/ui-vue';
 import awsconfig from './aws-exports';
 
 Amplify.configure(awsconfig);
+Vue.use(AmplifyPlugin, AmplifyModules);
 
 Vue.config.productionTip = false
 Vue.use(ElementUI, { locale });

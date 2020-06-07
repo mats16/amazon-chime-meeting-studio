@@ -2,53 +2,41 @@
 // this is an auto generated file. This will be overwritten
 
 export const onCreateAccountSettings = /* GraphQL */ `
-  subscription OnCreateAccountSettings($owner: String!) {
-    onCreateAccountSettings(owner: $owner) {
+  subscription OnCreateAccountSettings($id: String!) {
+    onCreateAccountSettings(id: $id) {
       id
-      owner
       twitch_stream_key
       youtube_stream_key
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
   }
 `;
 export const onUpdateAccountSettings = /* GraphQL */ `
-  subscription OnUpdateAccountSettings($owner: String!) {
-    onUpdateAccountSettings(owner: $owner) {
+  subscription OnUpdateAccountSettings($id: String!) {
+    onUpdateAccountSettings(id: $id) {
       id
-      owner
       twitch_stream_key
       youtube_stream_key
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
   }
 `;
 export const onDeleteAccountSettings = /* GraphQL */ `
-  subscription OnDeleteAccountSettings($owner: String!) {
-    onDeleteAccountSettings(owner: $owner) {
+  subscription OnDeleteAccountSettings($id: String!) {
+    onDeleteAccountSettings(id: $id) {
       id
-      owner
       twitch_stream_key
       youtube_stream_key
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
   }
 `;
 export const onCreateStatus = /* GraphQL */ `
-  subscription OnCreateStatus {
-    onCreateStatus {
+  subscription OnCreateStatus($owner: String!) {
+    onCreateStatus(owner: $owner) {
       id
       status
       owner
@@ -62,19 +50,14 @@ export const onCreateStatus = /* GraphQL */ `
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
-      startDate
-      stopDate
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
   }
 `;
 export const onUpdateStatus = /* GraphQL */ `
-  subscription OnUpdateStatus {
-    onUpdateStatus {
+  subscription OnUpdateStatus($owner: String!) {
+    onUpdateStatus(owner: $owner) {
       id
       status
       owner
@@ -88,19 +71,14 @@ export const onUpdateStatus = /* GraphQL */ `
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
-      startDate
-      stopDate
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
   }
 `;
 export const onDeleteStatus = /* GraphQL */ `
-  subscription OnDeleteStatus {
-    onDeleteStatus {
+  subscription OnDeleteStatus($owner: String!) {
+    onDeleteStatus(owner: $owner) {
       id
       status
       owner
@@ -114,11 +92,6 @@ export const onDeleteStatus = /* GraphQL */ `
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
-      startDate
-      stopDate
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }

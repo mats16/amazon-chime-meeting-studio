@@ -29,54 +29,34 @@ const getStatus = gql(`
     query GetStatus($id: ID!) {
         getStatus(id: $id) {
             transcriptionEnabled
-            _version
         }
     }
 `);
-
-const updateStatus = async function (variables) {
-  const updateStatus = gql(`
-    mutation UpdateStatus($id: ID!, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $_version: Int!) {
-      updateStatus(input: {
-        id: $id
-        transcriptionStatus: $transcriptionStatus
-        transcriptionMediaFileUri: $transcriptionMediaFileUri
-        _version: $_version
-      }) {
-        __typename
-        id
-        status
-        owner
-        description
-        src_url
-        recordingEnabled
-        recordingFileUri
-        transcriptionEnabled
-        transcriptionStatus
-        transcriptionMediaFileUri
-        transcriptFileUri
-        broadcastEnabled
-        broadcastRtmpUri
-        startDate
-        stopDate
-        _version
-        _deleted
-        _lastChangedAt
-      }
+const updateStatus = gql(`
+  mutation UpdateStatus($id: ID!, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL) {
+    updateStatus(input: {
+      id: $id
+      transcriptionStatus: $transcriptionStatus
+      transcriptionMediaFileUri: $transcriptionMediaFileUri
+    }) {
+      id
+      status
+      owner
+      description
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      createdAt
+      updatedAt
     }
-  `);
-  // Check current _version
-  await client.query({ variables: variables, query: getStatus, fetchPolicy: 'network-only' })
-    .then((data) => {
-        variables._version = data.data.getStatus._version;
-    })
-    .catch((err) => console.log(JSON.stringify(err)));    
-  // Update
-  const data = await client.mutate({ variables: variables, mutation: updateStatus })
-    .then((data) => console.log(JSON.stringify(data)))
-    .catch((err) => console.log(JSON.stringify(err)));
-  return data
-};
+  }
+`);
 
 exports.handler = async (event) => {
   console.log('Received S3 event:', JSON.stringify(event, null, 2));
@@ -126,6 +106,8 @@ exports.handler = async (event) => {
         console.log(JSON.stringify(err));
         variables.transcriptionStatus = 'ERROR';
       })
-    await updateStatus(variables);
+    await client.mutate({ variables: variables, mutation: updateStatus })
+      .then((data) => console.log(JSON.stringify(data)))
+      .catch((err) => console.log(JSON.stringify(err)));
   }
 };

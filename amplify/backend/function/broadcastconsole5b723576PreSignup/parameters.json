@@ -1,4 +1,1 @@
-{
-    "modules": "email-filter-whitelist",
-    "resourceName": "broadcastconsole5b723576PreSignup"
-}
+{"modules":"email-filter-whitelist"}

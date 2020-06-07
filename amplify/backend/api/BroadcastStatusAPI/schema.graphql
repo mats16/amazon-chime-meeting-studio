@@ -1,6 +1,6 @@
 type Status @model
   @auth(rules: [
-    { allow: owner, ownerField: "owner", provider: userPools, operations: [read] }
+    { allow: owner, ownerField: "owner", provider: userPools, operations: [create, read, update] }
     { allow: private, provider: iam }
   ])
 {
@@ -17,17 +17,14 @@ type Status @model
   transcriptFileUri: AWSURL
   broadcastEnabled: Boolean
   broadcastRtmpUri: String
-  startDate: AWSTimestamp
-  stopDate: AWSTimestamp
 }
 
 type AccountSettings @model
   @auth(rules: [
-    { allow: owner, ownerField: "owner", provider: userPools, operations: [create, read, update, delete] }
+    { allow: owner, ownerField: "id", provider: userPools, operations: [create, read, update, delete] }
   ])
 {
   id: ID!
-  owner: String
   twitch_stream_key: String
   youtube_stream_key: String
 }

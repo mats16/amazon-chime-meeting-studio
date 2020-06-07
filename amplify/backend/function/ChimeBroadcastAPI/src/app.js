@@ -47,7 +47,7 @@ const appsyncClient = new AWSAppSyncClient({
 });
 
 const createStatus = gql(`
-  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $description: String, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String, $startDate: AWSTimestamp) {
+  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $description: String, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
     createStatus(input: {
       id: $id
       status: $status
@@ -61,9 +61,7 @@ const createStatus = gql(`
       transcriptionMediaFileUri: $transcriptionMediaFileUri
       broadcastEnabled: $broadcastEnabled
       broadcastRtmpUri: $broadcastRtmpUri
-      startDate: $startDate
     }) {
-      __typename
       id
       status
       owner
@@ -77,11 +75,8 @@ const createStatus = gql(`
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
-      startDate
-      stopDate
-      _version
-      _deleted
-      _lastChangedAt
+      createdAt
+      updatedAt
     }
   }
 `);
@@ -134,7 +129,6 @@ app.post('/executions/new', function(req, res) {
     id: requestId,
     status: 'SUBMITTED',
     owner: cognitoUsername,
-    startDate: requestTimeEpoch,
     ...stateMachineInput
   }
 
