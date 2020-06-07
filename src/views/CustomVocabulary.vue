@@ -137,7 +137,32 @@ export default {
         }
       ],
       tbody: [
-        {}
+        {
+          a: {
+            type: 'input',
+            value: 'FireStore',
+            active: false,
+            style: {
+              color: '#000',
+            },
+          },
+          c: {
+            type: 'input',
+            value: 'ファイアーストア',
+            active: false,
+            style: {
+              color: '#000',
+            },
+          },
+          d: {
+            type: 'input',
+            value: 'FireStore',
+            active: false,
+            style: {
+              color: '#000',
+            },
+          }
+        }
       ],
       submenuThead: [
         {

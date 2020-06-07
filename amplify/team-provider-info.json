@@ -58,5 +58,35 @@
                 "RecordingStore": {}
             }
         }
+    },
+    "prod": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-chimestudio-prod-94704-authRole",
+            "UnauthRoleArn": "arn:aws:iam::983035974902:role/amplify-chimestudio-prod-94704-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::983035974902:role/amplify-chimestudio-prod-94704-authRole",
+            "Region": "ap-northeast-1",
+            "DeploymentBucketName": "amplify-chimestudio-prod-94704-deployment",
+            "UnauthRoleName": "amplify-chimestudio-prod-94704-unauthRole",
+            "StackName": "amplify-chimestudio-prod-94704",
+            "StackId": "arn:aws:cloudformation:ap-northeast-1:983035974902:stack/amplify-chimestudio-prod-94704/d832b980-a8a3-11ea-930a-0a50f89864ca",
+            "AmplifyAppId": "dltizck3weg0m"
+        },
+        "categories": {
+            "auth": {
+                "broadcastconsole5b723576": {}
+            },
+            "function": {
+                "StateMachineEventHandler": {},
+                "ChimeBroadcastAPI": {},
+                "S3Triggerf1c34a46": {},
+                "TranscribeEventHandler": {},
+                "broadcastconsole5b723576PreSignup": {
+                    "DOMAINWHITELIST": "amazon.co.jp, amazon.com"
+                },
+                "BroadcastStatusAPI": {},
+                "BroadcastContainer": {},
+                "RecordingStore": {}
+            }
+        }
     }
 }

@@ -15,7 +15,6 @@ const AWS = require('aws-sdk');
 const transcribeservice = new AWS.TranscribeService();
 const s3 = new AWS.S3();
 
-//const recordingBucket = process.env['STORAGE_RECORDINGSTORE_BUCKETNAME']
 const gqlEndpoint = process.env['API_BROADCASTSTATUSAPI_GRAPHQLAPIENDPOINTOUTPUT'];
 const region = process.env['REGION'];
 const authType = 'AWS_IAM';
