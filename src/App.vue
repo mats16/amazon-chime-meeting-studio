@@ -16,9 +16,7 @@
       <router-view/>
     </div>
     <div v-else>
-      <amplify-authenticator username-alias="email">
-        <amplify-sign-up slot="sign-up" username-alias="email" :form-fields.prop="formFields"></amplify-sign-up>
-      </amplify-authenticator>
+      <amplify-authenticator v-bind:authConfig="authConfig"/>
     </div>
   </div>
 </template>
@@ -33,20 +31,12 @@ export default {
     return {
       signedIn: false,
       username: '',
-      formFields: [
-        {
-          type: 'email',
-          label: 'Email Address',
-          placeholder: 'Email',
-          required: true,
-        },
-        {
-          type: 'password',
-          label: 'Password',
-          placeholder: 'Password',
-          required: true,
-        },
-      ]
+      authConfig: {
+        usernameAttributes: "email",
+        signUpConfig: {
+          hiddenDefaults: ["phone_number"]
+        }
+      }
     }
   },
   created () {
