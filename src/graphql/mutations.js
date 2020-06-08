@@ -43,6 +43,96 @@ export const deleteAccountSettings = /* GraphQL */ `
     }
   }
 `;
+export const createVocabulary = /* GraphQL */ `
+  mutation CreateVocabulary(
+    $input: CreateVocabularyInput!
+    $condition: ModelVocabularyConditionInput
+  ) {
+    createVocabulary(input: $input, condition: $condition) {
+      tableId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateVocabulary = /* GraphQL */ `
+  mutation UpdateVocabulary(
+    $input: UpdateVocabularyInput!
+    $condition: ModelVocabularyConditionInput
+  ) {
+    updateVocabulary(input: $input, condition: $condition) {
+      tableId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteVocabulary = /* GraphQL */ `
+  mutation DeleteVocabulary(
+    $input: DeleteVocabularyInput!
+    $condition: ModelVocabularyConditionInput
+  ) {
+    deleteVocabulary(input: $input, condition: $condition) {
+      tableId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createVocabularyTable = /* GraphQL */ `
+  mutation CreateVocabularyTable(
+    $input: CreateVocabularyTableInput!
+    $condition: ModelVocabularyTableConditionInput
+  ) {
+    createVocabularyTable(input: $input, condition: $condition) {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateVocabularyTable = /* GraphQL */ `
+  mutation UpdateVocabularyTable(
+    $input: UpdateVocabularyTableInput!
+    $condition: ModelVocabularyTableConditionInput
+  ) {
+    updateVocabularyTable(input: $input, condition: $condition) {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteVocabularyTable = /* GraphQL */ `
+  mutation DeleteVocabularyTable(
+    $input: DeleteVocabularyTableInput!
+    $condition: ModelVocabularyTableConditionInput
+  ) {
+    deleteVocabularyTable(input: $input, condition: $condition) {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createStatus = /* GraphQL */ `
   mutation CreateStatus(
     $input: CreateStatusInput!
@@ -57,6 +147,7 @@ export const createStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri
@@ -81,6 +172,7 @@ export const updateStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri
@@ -105,6 +197,7 @@ export const deleteStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri

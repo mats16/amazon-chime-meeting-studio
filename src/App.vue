@@ -93,5 +93,4 @@ export default {
   text-align: center;
   margin: 30px;
 }
-
 </style>

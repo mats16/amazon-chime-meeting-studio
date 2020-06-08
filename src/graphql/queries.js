@@ -34,6 +34,82 @@ export const listAccountSettingss = /* GraphQL */ `
     }
   }
 `;
+export const getVocabulary = /* GraphQL */ `
+  query GetVocabulary($tableId: ID!, $row: Int!) {
+    getVocabulary(tableId: $tableId, row: $row) {
+      tableId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listVocabularys = /* GraphQL */ `
+  query ListVocabularys(
+    $tableId: ID
+    $row: ModelIntKeyConditionInput
+    $filter: ModelVocabularyFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listVocabularys(
+      tableId: $tableId
+      row: $row
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        tableId
+        row
+        phrase
+        ipa
+        soundsLike
+        displayAs
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getVocabularyTable = /* GraphQL */ `
+  query GetVocabularyTable($id: ID!) {
+    getVocabularyTable(id: $id) {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listVocabularyTables = /* GraphQL */ `
+  query ListVocabularyTables(
+    $filter: ModelVocabularyTableFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listVocabularyTables(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const getStatus = /* GraphQL */ `
   query GetStatus($id: ID!) {
     getStatus(id: $id) {
@@ -45,6 +121,7 @@ export const getStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri
@@ -71,6 +148,7 @@ export const listStatuss = /* GraphQL */ `
         recordingEnabled
         recordingFileUri
         transcriptionEnabled
+        transcriptionMaxSpeakerLabels
         transcriptionStatus
         transcriptionMediaFileUri
         transcriptFileUri
