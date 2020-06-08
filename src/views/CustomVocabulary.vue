@@ -1,6 +1,33 @@
 <template>
   <div class="vocabulary">
 
+    <el-form ref="form" :inline="true" :model="form" label-width="180px">
+
+      <el-form-item label="Vocabulary Tables">
+        <el-select v-model="selectedTableId" placeholder="Select">
+          <el-option
+            v-for="item of vocabularyTables"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="danger" @click="deleteTable(selectedTableId)">Delete Table</el-button>
+      </el-form-item>
+
+      <el-form-item label="Create New Tables">
+        <el-input v-model="form.newTableName"></el-input>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="createTable(form.newTableName)">Creste Table</el-button>
+      </el-form-item>
+
+    </el-form>
+
     <vue-table
       :tbody-data="tbody"
       :headers="headers"
@@ -16,17 +43,21 @@
       @tbody-checked-row="checkedData"
       @tbody-all-checked-row="checkedAllData"
       @tbody-change-data="changeData"
-      @tbody-submenu-click-change-color="changeColorTbody"
+      @tbody-submenu-click-add-row="addRow"
       @tbody-submenu-click-change-value="changeValueTbody"
       @thead-submenu-click-change-color="changeColorThead"
       @thead-submenu-click-change-value="changeValueThead"
       @thead-td-sort="sortProduct">
-    <div slot="header">
-      Specific Header
-    </div>
-    <div slot="loader">
-      Loader
-    </div>
+
+      <div slot="header">
+        <el-button type="primary" @click="addRow()">Add Row</el-button>
+        <el-button type="danger" @click="deleteRow()">Delete Row</el-button>
+        Specific Header
+        <el-button type="primary" @click="publishToS3()">Publish to S3</el-button>
+      </div>
+      <div slot="loader">
+        Loader
+      </div>
     </vue-table>
 
   </div>
@@ -34,11 +65,21 @@
 
 <script>
 import VueTable from "vuejs-spreadsheet";
+import { API, graphqlOperation, Storage } from 'aws-amplify';
+import * as queries from '../graphql/queries';
+import * as mutations from '../graphql/mutations';
+import * as subscriptions from '../graphql/subscriptions';
 
 export default {
   name: 'vocabulary',
   data() {
     return {
+      subscription: {},
+      selectedTableId: '',
+      vocabularyTables: [],
+      form: {
+        newTableName: '',
+      },
       customOptions: {
         tbodyIndex: true,
         tbodyCheckbox: true,
@@ -86,7 +127,7 @@ export default {
         top: 0,
         left: 0
       },
-      disableSortThead: ["a"],
+      disableSortThead: ["phrase", "ipa", "soundsLike", "displayAs"],
       styleWrapVueTable: {
         height: "400px",
         overflow: "visible",
@@ -101,7 +142,7 @@ export default {
       headers: [
         {
           headerName: "Phrase",
-          headerKey: "a",
+          headerKey: "phrase",
           style: {
             width: "200px",
             minWidth: "200px",
@@ -110,7 +151,7 @@ export default {
         },
         {
           headerName: "IPA",
-          headerKey: "b",
+          headerKey: "ipa",
           style: {
             width: "200px",
             minWidth: "200px",
@@ -119,7 +160,7 @@ export default {
         },
         {
           headerName: "SoundsLike",
-          headerKey: "c",
+          headerKey: "soundsLike",
           style: {
             width: "200px",
             minWidth: "200px",
@@ -128,7 +169,7 @@ export default {
         },
         {
           headerName: "DisplayAs",
-          headerKey: "d",
+          headerKey: "displayAs",
           style: {
             width: "200px",
             minWidth: "200px",
@@ -138,7 +179,7 @@ export default {
       ],
       tbody: [
         {
-          a: {
+          phrase: {
             type: 'input',
             value: 'FireStore',
             active: false,
@@ -146,7 +187,7 @@ export default {
               color: '#000',
             },
           },
-          c: {
+          soundsLike: {
             type: 'input',
             value: 'ファイアーストア',
             active: false,
@@ -154,7 +195,7 @@ export default {
               color: '#000',
             },
           },
-          d: {
+          displayAs: {
             type: 'input',
             value: 'FireStore',
             active: false,
@@ -164,55 +205,13 @@ export default {
           }
         }
       ],
-      submenuThead: [
-        {
-          type: "button",
-          value: "change color",
-          function: "change-color",
-          disabled: ["a"]
-        },
-        {
-          type: "select",
-          disabled: ["a"],
-          subtitle: "Select state:",
-          selectOptions: [
-            {
-              value: "new-york",
-              label: "new-york"
-            },
-            {
-              value: "france",
-              label: "france"
-            }
-          ],
-          value: "new-york",
-          buttonOption: {
-            value: "change city",
-            function: "change-city",
-            style: {
-              display: "block"
-            }
-          }
-        },
-        {
-          type: "button",
-          value: "change value",
-          function: "change-value",
-          disabled: ["a", "b"]
-        }
-      ],
+      submenuThead: [],
       submenuTbody: [
         {
-          type: "button",
-          value: "change color",
-          function: "change-color",
-          disabled: ["img"]
-        },
-        {
-          type: "button",
-          value: "change value",
-          function: "change-value",
-          disabled: ["img", "name"]
+          type: 'button',
+          value: 'Add Row',
+          function: 'add-row',
+          disabled: ['img']
         }
       ]
     };
@@ -220,14 +219,144 @@ export default {
   components: {
     VueTable,
   },
+  watch: {
+    selectedTableId: function (tableId) {
+      API.graphql(graphqlOperation(queries.listVocabularys, {tableId: tableId}))
+        .then((res) => {
+          const items = res.data.listVocabularys.items
+          const tbody = []
+          for (let item of items) {
+            tbody[item.row] = this.genRowData(item)
+          }
+          this.tbody = tbody
+        })
+        .catch((err) => console.log(JSON.stringify(err)));
+      this.subscription.create = API.graphql(graphqlOperation(subscriptions.onCreateVocabulary, {tableId: tableId})).subscribe({
+        next: (eventData) => {
+          const item = eventData.value.data.onCreateVocabulary;
+          const rowData = this.genRowData(item)
+          this.$set(this.tbody, item.row, rowData);
+        }
+      });
+      this.subscription.update = API.graphql(graphqlOperation(subscriptions.onUpdateVocabulary, {tableId: tableId})).subscribe({
+        next: (eventData) => {
+          const item = eventData.value.data.onUpdateVocabulary;
+          const rowData = this.tbody[item.row]
+          for (let k of ['phrase', 'ipa', 'soundsLike', 'displayAs']) {
+            rowData[k].value = item[k]
+          }
+          this.$set(this.tbody, item.row, rowData);
+        }
+      });
+      this.subscription.delete = API.graphql(graphqlOperation(subscriptions.onDeleteVocabulary, {tableId: tableId})).subscribe({
+        next: (eventData) => {
+          const item = eventData.value.data.onDeleteVocabulary;
+          this.tbody.splice(item.row, item.row);
+        }
+      });
+    }
+  },
+  beforeDestroy() {
+    for (let item in this.subscription) {
+      this.subscription[item].unsubscribe();
+    }
+  },
   mounted() {
     this.loading = true;
     setTimeout(() => {
       this.loading = false;
     }, 300);
-    this.tbody.push({})
+    API.graphql(graphqlOperation(queries.listVocabularyTables))
+      .then((data) => {
+        this.vocabularyTables = data.data.listVocabularyTables.items;
+      })
+      .catch((err) => console.log(JSON.stringify(err)));
   },
   methods: {
+    genRowData(item) {
+      const rowData = {
+        phrase: {
+          type: 'input',
+          value: item.phrase,
+          active: false,
+          style: {
+            color: '#000',
+          },
+        },
+        ipa: {
+          type: 'input',
+          value: item.ipa,
+          active: false,
+          style: {
+            color: '#000',
+          },
+        },
+        soundsLike: {
+          type: 'input',
+          value: item.soundsLike,
+          active: false,
+          style: {
+            color: '#000',
+          },
+        },
+        displayAs: {
+          type: 'input',
+          value: item.displayAs,
+          active: false,
+          style: {
+            color: '#000',
+          },
+        }
+      }
+      return rowData
+    },
+    async createTable(tableName) {
+      const createVocabularyTableInput = { name: tableName }
+      const data = await API.graphql(graphqlOperation(mutations.createVocabularyTable, {input: createVocabularyTableInput}))
+        .catch((err) => console.log(JSON.stringify(err)));
+      const newTable = data.data.createVocabularyTable
+      const createVocabularyInput = {
+        tableId: newTable.id,
+        row:　0,
+        phrase: '',
+        ipa: '',
+        soundsLike: '',
+        displayAs: '',
+      }
+      await API.graphql(graphqlOperation(mutations.createVocabulary, {input: createVocabularyInput}))
+        .catch((err) => console.log(JSON.stringify(err)));
+      this.vocabularyTables.push(newTable)
+      this.selectedTableId = newTable.id
+    },
+    deleteTable(tableId) {
+      const input = {id: tableId}
+      API.graphql(graphqlOperation(mutations.deleteVocabularyTable, {input: input}))
+        .catch((err) => console.log(JSON.stringify(err)));
+      this.selectedTableId = ''
+      this.tbody = []
+    },
+    addRow() {
+      if (this.tbody.length < 100) {
+        const input = {
+          tableId: this.selectedTableId,
+          row:　this.tbody.length,
+          phrase: '',
+          ipa: '',
+          soundsLike: '',
+          displayAs: '',
+        }
+        API.graphql(graphqlOperation(mutations.createVocabulary, {input: input}))
+          .catch((err) => console.log(JSON.stringify(err)));
+      }
+    },
+    deleteRow() {
+      const input = {
+        tableId: this.selectedTableId,
+        row:　this.tbody.length - 1,
+      }
+      API.graphql(graphqlOperation(mutations.deleteVocabulary, {input: input}))
+        .catch((err) => console.log(JSON.stringify(err)));
+    },
     checkedAllData(isChecked) {
       console.log('checked all data', isChecked)
     },
@@ -235,7 +364,13 @@ export default {
       console.log('checked data', row)
     },
     changeData(row, header) {
-      console.log(row, header);
+      const input = {
+        tableId: this.selectedTableId,
+        row: row
+      }
+      input[header] = this.tbody[row][header].value  // Todo: delete キー押した際に古い value が取れてしまう問題
+      API.graphql(graphqlOperation(mutations.updateVocabulary, {input: input}))
+        .catch((err) => console.log(JSON.stringify(err)));
     },
     sortProduct(event, header, colIndex) {
       console.log(event, header, colIndex)
@@ -257,6 +392,18 @@ export default {
       console.log(colIndex)  // for Lint
       this.rows[rowIndex][header].value = 'T-shirt';
     },
+    async publishToS3() {
+      const data = await API.graphql(graphqlOperation(queries.getVocabularyTable, {id: this.selectedTableId}))
+      console.log(data)
+      const fileName = `${data.data.getVocabularyTable.name}.txt`
+      let body = ''
+      for (let row of this.tbody) {
+        body += `${row.phrase.value}\t${row.ipa.value}\t${row.soundsLike.value}\t${row.displayAs.value}\n`
+      }
+      Storage.put(fileName, body)
+        .then (result => console.log(result)) // {key: "test.txt"}
+        .catch(err => console.log(err));
+    }
   },
 };
 </script>

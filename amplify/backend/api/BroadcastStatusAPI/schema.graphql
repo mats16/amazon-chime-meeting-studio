@@ -1,6 +1,6 @@
 type Status @model
   @auth(rules: [
-    { allow: owner, ownerField: "owner", provider: userPools, operations: [create, read, update] }
+    { allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [create, read, update] }
     { allow: private, provider: iam }
   ])
 {
@@ -12,6 +12,7 @@ type Status @model
   recordingEnabled: Boolean
   recordingFileUri: AWSURL
   transcriptionEnabled: Boolean
+  transcriptionMaxSpeakerLabels: Int
   transcriptionStatus: String
   transcriptionMediaFileUri: AWSURL
   transcriptFileUri: AWSURL
@@ -29,13 +30,21 @@ type AccountSettings @model
   youtube_stream_key: String
 }
 
-#type Vocabulary @model
-#  @key(name: "vocabularyId", fields: ["listId", "row"]) {
-#  id: ID!
-#  listId: String!
-#  row: String!
-#  phrase: String
-#  ipa: String
-#  soundsLike: String
-#  displayAs: String
-#}
+type Vocabulary @model
+  @auth(rules: [ { allow: private, provider: userPools } ])
+  @key(fields: ["tableId", "row"])
+{
+  tableId: ID!
+  row: Int!
+  phrase: String!
+  ipa: String
+  soundsLike: String
+  displayAs: String
+}
+
+type VocabularyTable @model
+  @auth(rules: [ { allow: private, provider: userPools } ])
+{
+  id: ID!
+  name: String!
+}

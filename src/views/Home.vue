@@ -7,22 +7,24 @@
         <el-input v-model="form.description" placeholder="Note about this meeting"></el-input>
       </el-form-item>
 
-      <el-form-item label="Source Type">
-        <el-radio-group v-model="form.src_type">
-          <el-radio label="chime">Amazon Chime</el-radio>
-          <el-radio label="custom">Custom URL</el-radio>
-        </el-radio-group>
-      </el-form-item>
+      <el-form ref="form" :inline="true" :model="form" :rules="rules" label-width="180px">
+        <el-form-item label="Source Type">
+          <el-radio-group v-model="form.src_type">
+            <el-radio label="chime">Amazon Chime</el-radio>
+            <el-radio label="custom">Custom URL</el-radio>
+          </el-radio-group>
+        </el-form-item>
 
-      <el-form-item label="Meeting PIN" prop="meeting_pin" v-if="form.src_type === 'chime'">
-        <el-input v-model="form.meeting_pin" minlength=10 maxlength=10 placeholder="1234567890"></el-input>
-      </el-form-item>
+        <el-form-item label="Meeting PIN" prop="meeting_pin" v-if="form.src_type === 'chime'">
+          <el-input v-model="form.meeting_pin" minlength=10 maxlength=10 placeholder="1234567890"></el-input>
+        </el-form-item>
 
-      <el-form-item label="Custome URL" prop="src_url" v-if="form.src_type === 'custom'">
-        <el-input v-model="form.src_url" placeholder="www.example.com">
-          <template slot="prepend">https://</template>
-        </el-input>
-      </el-form-item>
+        <el-form-item label="Custome URL" prop="src_url" v-if="form.src_type === 'custom'">
+          <el-input v-model="form.src_url" placeholder="www.example.com">
+            <template slot="prepend">https://</template>
+          </el-input>
+        </el-form-item>
+      </el-form>
 
       <el-form-item label="Broadcast">
         <el-switch
@@ -61,25 +63,26 @@
         </el-switch>
       </el-form-item>
 
-      <el-form-item label="Transcription">
-        <el-switch
-          v-model="form.transcriptionEnabled"
-          active-text="Enabled"
-          inactive-text="Disabled">
-        </el-switch>
-      </el-form-item>
+      <el-form ref="form" :inline="true" :model="form" :rules="rules" label-width="180px">
+        <el-form-item label="Transcription">
+          <el-switch
+            v-model="form.transcriptionEnabled"
+            active-text="Enabled"
+            inactive-text="Disabled">
+          </el-switch>
+        </el-form-item>
+        <el-form-item label="Max Speaker Labels">
+          <el-input-number v-model="form.transcriptionMaxSpeakerLabels" :min="1" :max="10" :disabled="!(form.transcriptionEnabled)"></el-input-number>
+        </el-form-item>
+      </el-form>
 
-      <el-form-item label="File Access Level" v-if="form.recordingEnabled || form.transcriptionEnabled">
+      <!--
+      <el-form-item label="Access Level" v-if="form.recordingEnabled || form.transcriptionEnabled">
         <el-switch
-          v-model="form.filePrivateAccess"
+          v-model="form.privateAccess"
           active-text="Private"
           inactive-text="Sharing">
         </el-switch>
-      </el-form-item>
-
-      <!--
-      <el-form-item label="Max Speaker Labels">
-        <el-input-number v-model="form.transcriptionMaxSpeakerLabels" :min="1" :max="10" :disabled="!(form.transcriptionEnabled)"></el-input-number>
       </el-form-item>
       -->
 
@@ -103,6 +106,16 @@
           {{ scope.row.id.split('-')[0] }}
         </template>
       </el-table-column>
+
+      <!--
+      <el-table-column
+        prop="owner"
+        label="Owner">
+        <template slot-scope="scope">
+          {{ scope.row.owner.split('@')[0] }}
+        </template>
+      </el-table-column>
+      -->
 
       <el-table-column
         prop="description"
@@ -281,7 +294,8 @@ export default {
   name: 'Home',
   data() {
     return {
-      username: '',
+      user: {},
+      subscription: {},
       currentSettings: undefined,
       form: {
         description: '',
@@ -295,8 +309,8 @@ export default {
         broadcast_url: '',
         recordingEnabled: true,
         transcriptionEnabled: true,
-        filePrivateAccess: false,
-        //transcriptionMaxSpeakerLabels: 4
+        transcriptionMaxSpeakerLabels: 4,
+        privateAccess: true
       },
       rules: {
         meeting_pin: [
@@ -323,8 +337,11 @@ export default {
     }
   },
   async created () {
-    this.username = (await Auth.currentAuthenticatedUser()).username;
-    await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.username}))
+    await Auth.currentAuthenticatedUser()
+      .then((cognitoUser) => {
+        this.user = cognitoUser.attributes;
+      });
+    await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.user.sub}))
       .then((data) => {
         this.currentSettings = data.data.getAccountSettings;
         this.form.twitch_stream_key = this.currentSettings.twitch_stream_key;
@@ -336,14 +353,14 @@ export default {
       .then((data) => {
         this.tableData = data.data.listStatuss.items
       });
-    this.subscriptionCreate = API.graphql(graphqlOperation(subscriptions.onCreateStatus, {owner: this.username})).subscribe({
+    this.subscription.onCreateStatus = API.graphql(graphqlOperation(subscriptions.onCreateStatus, {owner: this.user.email})).subscribe({
       next: (eventData) => {
         console.log(eventData)
         const data = eventData.value.data.onCreateStatus;
         this.tableData.push(data);
       }
     });
-    this.subscriptionUpdate = API.graphql(graphqlOperation(subscriptions.onUpdateStatus, {owner: this.username})).subscribe({
+    this.subscription.onUpdateStatus = API.graphql(graphqlOperation(subscriptions.onUpdateStatus, {owner: this.user.email})).subscribe({
       next: (eventData) => {
         console.log(eventData)
         const data = eventData.value.data.onUpdateStatus;
@@ -357,17 +374,20 @@ export default {
     });
   },
   beforeDestroy() {
-    this.subscriptionCreate.unsubscribe();
-    this.subscriptionUpdate.unsubscribe();
+    for (let item in this.subscription) {
+      this.subscription[item].unsubscribe();
+    }
   },
   computed: {
     input: function () {
       const input = {
+        owner: this.user.email,
         description: this.form.description,
         broadcastEnabled: this.form.broadcastEnabled,
         recordingEnabled: this.form.recordingEnabled,
         transcriptionEnabled: this.form.transcriptionEnabled,
-        filePrivateAccess: this.form.filePrivateAccess,
+        transcriptionMaxSpeakerLabels: this.form.transcriptionMaxSpeakerLabels,
+        privateAccess: this.form.privateAccess,
       }
       if (this.form.src_type === 'chime') {
         const meeting_pin = this.form.meeting_pin.replace(/\s+/g, "")

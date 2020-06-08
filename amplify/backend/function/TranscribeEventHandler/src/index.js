@@ -51,6 +51,7 @@ const updateStatus = gql(`
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri

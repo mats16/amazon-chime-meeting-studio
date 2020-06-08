@@ -29,6 +29,7 @@ const getStatus = gql(`
     query GetStatus($id: ID!) {
         getStatus(id: $id) {
             transcriptionEnabled
+            transcriptionMaxSpeakerLabels
         }
     }
 `);
@@ -47,6 +48,7 @@ const updateStatus = gql(`
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri
@@ -72,6 +74,7 @@ exports.handler = async (event) => {
   const data = await client.query({ variables: variables, query: getStatus, fetchPolicy: 'network-only' })
     .catch((err) => console.log(JSON.stringify(err)));
   const transcriptionEnabled = data.data.getStatus.transcriptionEnabled;
+  const transcriptionMaxSpeakerLabels = data.data.getStatus.transcriptionMaxSpeakerLabels
 
   if (transcriptionEnabled) {
     const mediaFileUri = `https://s3.${region}.amazonaws.com/${bucket}/${key}`;
@@ -90,7 +93,7 @@ exports.handler = async (event) => {
       Settings: {
       //  ShowAlternatives: true || false,
       //  MaxAlternatives: 'NUMBER_VALUE',
-        MaxSpeakerLabels: 10,
+        MaxSpeakerLabels: transcriptionMaxSpeakerLabels,
         ShowSpeakerLabels: true,
       //  VocabularyFilterMethod: remove | mask,
       //  VocabularyFilterName: 'STRING_VALUE',

@@ -34,6 +34,78 @@ export const onDeleteAccountSettings = /* GraphQL */ `
     }
   }
 `;
+export const onCreateVocabulary = /* GraphQL */ `
+  subscription OnCreateVocabulary {
+    onCreateVocabulary {
+      tableId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateVocabulary = /* GraphQL */ `
+  subscription OnUpdateVocabulary {
+    onUpdateVocabulary {
+      tableId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteVocabulary = /* GraphQL */ `
+  subscription OnDeleteVocabulary {
+    onDeleteVocabulary {
+      tableId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreateVocabularyTable = /* GraphQL */ `
+  subscription OnCreateVocabularyTable {
+    onCreateVocabularyTable {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateVocabularyTable = /* GraphQL */ `
+  subscription OnUpdateVocabularyTable {
+    onUpdateVocabularyTable {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteVocabularyTable = /* GraphQL */ `
+  subscription OnDeleteVocabularyTable {
+    onDeleteVocabularyTable {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreateStatus = /* GraphQL */ `
   subscription OnCreateStatus($owner: String!) {
     onCreateStatus(owner: $owner) {
@@ -45,6 +117,7 @@ export const onCreateStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri
@@ -66,6 +139,7 @@ export const onUpdateStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri
@@ -87,6 +161,7 @@ export const onDeleteStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
       transcriptFileUri

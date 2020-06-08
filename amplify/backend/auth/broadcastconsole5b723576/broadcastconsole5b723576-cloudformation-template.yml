@@ -10,6 +10,7 @@ Parameters:
   
   
   
+  
   functionbroadcastconsole5b723576PreSignupArn: 
     Type: String
     Default: functionbroadcastconsole5b723576PreSignupArn

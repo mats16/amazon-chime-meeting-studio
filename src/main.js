@@ -11,7 +11,19 @@ import { AmplifyPlugin } from 'aws-amplify-vue'
 import '@aws-amplify/ui-vue';
 import awsconfig from './aws-exports';
 
-Amplify.configure(awsconfig);
+Amplify.configure({
+  ...awsconfig,
+  graphql_headers: async () => {
+    try {
+      const token = (await AmplifyModules.Auth.currentSession()).idToken.jwtToken;
+      return { Authorization: token }
+    }
+    catch (e) {
+        console.error(e);
+        return {};
+    }
+  }
+});
 Vue.use(AmplifyPlugin, AmplifyModules);
 
 Vue.config.productionTip = false
