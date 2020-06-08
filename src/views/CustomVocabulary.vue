@@ -3,7 +3,7 @@
 
     <el-form ref="form" :inline="true" :model="form" label-width="180px">
 
-      <el-form-item label="Vocabulary Tables">
+      <el-form-item label="Vocabulary Name">
         <el-select v-model="selectedTableId" placeholder="Select">
           <el-option
             v-for="item of vocabularyTables"
@@ -15,10 +15,14 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="danger" @click="deleteTable(selectedTableId)">Delete Table</el-button>
+        <el-button type="primary" @click="publishToS3()">Publish to S3</el-button>
+       </el-form-item>
+
+      <el-form-item>
+        <el-button type="danger" :disabled="(selectedTableName === 'default')" @click="deleteTable(selectedTableId)">Delete Table</el-button>
       </el-form-item>
 
-      <el-form-item label="Create New Tables">
+      <el-form-item label="Create New Vocabulary">
         <el-input v-model="form.newTableName"></el-input>
       </el-form-item>
 
@@ -50,10 +54,9 @@
       @thead-td-sort="sortProduct">
 
       <div slot="header">
-        <el-button type="primary" @click="addRow()">Add Row</el-button>
-        <el-button type="danger" @click="deleteRow()">Delete Row</el-button>
+        <el-button type="primary" :disabled="(tbody.length >= 100)" @click="addRow()">Add Row</el-button>
+        <el-button type="danger" :disabled="(tbody.length <= 1)" @click="deleteRow()">Delete Row</el-button>
         Specific Header
-        <el-button type="primary" @click="publishToS3()">Publish to S3</el-button>
       </div>
       <div slot="loader">
         Loader
@@ -76,6 +79,7 @@ export default {
     return {
       subscription: {},
       selectedTableId: '',
+      selectedTableName: '',
       vocabularyTables: [],
       form: {
         newTableName: '',
@@ -177,34 +181,7 @@ export default {
           }
         }
       ],
-      tbody: [
-        {
-          phrase: {
-            type: 'input',
-            value: 'FireStore',
-            active: false,
-            style: {
-              color: '#000',
-            },
-          },
-          soundsLike: {
-            type: 'input',
-            value: 'ファイアーストア',
-            active: false,
-            style: {
-              color: '#000',
-            },
-          },
-          displayAs: {
-            type: 'input',
-            value: 'FireStore',
-            active: false,
-            style: {
-              color: '#000',
-            },
-          }
-        }
-      ],
+      tbody: [],
       submenuThead: [],
       submenuTbody: [
         {
@@ -221,6 +198,7 @@ export default {
   },
   watch: {
     selectedTableId: function (tableId) {
+      this.selectedTableName = this.vocabularyTables.find(x => x.id === tableId).name;
       API.graphql(graphqlOperation(queries.listVocabularys, {tableId: tableId}))
         .then((res) => {
           const items = res.data.listVocabularys.items
@@ -269,6 +247,7 @@ export default {
     API.graphql(graphqlOperation(queries.listVocabularyTables))
       .then((data) => {
         this.vocabularyTables = data.data.listVocabularyTables.items;
+        this.selectedTableId = this.vocabularyTables.find(x => x.name === 'default').id;
       })
       .catch((err) => console.log(JSON.stringify(err)));
   },
@@ -317,7 +296,7 @@ export default {
       const newTable = data.data.createVocabularyTable
       const createVocabularyInput = {
         tableId: newTable.id,
-        row:　0,
+        row: 0,
         phrase: '',
         ipa: '',
         soundsLike: '',
@@ -326,20 +305,23 @@ export default {
       await API.graphql(graphqlOperation(mutations.createVocabulary, {input: createVocabularyInput}))
         .catch((err) => console.log(JSON.stringify(err)));
       this.vocabularyTables.push(newTable)
-      this.selectedTableId = newTable.id
+      this.selectedTable = {
+        id: newTable.id,
+        name: tableName
+      }
     },
     deleteTable(tableId) {
       const input = {id: tableId}
       API.graphql(graphqlOperation(mutations.deleteVocabularyTable, {input: input}))
         .catch((err) => console.log(JSON.stringify(err)));
-      this.selectedTableId = ''
+      this.selectedTable = {}
       this.tbody = []
     },
     addRow() {
       if (this.tbody.length < 100) {
         const input = {
           tableId: this.selectedTableId,
-          row:　this.tbody.length,
+          row: this.tbody.length,
           phrase: '',
           ipa: '',
           soundsLike: '',
@@ -352,7 +334,7 @@ export default {
     deleteRow() {
       const input = {
         tableId: this.selectedTableId,
-        row:　this.tbody.length - 1,
+        row: this.tbody.length - 1,
       }
       API.graphql(graphqlOperation(mutations.deleteVocabulary, {input: input}))
         .catch((err) => console.log(JSON.stringify(err)));
@@ -393,10 +375,8 @@ export default {
       this.rows[rowIndex][header].value = 'T-shirt';
     },
     async publishToS3() {
-      const data = await API.graphql(graphqlOperation(queries.getVocabularyTable, {id: this.selectedTableId}))
-      console.log(data)
-      const fileName = `${data.data.getVocabularyTable.name}.txt`
-      let body = ''
+      const fileName = `vocabulary/${this.selectedTableName}.txt`
+      let body = 'Phrase \tIPA\tSoundsLike\tDisplayAs\n'
       for (let row of this.tbody) {
         body += `${row.phrase.value}\t${row.ipa.value}\t${row.soundsLike.value}\t${row.displayAs.value}\n`
       }
