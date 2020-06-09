@@ -28,21 +28,21 @@ type AccountSettings @model
   youtube_stream_key: String
 }
 
-#type Vocabulary @model
-#  @auth(rules: [ { allow: private, provider: userPools } ])
-#  @key(fields: [ "tableId", "row" ])
-#{
-#  tableId: ID!
-#  row: Int!
-#  phrase: String!
-#  ipa: String
-#  soundsLike: String
-#  displayAs: String
-#}
+type VocabularySheet @model
+  @auth(rules: [ { allow: private, provider: userPools } ])
+  @key(fields: [ "vocabularyId", "row" ])
+{
+  vocabularyId: ID!
+  row: Int!
+  phrase: String!
+  ipa: String
+  soundsLike: String
+  displayAs: String
+}
 
-#type VocabularyTable @model
-#  @auth(rules: [ { allow: private, provider: userPools } ])
-#{
-#  id: ID!
-#  name: String!
-#}
+type Vocabulary @model
+  @auth(rules: [ { allow: private, provider: userPools } ])
+{
+  id: ID!
+  name: String!
+}

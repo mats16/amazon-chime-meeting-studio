@@ -4,9 +4,9 @@
     <el-form ref="form" :inline="true" :model="form" label-width="180px">
 
       <el-form-item label="Vocabulary Name">
-        <el-select v-model="selectedTableId" placeholder="Select">
+        <el-select v-model="selectedVocabularyId" placeholder="Select">
           <el-option
-            v-for="item of vocabularyTables"
+            v-for="item of vocabularyList"
             :key="item.id"
             :label="item.name"
             :value="item.id">
@@ -15,19 +15,19 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="publishToS3()">Publish to S3</el-button>
+        <el-button type="primary" @click="publishToS3(selectedVocabularyId)">Publish to S3</el-button>
        </el-form-item>
 
       <el-form-item>
-        <el-button type="danger" :disabled="(selectedTableName === 'default')" @click="deleteTable(selectedTableId)">Delete Table</el-button>
+        <el-button type="danger" :disabled="(selectedVocabularyName === 'default')" @click="deleteVocabulary(selectedVocabularyId)">Delete Vocabulary</el-button>
       </el-form-item>
 
       <el-form-item label="Create New Vocabulary">
-        <el-input v-model="form.newTableName"></el-input>
+        <el-input v-model="form.newVocabularyName"></el-input>
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="createTable(form.newTableName)">Creste Table</el-button>
+        <el-button type="primary" @click="createVocabulary(form.newVocabularyName)">Creste Vocabulary</el-button>
       </el-form-item>
 
     </el-form>
@@ -78,11 +78,13 @@ export default {
   data() {
     return {
       subscription: {},
-      selectedTableId: '',
-      selectedTableName: '',
-      vocabularyTables: [],
+      selectedVocabularyId: '',
+      selectedVocabularyName: '',
+      vocabularyList: [],
+      //selectedTableName: '',
+      //vocabularyTables: [],
       form: {
-        newTableName: '',
+        newVocabularyName: '',
       },
       customOptions: {
         tbodyIndex: true,
@@ -197,11 +199,12 @@ export default {
     VueTable,
   },
   watch: {
-    selectedTableId: function (tableId) {
-      this.selectedTableName = this.vocabularyTables.find(x => x.id === tableId).name;
-      API.graphql(graphqlOperation(queries.listVocabularys, {tableId: tableId}))
+    selectedVocabularyId: function (vocabularyId) {
+      this.selectedVocabularyName = this.vocabularyList.find(x => x.id === vocabularyId).name;
+      // Get sheet data
+      API.graphql(graphqlOperation(queries.listVocabularySheets, {vocabularyId: vocabularyId}))
         .then((res) => {
-          const items = res.data.listVocabularys.items
+          const items = res.data.listVocabularySheets.items
           const tbody = []
           for (let item of items) {
             tbody[item.row] = this.genRowData(item)
@@ -209,16 +212,17 @@ export default {
           this.tbody = tbody
         })
         .catch((err) => console.log(JSON.stringify(err)));
-      this.subscription.create = API.graphql(graphqlOperation(subscriptions.onCreateVocabulary, {tableId: tableId})).subscribe({
+      // Subscriptions
+      this.subscription.create = API.graphql(graphqlOperation(subscriptions.onCreateVocabularySheet, {vocabularyId: vocabularyId})).subscribe({
         next: (eventData) => {
-          const item = eventData.value.data.onCreateVocabulary;
+          const item = eventData.value.data.onCreateVocabularySheet;
           const rowData = this.genRowData(item)
           this.$set(this.tbody, item.row, rowData);
         }
       });
-      this.subscription.update = API.graphql(graphqlOperation(subscriptions.onUpdateVocabulary, {tableId: tableId})).subscribe({
+      this.subscription.update = API.graphql(graphqlOperation(subscriptions.onUpdateVocabularySheet, {vocabularyId: vocabularyId})).subscribe({
         next: (eventData) => {
-          const item = eventData.value.data.onUpdateVocabulary;
+          const item = eventData.value.data.onUpdateVocabularySheet;
           const rowData = this.tbody[item.row]
           for (let k of ['phrase', 'ipa', 'soundsLike', 'displayAs']) {
             rowData[k].value = item[k]
@@ -226,9 +230,9 @@ export default {
           this.$set(this.tbody, item.row, rowData);
         }
       });
-      this.subscription.delete = API.graphql(graphqlOperation(subscriptions.onDeleteVocabulary, {tableId: tableId})).subscribe({
+      this.subscription.delete = API.graphql(graphqlOperation(subscriptions.onDeleteVocabularySheet, {vocabularyId: vocabularyId})).subscribe({
         next: (eventData) => {
-          const item = eventData.value.data.onDeleteVocabulary;
+          const item = eventData.value.data.onDeleteVocabularySheet;
           this.tbody.splice(item.row, item.row);
         }
       });
@@ -244,10 +248,10 @@ export default {
     setTimeout(() => {
       this.loading = false;
     }, 300);
-    API.graphql(graphqlOperation(queries.listVocabularyTables))
+    API.graphql(graphqlOperation(queries.listVocabularys))
       .then((data) => {
-        this.vocabularyTables = data.data.listVocabularyTables.items;
-        this.selectedTableId = this.vocabularyTables.find(x => x.name === 'default').id;
+        this.vocabularyList = data.data.listVocabularys.items;
+        this.selectedVocabularyId = this.vocabularyList.find(x => x.name === 'default').id;
       })
       .catch((err) => console.log(JSON.stringify(err)));
   },
@@ -289,54 +293,51 @@ export default {
       }
       return rowData
     },
-    async createTable(tableName) {
-      const createVocabularyTableInput = { name: tableName }
-      const data = await API.graphql(graphqlOperation(mutations.createVocabularyTable, {input: createVocabularyTableInput}))
+    async createVocabulary(vocabularyName) {
+      const data = await API.graphql(graphqlOperation(mutations.createVocabulary, { input: { name: vocabularyName } }))
         .catch((err) => console.log(JSON.stringify(err)));
-      const newTable = data.data.createVocabularyTable
-      const createVocabularyInput = {
-        tableId: newTable.id,
+      const newVocabulary = data.data.createVocabulary
+      const input = {
+        vocabularyId: newVocabulary.id,
         row: 0,
         phrase: '',
         ipa: '',
         soundsLike: '',
         displayAs: '',
       }
-      await API.graphql(graphqlOperation(mutations.createVocabulary, {input: createVocabularyInput}))
+      await API.graphql(graphqlOperation(mutations.createVocabularySheet, {input: input}))
         .catch((err) => console.log(JSON.stringify(err)));
-      this.vocabularyTables.push(newTable)
-      this.selectedTable = {
-        id: newTable.id,
-        name: tableName
-      }
+      this.vocabularyList.push(newVocabulary);
+      this.selectedVocabularyId = newVocabulary.id;
+      //this.selectedVocabularyName = vocabularyName
     },
-    deleteTable(tableId) {
-      const input = {id: tableId}
-      API.graphql(graphqlOperation(mutations.deleteVocabularyTable, {input: input}))
+    deleteVocabulary(vocabularyId) {
+      const input = {id: vocabularyId}
+      API.graphql(graphqlOperation(mutations.deleteVocabulary, {input: input}))
         .catch((err) => console.log(JSON.stringify(err)));
-      this.selectedTable = {}
-      this.tbody = []
+      this.selectedVocabularyId = '';
+      this.tbody.length = 0
     },
     addRow() {
       if (this.tbody.length < 100) {
         const input = {
-          tableId: this.selectedTableId,
+          vocabularyId: this.selectedVocabularyId,
           row: this.tbody.length,
           phrase: '',
           ipa: '',
           soundsLike: '',
           displayAs: '',
         }
-        API.graphql(graphqlOperation(mutations.createVocabulary, {input: input}))
+        API.graphql(graphqlOperation(mutations.createVocabularySheet, {input: input}))
           .catch((err) => console.log(JSON.stringify(err)));
       }
     },
     deleteRow() {
       const input = {
-        tableId: this.selectedTableId,
+        vocabularyId: this.selectedVocabularyId,
         row: this.tbody.length - 1,
       }
-      API.graphql(graphqlOperation(mutations.deleteVocabulary, {input: input}))
+      API.graphql(graphqlOperation(mutations.deleteVocabularySheet, {input: input}))
         .catch((err) => console.log(JSON.stringify(err)));
     },
     checkedAllData(isChecked) {
@@ -347,11 +348,11 @@ export default {
     },
     changeData(row, header) {
       const input = {
-        tableId: this.selectedTableId,
+        vocabularyId: this.selectedVocabularyId,
         row: row
       }
       input[header] = this.tbody[row][header].value  // Todo: delete キー押した際に古い value が取れてしまう問題
-      API.graphql(graphqlOperation(mutations.updateVocabulary, {input: input}))
+      API.graphql(graphqlOperation(mutations.updateVocabularySheet, {input: input}))
         .catch((err) => console.log(JSON.stringify(err)));
     },
     sortProduct(event, header, colIndex) {
@@ -374,8 +375,9 @@ export default {
       console.log(colIndex)  // for Lint
       this.rows[rowIndex][header].value = 'T-shirt';
     },
-    async publishToS3() {
-      const fileName = `vocabulary/${this.selectedTableName}.txt`
+    async publishToS3(vocabularyId) {
+      const vocabularyName = this.vocabularyList.find(x => x.id === vocabularyId).name;
+      const fileName = `vocabulary/${vocabularyName}.txt`
       let body = 'Phrase \tIPA\tSoundsLike\tDisplayAs\n'
       for (let row of this.tbody) {
         body += `${row.phrase.value}\t${row.ipa.value}\t${row.soundsLike.value}\t${row.displayAs.value}\n`
