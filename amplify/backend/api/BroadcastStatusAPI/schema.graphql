@@ -1,6 +1,7 @@
 type Status @model
   @auth(rules: [
-    { allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [create, read, update] }
+    #{ allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [create, read, update] }
+    { allow: private, provider: userPools }
     { allow: private, provider: iam }
   ])
 {
