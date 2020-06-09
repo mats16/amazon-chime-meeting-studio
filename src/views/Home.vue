@@ -310,7 +310,7 @@ export default {
         recordingEnabled: true,
         transcriptionEnabled: true,
         transcriptionMaxSpeakerLabels: 4,
-        privateAccess: true
+        privateAccess: false
       },
       rules: {
         meeting_pin: [
@@ -353,14 +353,16 @@ export default {
       .then((data) => {
         this.tableData = data.data.listStatuss.items
       });
-    this.subscription.onCreateStatus = API.graphql(graphqlOperation(subscriptions.onCreateStatus, {owner: this.user.email})).subscribe({
+    //this.subscription.onCreateStatus = API.graphql(graphqlOperation(subscriptions.onCreateStatus, {owner: this.user.email})).subscribe({
+    this.subscription.onCreateStatus = API.graphql(graphqlOperation(subscriptions.onCreateStatus)).subscribe({
       next: (eventData) => {
         console.log(eventData)
         const data = eventData.value.data.onCreateStatus;
         this.tableData.push(data);
       }
     });
-    this.subscription.onUpdateStatus = API.graphql(graphqlOperation(subscriptions.onUpdateStatus, {owner: this.user.email})).subscribe({
+    //this.subscription.onUpdateStatus = API.graphql(graphqlOperation(subscriptions.onUpdateStatus, {owner: this.user.email})).subscribe({
+    this.subscription.onUpdateStatus = API.graphql(graphqlOperation(subscriptions.onUpdateStatus)).subscribe({
       next: (eventData) => {
         console.log(eventData)
         const data = eventData.value.data.onUpdateStatus;
