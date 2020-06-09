@@ -1,5 +1,5 @@
 <template>
-  <div class="account">
+  <div class="settings">
     <el-form ref="form" :model="form" label-width="150px">
 
       <el-form-item label="Twitch Stream Key">
@@ -23,7 +23,7 @@ import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 
 export default {
-  name: 'Account',
+  name: 'Settings',
   data() {
     return {
       currentSettings: undefined,

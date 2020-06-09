@@ -26,21 +26,23 @@
         </el-form-item>
       </el-form>
 
-      <el-form-item label="Broadcast">
-        <el-switch
-          v-model="form.broadcastEnabled"
-          active-text="Enabled"
-          inactive-text="Disabled">
-        </el-switch>
-      </el-form-item>
+      <el-form ref="form" :inline="true" :model="form" :rules="rules" label-width="180px">
+        <el-form-item label="Broadcast">
+          <el-switch
+            v-model="form.broadcastEnabled"
+            active-text="Enabled"
+            inactive-text="Disabled">
+          </el-switch>
+        </el-form-item>
 
-      <el-form-item label="Broadcast Type" prop="broadcastType" v-if="form.broadcastEnabled">
-        <el-checkbox-group v-model="form.broadcastType">
-          <el-checkbox label="twitch">Twitch</el-checkbox>
-          <el-checkbox label="youtube">YouTube</el-checkbox>
-          <el-checkbox label="custom">Custome RTMP</el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
+        <el-form-item label="Broadcast Type" prop="broadcastType">
+          <el-checkbox-group v-model="form.broadcastType" :disabled="!(form.broadcastEnabled)">
+            <el-checkbox label="twitch">Twitch</el-checkbox>
+            <el-checkbox label="youtube">YouTube</el-checkbox>
+            <el-checkbox label="custom">Custome RTMP</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
 
       <el-form-item label="Twitch Stream Key" prop="twitch_stream_key" v-if="form.broadcastEnabled && form.broadcastType.includes('twitch')">
         <el-input v-model="form.twitch_stream_key" placeholder="live_123456789_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"></el-input>
@@ -76,15 +78,14 @@
         </el-form-item>
       </el-form>
 
-      <!--
       <el-form-item label="Access Level" v-if="form.recordingEnabled || form.transcriptionEnabled">
         <el-switch
           v-model="form.privateAccess"
+          disabled
           active-text="Private"
           inactive-text="Sharing">
         </el-switch>
       </el-form-item>
-      -->
 
       <el-form-item>
         <el-button type="primary" @click="submitForm('form')">Submit</el-button>
@@ -107,7 +108,6 @@
         </template>
       </el-table-column>
 
-      <!--
       <el-table-column
         prop="owner"
         label="Owner">
@@ -115,7 +115,6 @@
           {{ scope.row.owner.split('@')[0] }}
         </template>
       </el-table-column>
-      -->
 
       <el-table-column
         prop="description"
@@ -128,16 +127,6 @@
         width="130">
         <template slot-scope="scope" v-if="(scope.row.src_url)">
           {{ scope.row.src_url.replace('https://app.chime.aws/portal/', 'PIN:&nbsp;') }}
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        prop="updatedAt"
-        label="Last Update"
-        sortable
-        width="145">
-        <template slot-scope="scope">
-          {{ convertToDate(scope.row.updatedAt) }}
         </template>
       </el-table-column>
 
@@ -269,6 +258,17 @@
           </template>
         </el-table-column>
       </el-table-column>
+
+      <el-table-column
+        prop="updatedAt"
+        label="Last Update"
+        sortable
+        width="145">
+        <template slot-scope="scope">
+          {{ convertToDate(scope.row.updatedAt) }}
+        </template>
+      </el-table-column>
+
       <!--
       <el-table-column
         fixed="right"
