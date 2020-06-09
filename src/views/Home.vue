@@ -74,7 +74,7 @@
           </el-switch>
         </el-form-item>
         <el-form-item label="Max Speaker Labels">
-          <el-input-number v-model="form.transcriptionMaxSpeakerLabels" :min="1" :max="10" :disabled="!(form.transcriptionEnabled)"></el-input-number>
+          <el-input-number v-model="form.transcriptionMaxSpeakerLabels" :min="2" :max="10" :disabled="!(form.transcriptionEnabled)"></el-input-number>
         </el-form-item>
       </el-form>
 
