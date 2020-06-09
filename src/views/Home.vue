@@ -382,12 +382,17 @@ export default {
     input: function () {
       const input = {
         owner: this.user.email,
-        description: this.form.description,
         broadcastEnabled: this.form.broadcastEnabled,
         recordingEnabled: this.form.recordingEnabled,
         transcriptionEnabled: this.form.transcriptionEnabled,
         transcriptionMaxSpeakerLabels: this.form.transcriptionMaxSpeakerLabels,
         privateAccess: this.form.privateAccess,
+      }
+      if (this.form.description === '') {
+        const dateNow = Date.now();
+        input.description = `Started at ${this.convertToDate(dateNow)}`
+      } else {
+        input.description = this.form.description
       }
       if (this.form.src_type === 'chime') {
         const meeting_pin = this.form.meeting_pin.replace(/\s+/g, "")
