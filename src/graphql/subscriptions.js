@@ -107,8 +107,8 @@ export const onDeleteVocabulary = /* GraphQL */ `
   }
 `;
 export const onCreateStatus = /* GraphQL */ `
-  subscription OnCreateStatus($owner: String!) {
-    onCreateStatus(owner: $owner) {
+  subscription OnCreateStatus {
+    onCreateStatus {
       id
       status
       owner
@@ -129,8 +129,8 @@ export const onCreateStatus = /* GraphQL */ `
   }
 `;
 export const onUpdateStatus = /* GraphQL */ `
-  subscription OnUpdateStatus($owner: String!) {
-    onUpdateStatus(owner: $owner) {
+  subscription OnUpdateStatus {
+    onUpdateStatus {
       id
       status
       owner
@@ -151,8 +151,8 @@ export const onUpdateStatus = /* GraphQL */ `
   }
 `;
 export const onDeleteStatus = /* GraphQL */ `
-  subscription OnDeleteStatus($owner: String!) {
-    onDeleteStatus(owner: $owner) {
+  subscription OnDeleteStatus {
+    onDeleteStatus {
       id
       status
       owner
