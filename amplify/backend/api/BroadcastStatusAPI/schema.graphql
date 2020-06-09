@@ -21,30 +21,28 @@ type Status @model
 }
 
 type AccountSettings @model
-  @auth(rules: [
-    { allow: owner, ownerField: "id", provider: userPools, operations: [create, read, update, delete] }
-  ])
+  @auth(rules: [ { allow: owner, ownerField: "id", provider: userPools, operations: [create, read, update, delete] } ])
 {
   id: ID!
   twitch_stream_key: String
   youtube_stream_key: String
 }
 
-type Vocabulary @model
-  @auth(rules: [ { allow: private, provider: userPools } ])
-  @key(fields: ["tableId", "row"])
-{
-  tableId: ID!
-  row: Int!
-  phrase: String!
-  ipa: String
-  soundsLike: String
-  displayAs: String
-}
+#type Vocabulary @model
+#  @auth(rules: [ { allow: private, provider: userPools } ])
+#  @key(fields: [ "tableId", "row" ])
+#{
+#  tableId: ID!
+#  row: Int!
+#  phrase: String!
+#  ipa: String
+#  soundsLike: String
+#  displayAs: String
+#}
 
-type VocabularyTable @model
-  @auth(rules: [ { allow: private, provider: userPools } ])
-{
-  id: ID!
-  name: String!
-}
+#type VocabularyTable @model
+#  @auth(rules: [ { allow: private, provider: userPools } ])
+#{
+#  id: ID!
+#  name: String!
+#}
