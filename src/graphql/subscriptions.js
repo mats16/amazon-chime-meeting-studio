@@ -34,15 +34,53 @@ export const onDeleteAccountSettings = /* GraphQL */ `
     }
   }
 `;
-export const onCreateVocabulary = /* GraphQL */ `
-  subscription OnCreateVocabulary {
-    onCreateVocabulary {
-      tableId
+export const onCreateVocabularySheet = /* GraphQL */ `
+  subscription OnCreateVocabularySheet {
+    onCreateVocabularySheet {
+      vocabularyId
       row
       phrase
       ipa
       soundsLike
       displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateVocabularySheet = /* GraphQL */ `
+  subscription OnUpdateVocabularySheet {
+    onUpdateVocabularySheet {
+      vocabularyId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteVocabularySheet = /* GraphQL */ `
+  subscription OnDeleteVocabularySheet {
+    onDeleteVocabularySheet {
+      vocabularyId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreateVocabulary = /* GraphQL */ `
+  subscription OnCreateVocabulary {
+    onCreateVocabulary {
+      id
+      name
       createdAt
       updatedAt
     }
@@ -51,12 +89,8 @@ export const onCreateVocabulary = /* GraphQL */ `
 export const onUpdateVocabulary = /* GraphQL */ `
   subscription OnUpdateVocabulary {
     onUpdateVocabulary {
-      tableId
-      row
-      phrase
-      ipa
-      soundsLike
-      displayAs
+      id
+      name
       createdAt
       updatedAt
     }
@@ -65,40 +99,6 @@ export const onUpdateVocabulary = /* GraphQL */ `
 export const onDeleteVocabulary = /* GraphQL */ `
   subscription OnDeleteVocabulary {
     onDeleteVocabulary {
-      tableId
-      row
-      phrase
-      ipa
-      soundsLike
-      displayAs
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onCreateVocabularyTable = /* GraphQL */ `
-  subscription OnCreateVocabularyTable {
-    onCreateVocabularyTable {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onUpdateVocabularyTable = /* GraphQL */ `
-  subscription OnUpdateVocabularyTable {
-    onUpdateVocabularyTable {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onDeleteVocabularyTable = /* GraphQL */ `
-  subscription OnDeleteVocabularyTable {
-    onDeleteVocabularyTable {
       id
       name
       createdAt

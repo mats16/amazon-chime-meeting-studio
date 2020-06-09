@@ -34,10 +34,10 @@ export const listAccountSettingss = /* GraphQL */ `
     }
   }
 `;
-export const getVocabulary = /* GraphQL */ `
-  query GetVocabulary($tableId: ID!, $row: Int!) {
-    getVocabulary(tableId: $tableId, row: $row) {
-      tableId
+export const getVocabularySheet = /* GraphQL */ `
+  query GetVocabularySheet($vocabularyId: ID!, $row: Int!) {
+    getVocabularySheet(vocabularyId: $vocabularyId, row: $row) {
+      vocabularyId
       row
       phrase
       ipa
@@ -48,17 +48,17 @@ export const getVocabulary = /* GraphQL */ `
     }
   }
 `;
-export const listVocabularys = /* GraphQL */ `
-  query ListVocabularys(
-    $tableId: ID
+export const listVocabularySheets = /* GraphQL */ `
+  query ListVocabularySheets(
+    $vocabularyId: ID
     $row: ModelIntKeyConditionInput
-    $filter: ModelVocabularyFilterInput
+    $filter: ModelVocabularySheetFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
-    listVocabularys(
-      tableId: $tableId
+    listVocabularySheets(
+      vocabularyId: $vocabularyId
       row: $row
       filter: $filter
       limit: $limit
@@ -66,7 +66,7 @@ export const listVocabularys = /* GraphQL */ `
       sortDirection: $sortDirection
     ) {
       items {
-        tableId
+        vocabularyId
         row
         phrase
         ipa
@@ -79,9 +79,9 @@ export const listVocabularys = /* GraphQL */ `
     }
   }
 `;
-export const getVocabularyTable = /* GraphQL */ `
-  query GetVocabularyTable($id: ID!) {
-    getVocabularyTable(id: $id) {
+export const getVocabulary = /* GraphQL */ `
+  query GetVocabulary($id: ID!) {
+    getVocabulary(id: $id) {
       id
       name
       createdAt
@@ -89,17 +89,13 @@ export const getVocabularyTable = /* GraphQL */ `
     }
   }
 `;
-export const listVocabularyTables = /* GraphQL */ `
-  query ListVocabularyTables(
-    $filter: ModelVocabularyTableFilterInput
+export const listVocabularys = /* GraphQL */ `
+  query ListVocabularys(
+    $filter: ModelVocabularyFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    listVocabularyTables(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
+    listVocabularys(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
         name

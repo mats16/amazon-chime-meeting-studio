@@ -43,18 +43,65 @@ export const deleteAccountSettings = /* GraphQL */ `
     }
   }
 `;
+export const createVocabularySheet = /* GraphQL */ `
+  mutation CreateVocabularySheet(
+    $input: CreateVocabularySheetInput!
+    $condition: ModelVocabularySheetConditionInput
+  ) {
+    createVocabularySheet(input: $input, condition: $condition) {
+      vocabularyId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateVocabularySheet = /* GraphQL */ `
+  mutation UpdateVocabularySheet(
+    $input: UpdateVocabularySheetInput!
+    $condition: ModelVocabularySheetConditionInput
+  ) {
+    updateVocabularySheet(input: $input, condition: $condition) {
+      vocabularyId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteVocabularySheet = /* GraphQL */ `
+  mutation DeleteVocabularySheet(
+    $input: DeleteVocabularySheetInput!
+    $condition: ModelVocabularySheetConditionInput
+  ) {
+    deleteVocabularySheet(input: $input, condition: $condition) {
+      vocabularyId
+      row
+      phrase
+      ipa
+      soundsLike
+      displayAs
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createVocabulary = /* GraphQL */ `
   mutation CreateVocabulary(
     $input: CreateVocabularyInput!
     $condition: ModelVocabularyConditionInput
   ) {
     createVocabulary(input: $input, condition: $condition) {
-      tableId
-      row
-      phrase
-      ipa
-      soundsLike
-      displayAs
+      id
+      name
       createdAt
       updatedAt
     }
@@ -66,12 +113,8 @@ export const updateVocabulary = /* GraphQL */ `
     $condition: ModelVocabularyConditionInput
   ) {
     updateVocabulary(input: $input, condition: $condition) {
-      tableId
-      row
-      phrase
-      ipa
-      soundsLike
-      displayAs
+      id
+      name
       createdAt
       updatedAt
     }
@@ -83,49 +126,6 @@ export const deleteVocabulary = /* GraphQL */ `
     $condition: ModelVocabularyConditionInput
   ) {
     deleteVocabulary(input: $input, condition: $condition) {
-      tableId
-      row
-      phrase
-      ipa
-      soundsLike
-      displayAs
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const createVocabularyTable = /* GraphQL */ `
-  mutation CreateVocabularyTable(
-    $input: CreateVocabularyTableInput!
-    $condition: ModelVocabularyTableConditionInput
-  ) {
-    createVocabularyTable(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const updateVocabularyTable = /* GraphQL */ `
-  mutation UpdateVocabularyTable(
-    $input: UpdateVocabularyTableInput!
-    $condition: ModelVocabularyTableConditionInput
-  ) {
-    updateVocabularyTable(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const deleteVocabularyTable = /* GraphQL */ `
-  mutation DeleteVocabularyTable(
-    $input: DeleteVocabularyTableInput!
-    $condition: ModelVocabularyTableConditionInput
-  ) {
-    deleteVocabularyTable(input: $input, condition: $condition) {
       id
       name
       createdAt
