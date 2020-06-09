@@ -19,9 +19,9 @@ const routes = [
     component: loadView('About')
   },
   {
-    path: '/account',
-    name: 'Account',
-    component: loadView('Account')
+    path: '/settings',
+    name: 'Settings',
+    component: loadView('Settings')
   },
   {
     path: '/vocabulary',

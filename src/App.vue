@@ -8,8 +8,8 @@
       <div id="nav">
         <el-menu mode="horizontal" router>
             <el-menu-item index="home" :route="{ name:'Home' }">Home</el-menu-item>
-            <el-menu-item index="about" :route="{ name:'About' }">About</el-menu-item>
-            <el-menu-item index="account" :route="{ name:'Account' }">Account</el-menu-item>
+            <!--<el-menu-item index="about" :route="{ name:'About' }">About</el-menu-item>-->
+            <el-menu-item index="settings" :route="{ name:'Settings' }">Settings</el-menu-item>
             <el-menu-item index="vocabulary" :route="{ name:'CustomVocabulary' }">Custom Vocabulary (WIP)</el-menu-item>
         </el-menu>
       </div>
