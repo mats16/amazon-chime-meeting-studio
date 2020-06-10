@@ -216,8 +216,8 @@ Resources:
           MemoryReservation: 16000
           Essential: "true"
           Environment:
-            - Name: AUDIO_DELAYS
-              Value: 1900
+            #- Name: AUDIO_DELAYS
+            #  Value: 1900
             - Name: THREAD_NUM
               Value: 4
             #- Name: AUDIO_CODEC
