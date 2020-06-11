@@ -5,6 +5,7 @@ export const getAccountSettings = /* GraphQL */ `
   query GetAccountSettings($id: ID!) {
     getAccountSettings(id: $id) {
       id
+      defaultTranscriptionLanguageCode
       twitch_stream_key
       youtube_stream_key
       createdAt
@@ -25,6 +26,7 @@ export const listAccountSettingss = /* GraphQL */ `
     ) {
       items {
         id
+        defaultTranscriptionLanguageCode
         twitch_stream_key
         youtube_stream_key
         createdAt
@@ -117,6 +119,7 @@ export const getStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionLanguageCode
       transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
@@ -144,6 +147,7 @@ export const listStatuss = /* GraphQL */ `
         recordingEnabled
         recordingFileUri
         transcriptionEnabled
+        transcriptionLanguageCode
         transcriptionMaxSpeakerLabels
         transcriptionStatus
         transcriptionMediaFileUri

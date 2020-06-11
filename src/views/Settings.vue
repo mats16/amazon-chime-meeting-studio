@@ -1,6 +1,17 @@
 <template>
   <div class="settings">
-    <el-form ref="form" :model="form" label-width="150px">
+    <el-form ref="form" :model="form" label-width="220px">
+
+      <el-form-item label="Default Transcription Language">
+        <el-select v-model="form.defaultTranscriptionLanguageCode" placeholder="Select">
+          <el-option
+            v-for="item of languageCodeList"
+            :key="item"
+            :label="item"
+            :value="item">
+          </el-option>
+        </el-select>
+      </el-form-item>
 
       <el-form-item label="Twitch Stream Key">
         <el-input v-model="form.twitch_stream_key" placeholder="live_123456789_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"></el-input>
@@ -21,16 +32,19 @@
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
+import transcribe from '../assets/transcribe';
 
 export default {
   name: 'Settings',
   data() {
     return {
+      languageCodeList: transcribe.languageCodeList,
       user: {},
       currentSettings: null,
       form: {
-        twitch_stream_key: '',
-        youtube_stream_key: ''
+        defaultTranscriptionLanguageCode: null,
+        twitch_stream_key: null,
+        youtube_stream_key: null
       }
     }
   },
@@ -45,8 +59,9 @@ export default {
       })
       .catch((err) => console.log(JSON.stringify(err)));
     if (this.currentSettings) {
-     this.form.twitch_stream_key = this.currentSettings.twitch_stream_key
-     this.form.youtube_stream_key = this.currentSettings.youtube_stream_key
+      this.form.defaultTranscriptionLanguageCode = this.currentSettings.defaultTranscriptionLanguageCode
+      this.form.twitch_stream_key = this.currentSettings.twitch_stream_key
+      this.form.youtube_stream_key = this.currentSettings.youtube_stream_key
     }
   },
   methods: {
