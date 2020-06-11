@@ -22,7 +22,7 @@ type Status @model
 }
 
 type AccountSettings @model
-  @auth(rules: [ { allow: owner, ownerField: "id", provider: userPools, operations: [create, read, update, delete] } ])
+  @auth(rules: [ { allow: owner, ownerField: "id", provider: userPools, identityClaim: "sub", operations: [create, read, update, delete] } ])
 {
   id: ID!
   twitch_stream_key: String

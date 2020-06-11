@@ -26,7 +26,8 @@ export default {
   name: 'Settings',
   data() {
     return {
-      currentSettings: undefined,
+      user: {},
+      currentSettings: null,
       form: {
         twitch_stream_key: '',
         youtube_stream_key: ''
@@ -34,8 +35,11 @@ export default {
     }
   },
   async created () {
-    this.username = (await Auth.currentAuthenticatedUser()).username;
-    await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.username}))
+    await Auth.currentAuthenticatedUser()
+      .then((cognitoUser) => {
+        this.user = cognitoUser.attributes;
+      });
+    await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.user.sub}))
       .then((data) => {
         this.currentSettings = data.data.getAccountSettings
       })
@@ -48,10 +52,10 @@ export default {
   methods: {
     async onSubmit() {
       const input = {
-        id: this.username,
+        id: this.user.sub,
         ...this.form
       }
-      if (this.currentSettings) {
+      if (this.currentSettings === null) {
         await API.graphql(graphqlOperation(mutations.createAccountSettings, {input: input}))
           .then((data) => {
             this.currentSettings = data.data.createAccountSettings
