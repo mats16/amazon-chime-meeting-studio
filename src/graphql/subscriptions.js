@@ -5,6 +5,7 @@ export const onCreateAccountSettings = /* GraphQL */ `
   subscription OnCreateAccountSettings($id: String!) {
     onCreateAccountSettings(id: $id) {
       id
+      defaultTranscriptionLanguageCode
       twitch_stream_key
       youtube_stream_key
       createdAt
@@ -16,6 +17,7 @@ export const onUpdateAccountSettings = /* GraphQL */ `
   subscription OnUpdateAccountSettings($id: String!) {
     onUpdateAccountSettings(id: $id) {
       id
+      defaultTranscriptionLanguageCode
       twitch_stream_key
       youtube_stream_key
       createdAt
@@ -27,6 +29,7 @@ export const onDeleteAccountSettings = /* GraphQL */ `
   subscription OnDeleteAccountSettings($id: String!) {
     onDeleteAccountSettings(id: $id) {
       id
+      defaultTranscriptionLanguageCode
       twitch_stream_key
       youtube_stream_key
       createdAt
@@ -117,6 +120,7 @@ export const onCreateStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionLanguageCode
       transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
@@ -139,6 +143,7 @@ export const onUpdateStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionLanguageCode
       transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
@@ -161,6 +166,7 @@ export const onDeleteStatus = /* GraphQL */ `
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionLanguageCode
       transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri

@@ -47,7 +47,7 @@ const appsyncClient = new AWSAppSyncClient({
 });
 
 const createStatus = gql(`
-  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $description: String, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionMaxSpeakerLabels: Int, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
+  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $description: String, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionLanguageCode: String, $transcriptionMaxSpeakerLabels: Int, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
     createStatus(input: {
       id: $id
       status: $status
@@ -57,6 +57,7 @@ const createStatus = gql(`
       recordingEnabled: $recordingEnabled
       recordingFileUri: $recordingFileUri
       transcriptionEnabled: $transcriptionEnabled
+      transcriptionLanguageCode: $transcriptionLanguageCode
       transcriptionMaxSpeakerLabels: $transcriptionMaxSpeakerLabels
       transcriptionStatus: $transcriptionStatus
       transcriptionMediaFileUri: $transcriptionMediaFileUri
@@ -71,6 +72,7 @@ const createStatus = gql(`
       recordingEnabled
       recordingFileUri
       transcriptionEnabled
+      transcriptionLanguageCode
       transcriptionMaxSpeakerLabels
       transcriptionStatus
       transcriptionMediaFileUri
@@ -100,7 +102,7 @@ app.post('/executions/new', function(req, res) {
   const { requestId, requestTimeEpoch, identity } = req.apiGateway.event.requestContext
   const cognitoIdentityId = identity.cognitoIdentityId  // for S3 path
   //const cognitoUsername = identity.cognitoAuthenticationProvider.split(':')[2]  // for AppSync Permission
-  const { owner, description, src_url, broadcastEnabled, broadcastRtmpUri, recordingEnabled, transcriptionEnabled, transcriptionMaxSpeakerLabels, privateAccess } = req.body
+  const { owner, description, src_url, broadcastEnabled, broadcastRtmpUri, recordingEnabled, transcriptionEnabled, transcriptionLanguageCode, transcriptionMaxSpeakerLabels, privateAccess } = req.body
   const accessLevel = (privateAccess) ? 'private' : 'protected';
   const recordingFileUri = `s3://${bucketName}/${accessLevel}/${cognitoIdentityId}/${requestId}/Meeting.mp4`
   const transcriptionMediaFileUri = `s3://${bucketName}/${accessLevel}/${cognitoIdentityId}/${requestId}/Meeting_AudioOnly.flac`
@@ -114,18 +116,19 @@ app.post('/executions/new', function(req, res) {
     broadcastEnabled: broadcastEnabled,
   }
   if (stateMachineInput.broadcastEnabled) {
-    stateMachineInput.broadcastRtmpUri = broadcastRtmpUri.join(',')  // for AppSync Status
-    stateMachineInput.dst_url.push(...broadcastRtmpUri)  // for StateMachine
+    stateMachineInput.broadcastRtmpUri = broadcastRtmpUri.join(',');  // for AppSync Status
+    stateMachineInput.dst_url.push(...broadcastRtmpUri);  // for StateMachine
   }
   if (stateMachineInput.recordingEnabled) {
-    stateMachineInput.recordingFileUri = recordingFileUri  // for AppSync Status
-    stateMachineInput.dst_url.push(recordingFileUri)  // for StateMachine
+    stateMachineInput.recordingFileUri = recordingFileUri;  // for AppSync Status
+    stateMachineInput.dst_url.push(recordingFileUri);  // for StateMachine
   }
   if (stateMachineInput.transcriptionEnabled) {
-    stateMachineInput.transcriptionStatus = 'WAITING'
-    stateMachineInput.transcriptionMaxSpeakerLabels = transcriptionMaxSpeakerLabels
-    stateMachineInput.transcriptionMediaFileUri = transcriptionMediaFileUri  // for AppSync Status
-    stateMachineInput.dst_url.push(transcriptionMediaFileUri)  // for StateMachine
+    stateMachineInput.transcriptionStatus = 'WAITING';
+    stateMachineInput.transcriptionLanguageCode = transcriptionLanguageCode;
+    stateMachineInput.transcriptionMaxSpeakerLabels = transcriptionMaxSpeakerLabels;
+    stateMachineInput.transcriptionMediaFileUri = transcriptionMediaFileUri;  // for AppSync Status
+    stateMachineInput.dst_url.push(transcriptionMediaFileUri);  // for StateMachine
   }
   // Update AppSync Status
   const gqlVariables = {

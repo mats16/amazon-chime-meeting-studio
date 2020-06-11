@@ -13,6 +13,7 @@ type Status @model
   recordingEnabled: Boolean
   recordingFileUri: AWSURL
   transcriptionEnabled: Boolean
+  transcriptionLanguageCode: String
   transcriptionMaxSpeakerLabels: Int
   transcriptionStatus: String
   transcriptionMediaFileUri: AWSURL
@@ -25,6 +26,7 @@ type AccountSettings @model
   @auth(rules: [ { allow: owner, ownerField: "id", provider: userPools, identityClaim: "sub", operations: [create, read, update, delete] } ])
 {
   id: ID!
+  defaultTranscriptionLanguageCode: String
   twitch_stream_key: String
   youtube_stream_key: String
 }

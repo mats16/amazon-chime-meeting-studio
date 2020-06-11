@@ -73,6 +73,18 @@
             inactive-text="Disabled">
           </el-switch>
         </el-form-item>
+
+        <el-form-item label="Language Code">
+          <el-select v-model="form.transcriptionLanguageCode" placeholder="Select" :disabled="!(form.transcriptionEnabled)">
+            <el-option
+              v-for="item of languageCodeList"
+              :key="item"
+              :label="item"
+              :value="item">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="Max Speaker Labels">
           <el-input-number v-model="form.transcriptionMaxSpeakerLabels" :min="2" :max="10" :disabled="!(form.transcriptionEnabled)"></el-input-number>
         </el-form-item>
@@ -289,6 +301,7 @@ import AmazonS3URI from 'amazon-s3-uri'
 import * as queries from '../graphql/queries';
 //import * as mutations from '../graphql/mutations';
 import * as subscriptions from '../graphql/subscriptions';
+import transcribe from '../assets/transcribe';
 
 export default {
   name: 'Home',
@@ -297,6 +310,7 @@ export default {
       user: {},
       subscription: {},
       currentSettings: undefined,
+      languageCodeList: transcribe.languageCodeList,
       form: {
         description: '',
         src_type: 'chime',
@@ -309,6 +323,7 @@ export default {
         broadcast_url: '',
         recordingEnabled: true,
         transcriptionEnabled: true,
+        transcriptionLanguageCode: 'ja-JP',
         transcriptionMaxSpeakerLabels: 4,
         privateAccess: false
       },
@@ -344,6 +359,7 @@ export default {
     await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.user.sub}))
       .then((data) => {
         this.currentSettings = data.data.getAccountSettings;
+        this.form.transcriptionLanguageCode = this.currentSettings.defaultTranscriptionLanguageCode
         this.form.twitch_stream_key = this.currentSettings.twitch_stream_key;
         this.form.youtube_stream_key = this.currentSettings.youtube_stream_key;
       })
@@ -387,6 +403,7 @@ export default {
         broadcastEnabled: this.form.broadcastEnabled,
         recordingEnabled: this.form.recordingEnabled,
         transcriptionEnabled: this.form.transcriptionEnabled,
+        transcriptionLanguageCode: this.form.transcriptionLanguageCode,
         transcriptionMaxSpeakerLabels: this.form.transcriptionMaxSpeakerLabels,
         privateAccess: this.form.privateAccess,
       }
