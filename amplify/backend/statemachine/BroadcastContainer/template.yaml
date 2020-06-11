@@ -216,14 +216,10 @@ Resources:
           MemoryReservation: 16000
           Essential: "true"
           Environment:
-            #- Name: AUDIO_DELAYS
-            #  Value: 1900
+            - Name: AUDIO_DELAYS
+              Value: 2010
             - Name: THREAD_NUM
               Value: 4
-            #- Name: AUDIO_CODEC
-            #  Value: flac  # for Transcribe
-            #- Name: AUDIO_SAMPLERATE
-            #  Value: 16000  # for Transcribe
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -284,10 +280,6 @@ Resources:
                           {
                             "Name": "broadcast",
                             "Environment":[
-                              {  
-                                 "Name": "JOB_NAME",
-                                 "Value.$": "$$.Execution.Name"
-                              },
                               {  
                                  "Name": "SRC_URL",
                                  "Value.$": "$.src_url"
