@@ -22,6 +22,22 @@ type Status @model
   broadcastRtmpUri: String
 }
 
+type TranscriptSpeakerLabel @model
+  @auth(rules: [ { allow: private, provider: userPools } ])
+{
+  id: ID!
+  spk_0: String
+  spk_1: String
+  spk_2: String
+  spk_3: String
+  spk_4: String
+  spk_5: String
+  spk_6: String
+  spk_7: String
+  spk_8: String
+  spk_9: String
+}
+
 type AccountSettings @model
   @auth(rules: [ { allow: owner, ownerField: "id", provider: userPools, identityClaim: "sub", operations: [create, read, update, delete] } ])
 {
@@ -44,8 +60,13 @@ type VocabularySheet @model
 }
 
 type Vocabulary @model
-  @auth(rules: [ { allow: private, provider: userPools } ])
+  @auth(rules: [
+    { allow: private, provider: userPools }
+    { allow: private, provider: iam }
+  ])
 {
   id: ID!
   name: String!
+  status: String
+  fileUri: AWSURL
 }

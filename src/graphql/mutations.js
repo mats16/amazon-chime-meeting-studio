@@ -1,6 +1,72 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createTranscriptSpeakerLabel = /* GraphQL */ `
+  mutation CreateTranscriptSpeakerLabel(
+    $input: CreateTranscriptSpeakerLabelInput!
+    $condition: ModelTranscriptSpeakerLabelConditionInput
+  ) {
+    createTranscriptSpeakerLabel(input: $input, condition: $condition) {
+      id
+      spk_0
+      spk_1
+      spk_2
+      spk_3
+      spk_4
+      spk_5
+      spk_6
+      spk_7
+      spk_8
+      spk_9
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateTranscriptSpeakerLabel = /* GraphQL */ `
+  mutation UpdateTranscriptSpeakerLabel(
+    $input: UpdateTranscriptSpeakerLabelInput!
+    $condition: ModelTranscriptSpeakerLabelConditionInput
+  ) {
+    updateTranscriptSpeakerLabel(input: $input, condition: $condition) {
+      id
+      spk_0
+      spk_1
+      spk_2
+      spk_3
+      spk_4
+      spk_5
+      spk_6
+      spk_7
+      spk_8
+      spk_9
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteTranscriptSpeakerLabel = /* GraphQL */ `
+  mutation DeleteTranscriptSpeakerLabel(
+    $input: DeleteTranscriptSpeakerLabelInput!
+    $condition: ModelTranscriptSpeakerLabelConditionInput
+  ) {
+    deleteTranscriptSpeakerLabel(input: $input, condition: $condition) {
+      id
+      spk_0
+      spk_1
+      spk_2
+      spk_3
+      spk_4
+      spk_5
+      spk_6
+      spk_7
+      spk_8
+      spk_9
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createAccountSettings = /* GraphQL */ `
   mutation CreateAccountSettings(
     $input: CreateAccountSettingsInput!
@@ -97,45 +163,6 @@ export const deleteVocabularySheet = /* GraphQL */ `
     }
   }
 `;
-export const createVocabulary = /* GraphQL */ `
-  mutation CreateVocabulary(
-    $input: CreateVocabularyInput!
-    $condition: ModelVocabularyConditionInput
-  ) {
-    createVocabulary(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const updateVocabulary = /* GraphQL */ `
-  mutation UpdateVocabulary(
-    $input: UpdateVocabularyInput!
-    $condition: ModelVocabularyConditionInput
-  ) {
-    updateVocabulary(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const deleteVocabulary = /* GraphQL */ `
-  mutation DeleteVocabulary(
-    $input: DeleteVocabularyInput!
-    $condition: ModelVocabularyConditionInput
-  ) {
-    deleteVocabulary(input: $input, condition: $condition) {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const createStatus = /* GraphQL */ `
   mutation CreateStatus(
     $input: CreateStatusInput!
@@ -209,6 +236,51 @@ export const deleteStatus = /* GraphQL */ `
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createVocabulary = /* GraphQL */ `
+  mutation CreateVocabulary(
+    $input: CreateVocabularyInput!
+    $condition: ModelVocabularyConditionInput
+  ) {
+    createVocabulary(input: $input, condition: $condition) {
+      id
+      name
+      status
+      fileUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateVocabulary = /* GraphQL */ `
+  mutation UpdateVocabulary(
+    $input: UpdateVocabularyInput!
+    $condition: ModelVocabularyConditionInput
+  ) {
+    updateVocabulary(input: $input, condition: $condition) {
+      id
+      name
+      status
+      fileUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteVocabulary = /* GraphQL */ `
+  mutation DeleteVocabulary(
+    $input: DeleteVocabularyInput!
+    $condition: ModelVocabularyConditionInput
+  ) {
+    deleteVocabulary(input: $input, condition: $condition) {
+      id
+      name
+      status
+      fileUri
       createdAt
       updatedAt
     }

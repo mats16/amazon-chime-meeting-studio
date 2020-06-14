@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <el-alert title="Chime に <Broadcast> ユーザーとして参加します ( Attendees に表示されます )" type="warning" show-icon v-if="(form.src_type === 'chime') && (form.broadcastEnabled || form.recordingEnabled || form.transcriptionEnabled)"></el-alert>
+    <el-alert title="Private mode は現状、録画・文字起こしファイルについてのみ有効です ( 実行履歴は公開されます )" type="warning" show-icon v-if="form.privateAccess"></el-alert>
+    <br>
     <el-form ref="form" :model="form" :rules="rules" label-width="180px">
       <!--<el-alert title="error alert" type="error" show-icon v-if="this.invalid.src"></el-alert>-->
 
@@ -74,7 +77,7 @@
           </el-switch>
         </el-form-item>
 
-        <el-form-item label="Language Code">
+        <el-form-item label="Language Code" prop="transcriptionLanguageCode">
           <el-select v-model="form.transcriptionLanguageCode" placeholder="Select" :disabled="!(form.transcriptionEnabled)">
             <el-option
               v-for="item of languageCodeList"
@@ -93,7 +96,6 @@
       <el-form-item label="Access Level" v-if="form.recordingEnabled || form.transcriptionEnabled">
         <el-switch
           v-model="form.privateAccess"
-          disabled
           active-text="Private"
           inactive-text="Sharing">
         </el-switch>
@@ -122,24 +124,25 @@
 
       <el-table-column
         prop="owner"
-        label="Owner">
+        label="Owner"
+        width="85">
         <template slot-scope="scope">
           {{ scope.row.owner.split('@')[0] }}
         </template>
       </el-table-column>
 
       <el-table-column
-        prop="description"
-        label="Description">
+        prop="src_url"
+        label="Source"
+        width="100">
+        <template slot-scope="scope" v-if="(scope.row.src_url)">
+          {{ scope.row.src_url.replace('https://app.chime.aws/portal/', '') }}
+        </template>
       </el-table-column>
 
       <el-table-column
-        prop="src_url"
-        label="Source URL"
-        width="130">
-        <template slot-scope="scope" v-if="(scope.row.src_url)">
-          {{ scope.row.src_url.replace('https://app.chime.aws/portal/', 'PIN:&nbsp;') }}
-        </template>
+        prop="description"
+        label="Description">
       </el-table-column>
 
       <el-table-column label="Settiongs">
@@ -184,7 +187,7 @@
           prop="status"
           label="Broadcast/Recording"
           sortable
-          width="200">
+          width="185">
           <template slot-scope="scope">
             <el-tag
               :type="scope.row.status === 'RUNNING' ? 'primary' : scope.row.status === 'SUCCEEDED' ? 'success' : scope.row.status === 'FAILED' ? 'danger' : scope.row.status === 'ABORTED' ? 'warning' : 'info'"
@@ -207,7 +210,7 @@
           prop="transcriptionStatus"
           label="Transcription"
           sortable
-          width="200">
+          width="130">
           <template slot-scope="scope">
             <el-tag
               v-if="(scope.row.transcriptionEnabled)"
@@ -264,7 +267,7 @@
               :disabled="(scope.row.transcriptionStatus === 'WAITING') || (scope.row.transcriptionStatus === 'FAILED')"
               :loading="(scope.row.transcriptionStatus === 'IN_PROGRESS')"
               size="small" plain
-              @click="onOpenTranscript(`${scope.row.transcriptFileUri}`)">
+              @click="onOpenTranscript(`${scope.row.id}`)">
               Preview
             </el-button>
           </template>
@@ -297,7 +300,7 @@
 
 <script>
 import { Auth, API, graphqlOperation, Storage } from 'aws-amplify';
-import AmazonS3URI from 'amazon-s3-uri'
+import AmazonS3URI from 'amazon-s3-uri';
 import * as queries from '../graphql/queries';
 //import * as mutations from '../graphql/mutations';
 import * as subscriptions from '../graphql/subscriptions';
@@ -346,6 +349,9 @@ export default {
         ],
         broadcast_url: [
           { required: true, message: 'Please input rtmp url', trigger: 'blur' },
+        ],
+        transcriptionLanguageCode: [
+          { required: true, message: 'Please select language code', trigger: 'blur' },
         ],
       },
       tableData: []
@@ -441,10 +447,16 @@ export default {
       return `${dateTime.toLocaleDateString()} ${dateTime.toLocaleTimeString()}`;
     },
     onOpenStorageFile(s3uri) {
-      const { key } = AmazonS3URI(s3uri)
-      const accessLevel = key.split('/')[0]
-      const file = key.split('/').slice(2).join('/')
-      Storage.get(file, { level: accessLevel, expires: 60 * 5 })
+      const { key } = AmazonS3URI(s3uri);
+      const accessLevel = key.split('/')[0];
+      const identityId = key.split('/')[1];
+      const file = key.split('/').slice(2).join('/');
+      const params = {
+        level: accessLevel,
+        expires: 60 * 5 
+      };
+      if (accessLevel === 'protected') { params.identityId = identityId }
+      Storage.get(file, params)
         .then(result => {
           const link = document.createElement('a')
           link.href = result
@@ -453,12 +465,10 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    onOpenTranscript(s3uri) {
-      const { key } = AmazonS3URI(s3uri)
-      const accessLevel = key.split('/')[0]
-      const file = key.split('/').slice(2).join('/')
+    onOpenTranscript(executionId) {
+      //const { key } = AmazonS3URI(s3uri)
       const link = document.createElement('a')
-      link.href = `/transcript?level=${accessLevel}&file=${file}`
+      link.href = `/transcript?id=${executionId}`
       link.target = '_blank'
       link.click()
     },

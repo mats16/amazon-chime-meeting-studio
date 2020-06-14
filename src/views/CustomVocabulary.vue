@@ -16,7 +16,7 @@
 
       <el-form-item>
         <el-button type="primary" @click="publishToS3(selectedVocabularyId)">Publish to S3</el-button>
-       </el-form-item>
+      </el-form-item>
 
       <el-form-item>
         <el-button type="danger" :disabled="(selectedVocabularyName === 'default')" @click="deleteVocabulary(selectedVocabularyId)">Delete Vocabulary</el-button>
@@ -27,7 +27,7 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="createVocabulary(form.newVocabularyName)">Creste Vocabulary</el-button>
+        <el-button type="primary" :disabled="(form.newVocabularyName === 'default')" @click="createVocabulary(form.newVocabularyName)">Creste Vocabulary</el-button>
       </el-form-item>
 
     </el-form>
@@ -201,6 +201,9 @@ export default {
   watch: {
     selectedVocabularyId: function (vocabularyId) {
       this.selectedVocabularyName = this.vocabularyList.find(x => x.id === vocabularyId).name;
+      for (let item in this.subscription) {
+        this.subscription[item].unsubscribe();
+      }
       // Get sheet data
       API.graphql(graphqlOperation(queries.listVocabularySheets, {vocabularyId: vocabularyId}))
         .then((res) => {
@@ -309,14 +312,12 @@ export default {
         .catch((err) => console.log(JSON.stringify(err)));
       this.vocabularyList.push(newVocabulary);
       this.selectedVocabularyId = newVocabulary.id;
-      //this.selectedVocabularyName = vocabularyName
     },
     deleteVocabulary(vocabularyId) {
       const input = {id: vocabularyId}
       API.graphql(graphqlOperation(mutations.deleteVocabulary, {input: input}))
         .catch((err) => console.log(JSON.stringify(err)));
-      this.selectedVocabularyId = '';
-      this.tbody.length = 0
+      this.selectedVocabularyId = this.vocabularyList.find(x => x.name === 'default').id;
     },
     addRow() {
       if (this.tbody.length < 100) {
@@ -376,14 +377,13 @@ export default {
       this.rows[rowIndex][header].value = 'T-shirt';
     },
     async publishToS3(vocabularyId) {
-      const vocabularyName = this.vocabularyList.find(x => x.id === vocabularyId).name;
-      const fileName = `vocabulary/${vocabularyName}.txt`
-      let body = 'Phrase \tIPA\tSoundsLike\tDisplayAs\n'
+      const fileName = `vocabulary/${vocabularyId}/input.txt`;
+      let body = 'Phrase \tIPA\tSoundsLike\tDisplayAs\n';
       for (let row of this.tbody) {
         body += `${row.phrase.value}\t${row.ipa.value}\t${row.soundsLike.value}\t${row.displayAs.value}\n`
       }
       Storage.put(fileName, body)
-        .then (result => console.log(result)) // {key: "test.txt"}
+        .then (result => console.log(result))
         .catch(err => console.log(err));
     }
   },
