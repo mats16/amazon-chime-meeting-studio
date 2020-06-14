@@ -6,6 +6,9 @@
           <el-input v-model="form[`spk_${n-1}`]"></el-input>
         </el-form-item>
       </div>
+      <el-form-item>
+        <el-button type="primary" @click="onSaveLabels()">Save</el-button>
+      </el-form-item>
     </el-form>
     <el-table
       :data="speakerLabeledTranscript"
@@ -50,13 +53,36 @@
 </template>
 
 <script>
-import { Storage } from 'aws-amplify';
+import { Storage, API, graphqlOperation } from 'aws-amplify';
 import request from 'request-promise-native';
+import AmazonS3URI from 'amazon-s3-uri';
+import * as queries from '../graphql/queries';
+import * as mutations from '../graphql/mutations';
+//import * as subscriptions from '../graphql/subscriptions';
+
+const getTranscriptSpeakerLabel = /* GraphQL */ `
+  query GetTranscriptSpeakerLabel($id: ID!) {
+    getTranscriptSpeakerLabel(id: $id) {
+      spk_0
+      spk_1
+      spk_2
+      spk_3
+      spk_4
+      spk_5
+      spk_6
+      spk_7
+      spk_8
+      spk_9
+    }
+  }
+`;
 
 export default {
   name: 'Transcript',
   data() {
     return {
+      executionId: '',
+      transcriptFileUri: '',
       form: {},
       transcriptResults: {
         items: [],
@@ -68,23 +94,61 @@ export default {
       speakerLabeledTranscript: []
     }
   },
-  beforeCreate() {
-    const accessLevel = this.$route.query.level
-    const file = this.$route.query.file
-    Storage.get(file, { level: accessLevel, expires: 60 })
-      .then(url => {
-        request(url)
-          .then((transcriptText) => {
-            const transcriptJson = JSON.parse(transcriptText)
-            this.genSpeakerLabeledTranscript(transcriptJson.results)
-            this.transcriptResults = transcriptJson.results
+  created() {
+    this.executionId = this.$route.query.id;
+    // Load transcript file
+    API.graphql(graphqlOperation(queries.getStatus, {id: this.executionId}))
+      .then((data) => {
+        this.transcriptFileUri = data.data.getStatus.transcriptFileUri;
+        const { key } = AmazonS3URI(this.transcriptFileUri);
+        const accessLevel = key.split('/')[0];
+        const identityId = key.split('/')[1];
+        const storageFile = key.split('/').slice(2).join('/');
+        const params = {
+          level: accessLevel,
+          expires: 60
+        };
+        if (accessLevel === 'protected') { params.identityId = identityId }
+        Storage.get(storageFile, params)
+          .then(url => {
+            request(url)
+              .then((transcriptText) => {
+                const transcriptJson = JSON.parse(transcriptText)
+                this.genSpeakerLabeledTranscript(transcriptJson.results)
+                this.transcriptResults = transcriptJson.results
+              })
+              .catch((err) => console.log(JSON.stringify(err)));
           })
-          .catch((err) => console.log(JSON.stringify(err)));
+          .catch(err => console.log(err));
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(JSON.stringify(err)));
+    // Load label
+    API.graphql(graphqlOperation(getTranscriptSpeakerLabel, {id: this.executionId}))
+      .then((data) => {
+        const form = {};
+        const speakerLabel = data.data.getTranscriptSpeakerLabel;
+        for (let i in speakerLabel) {
+          if (speakerLabel[i] !== null) {
+            form[i] = speakerLabel[i];
+          }
+        }
+        this.form = form;
+      })
+      .catch((err) => console.log(JSON.stringify(err)));
   },
   computed: {},
   methods: {
+    onSaveLabels() {
+      const input = {
+        id: this.executionId,
+        ...this.form
+      }
+      API.graphql(graphqlOperation(mutations.updateTranscriptSpeakerLabel, {input: input}))
+        .catch(() => {
+          API.graphql(graphqlOperation(mutations.createTranscriptSpeakerLabel, {input: input}))
+            .catch((err) => console.log(JSON.stringify(err)));
+        });
+    },
     genSpeakerLabeledTranscript(transcriptResults) {
       const speakerLabeledTranscript = []
       const speakerLabelsSegments = transcriptResults.speaker_labels.segments

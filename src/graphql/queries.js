@@ -1,6 +1,55 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getTranscriptSpeakerLabel = /* GraphQL */ `
+  query GetTranscriptSpeakerLabel($id: ID!) {
+    getTranscriptSpeakerLabel(id: $id) {
+      id
+      spk_0
+      spk_1
+      spk_2
+      spk_3
+      spk_4
+      spk_5
+      spk_6
+      spk_7
+      spk_8
+      spk_9
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listTranscriptSpeakerLabels = /* GraphQL */ `
+  query ListTranscriptSpeakerLabels(
+    $filter: ModelTranscriptSpeakerLabelFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTranscriptSpeakerLabels(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        spk_0
+        spk_1
+        spk_2
+        spk_3
+        spk_4
+        spk_5
+        spk_6
+        spk_7
+        spk_8
+        spk_9
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const getAccountSettings = /* GraphQL */ `
   query GetAccountSettings($id: ID!) {
     getAccountSettings(id: $id) {
@@ -81,33 +130,6 @@ export const listVocabularySheets = /* GraphQL */ `
     }
   }
 `;
-export const getVocabulary = /* GraphQL */ `
-  query GetVocabulary($id: ID!) {
-    getVocabulary(id: $id) {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listVocabularys = /* GraphQL */ `
-  query ListVocabularys(
-    $filter: ModelVocabularyFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listVocabularys(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const getStatus = /* GraphQL */ `
   query GetStatus($id: ID!) {
     getStatus(id: $id) {
@@ -154,6 +176,37 @@ export const listStatuss = /* GraphQL */ `
         transcriptFileUri
         broadcastEnabled
         broadcastRtmpUri
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getVocabulary = /* GraphQL */ `
+  query GetVocabulary($id: ID!) {
+    getVocabulary(id: $id) {
+      id
+      name
+      status
+      fileUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listVocabularys = /* GraphQL */ `
+  query ListVocabularys(
+    $filter: ModelVocabularyFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listVocabularys(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        status
+        fileUri
         createdAt
         updatedAt
       }

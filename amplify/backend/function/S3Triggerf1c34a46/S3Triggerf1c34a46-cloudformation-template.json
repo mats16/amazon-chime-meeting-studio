@@ -77,7 +77,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-chimestudio-dev-152645-deployment",
-					"S3Key": "amplify-builds/S3Triggerf1c34a46-68553777744b2f6e7573-build.zip"
+					"S3Key": "amplify-builds/S3Triggerf1c34a46-62655859396b7233522f-build.zip"
 				}
 			}
 		},
@@ -181,7 +181,10 @@
 						{
 							"Effect": "Allow",
 							"Action": [
-								"transcribe:StartTranscriptionJob"
+								"transcribe:StartTranscriptionJob",
+								"transcribe:GetVocabulary",
+								"transcribe:CreateVocabulary",
+								"transcribe:UpdateVocabulary"
 							],
 							"Resource": "*"
 						}

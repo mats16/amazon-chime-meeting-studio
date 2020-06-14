@@ -1,6 +1,63 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateTranscriptSpeakerLabel = /* GraphQL */ `
+  subscription OnCreateTranscriptSpeakerLabel {
+    onCreateTranscriptSpeakerLabel {
+      id
+      spk_0
+      spk_1
+      spk_2
+      spk_3
+      spk_4
+      spk_5
+      spk_6
+      spk_7
+      spk_8
+      spk_9
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateTranscriptSpeakerLabel = /* GraphQL */ `
+  subscription OnUpdateTranscriptSpeakerLabel {
+    onUpdateTranscriptSpeakerLabel {
+      id
+      spk_0
+      spk_1
+      spk_2
+      spk_3
+      spk_4
+      spk_5
+      spk_6
+      spk_7
+      spk_8
+      spk_9
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteTranscriptSpeakerLabel = /* GraphQL */ `
+  subscription OnDeleteTranscriptSpeakerLabel {
+    onDeleteTranscriptSpeakerLabel {
+      id
+      spk_0
+      spk_1
+      spk_2
+      spk_3
+      spk_4
+      spk_5
+      spk_6
+      spk_7
+      spk_8
+      spk_9
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreateAccountSettings = /* GraphQL */ `
   subscription OnCreateAccountSettings($id: String!) {
     onCreateAccountSettings(id: $id) {
@@ -79,36 +136,6 @@ export const onDeleteVocabularySheet = /* GraphQL */ `
     }
   }
 `;
-export const onCreateVocabulary = /* GraphQL */ `
-  subscription OnCreateVocabulary {
-    onCreateVocabulary {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onUpdateVocabulary = /* GraphQL */ `
-  subscription OnUpdateVocabulary {
-    onUpdateVocabulary {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const onDeleteVocabulary = /* GraphQL */ `
-  subscription OnDeleteVocabulary {
-    onDeleteVocabulary {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-  }
-`;
 export const onCreateStatus = /* GraphQL */ `
   subscription OnCreateStatus {
     onCreateStatus {
@@ -173,6 +200,42 @@ export const onDeleteStatus = /* GraphQL */ `
       transcriptFileUri
       broadcastEnabled
       broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreateVocabulary = /* GraphQL */ `
+  subscription OnCreateVocabulary {
+    onCreateVocabulary {
+      id
+      name
+      status
+      fileUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateVocabulary = /* GraphQL */ `
+  subscription OnUpdateVocabulary {
+    onUpdateVocabulary {
+      id
+      name
+      status
+      fileUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteVocabulary = /* GraphQL */ `
+  subscription OnDeleteVocabulary {
+    onDeleteVocabulary {
+      id
+      name
+      status
+      fileUri
       createdAt
       updatedAt
     }
