@@ -14,6 +14,7 @@
         <el-form-item label="Source Type">
           <el-radio-group v-model="form.src_type">
             <el-radio label="chime">Amazon Chime</el-radio>
+            <el-radio label="zoom" disabled>Zoom</el-radio>
             <el-radio label="custom">Custom URL</el-radio>
           </el-radio-group>
         </el-form-item>
