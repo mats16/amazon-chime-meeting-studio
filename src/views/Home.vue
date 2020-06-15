@@ -1,7 +1,8 @@
 <template>
   <div class="home">
     <el-alert title="Chime に <Broadcast> ユーザーとして参加します ( Attendees に表示されます )" type="warning" show-icon v-if="(form.src_type === 'chime')"></el-alert>
-    <el-alert title="Private mode は現状、録画・文字起こしファイルについてのみ有効です ( 実行履歴は公開されます )" type="warning" show-icon v-if="form.privateAccess"></el-alert>
+    <el-alert title="現状、レコーディング機能は映像と音声に若干のズレが発生します ( 対応中 )" type="warning" show-icon v-if="form.recordingEnabled"></el-alert>
+    <el-alert title="現状、プライベートモードは録画・文字起こしのファイルアクセスについてのみ有効です ( 実行履歴には公開されます )" type="warning" show-icon v-if="form.privateAccess"></el-alert>
     <br>
     <el-form ref="form" :model="form" :rules="rules" label-width="180px">
       <!--<el-alert title="error alert" type="error" show-icon v-if="this.invalid.src"></el-alert>-->
