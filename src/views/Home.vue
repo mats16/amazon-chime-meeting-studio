@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <el-alert title="Chime に <Broadcast> ユーザーとして参加します ( Attendees に表示されます )" type="warning" show-icon v-if="(form.src_type === 'chime') && (form.broadcastEnabled || form.recordingEnabled || form.transcriptionEnabled)"></el-alert>
+    <el-alert title="Chime に <Broadcast> ユーザーとして参加します ( Attendees に表示されます )" type="warning" show-icon v-if="(form.src_type === 'chime')"></el-alert>
     <el-alert title="Private mode は現状、録画・文字起こしファイルについてのみ有効です ( 実行履歴は公開されます )" type="warning" show-icon v-if="form.privateAccess"></el-alert>
     <br>
     <el-form ref="form" :model="form" :rules="rules" label-width="180px">
@@ -144,12 +144,16 @@
       <el-table-column
         prop="description"
         label="Description">
+        <template slot-scope="scope">
+          {{ (scope.row.description === null) ? convertToDate(scope.row.createdAt) : scope.row.description }}
+        </template>
       </el-table-column>
 
       <el-table-column label="Settiongs">
         <el-table-column
           prop="broadcastEnabled"
-          label="Broadcast">
+          label="Broadcast"
+          width="106">
           <template slot-scope="scope">
             <el-tag
               :type="scope.row.broadcastEnabled === true ? 'primary' : 'info'"
@@ -160,7 +164,8 @@
         </el-table-column>
         <el-table-column
           prop="recordingEnabled"
-          label="Recording">
+          label="Recording"
+          width="106">
           <template slot-scope="scope">
             <el-tag
               :type="scope.row.recordingEnabled === true ? 'primary' : 'info'"
@@ -172,7 +177,7 @@
         <el-table-column
           prop="transcriptionEnabled"
           label="Transcription"
-          width="110">
+          width="106">
           <template slot-scope="scope">
             <el-tag
               :type="scope.row.transcriptionEnabled === true ? 'primary' : 'info'"
@@ -226,7 +231,8 @@
       <el-table-column label="Output">
         <el-table-column
           prop="recordingEnabled"
-          label="Video">
+          label="Video"
+          width="104">
           <template slot-scope="scope">
             <el-tooltip class="item" effect="dark" content="Open recording file" placement="top">
               <el-button
@@ -244,7 +250,8 @@
 
         <el-table-column
           prop="transcriptionEnabled"
-          label="Audio">
+          label="Audio"
+          width="104">
           <template slot-scope="scope">
             <el-button
               v-if="scope.row.transcriptionEnabled"
@@ -260,16 +267,17 @@
 
         <el-table-column
           prop="transcriptionEnabled"
-          label="Transcript">
+          label="Transcript"
+          width="104">
           <template slot-scope="scope">
             <el-button
               v-if="scope.row.transcriptionEnabled"
               type="info"
-              :disabled="(scope.row.transcriptionStatus === 'WAITING') || (scope.row.transcriptionStatus === 'FAILED')"
-              :loading="(scope.row.transcriptionStatus === 'IN_PROGRESS')"
+              :disabled="(scope.row.transcriptionStatus === 'FAILED')"
+              :loading="(scope.row.transcriptionStatus === 'WAITING') || (scope.row.transcriptionStatus === 'IN_PROGRESS')"
               size="small" plain
               @click="onOpenTranscript(`${scope.row.id}`)">
-              Preview
+              Open
             </el-button>
           </template>
         </el-table-column>
@@ -414,10 +422,7 @@ export default {
         transcriptionMaxSpeakerLabels: this.form.transcriptionMaxSpeakerLabels,
         privateAccess: this.form.privateAccess,
       }
-      if (this.form.description === '') {
-        const dateNow = Date.now();
-        input.description = `Started at ${this.convertToDate(dateNow)}`
-      } else {
+      if (this.form.description !== '') {
         input.description = this.form.description
       }
       if (this.form.src_type === 'chime') {
@@ -499,13 +504,20 @@ export default {
     },
     onClear() {
       this.form = {
+        description: '',
         src_type: 'chime',
         src_url: '',
         meeting_pin: '',
+        broadcastEnabled: false,
         broadcastType: [],
         twitch_stream_key: '',
         youtube_stream_key: '',
-        broadcast_url: ''
+        broadcast_url: '',
+        recordingEnabled: true,
+        transcriptionEnabled: true,
+        transcriptionLanguageCode: 'ja-JP',
+        transcriptionMaxSpeakerLabels: 4,
+        privateAccess: false
       }
     },
     stopExecution(row) {
