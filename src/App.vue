@@ -2,9 +2,6 @@
   <div id="app">
     <h2>Amazon Chime Meeting Studio (β)</h2>
     <div v-if="signedIn">
-      <div class="amplify-sign-out">
-        <amplify-sign-out></amplify-sign-out>
-      </div>
       <div id="nav">
         <el-menu mode="horizontal" router>
             <el-menu-item index="home" :route="{ name:'Home' }">Home</el-menu-item>
