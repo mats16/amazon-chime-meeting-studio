@@ -24,6 +24,10 @@
       <el-form-item>
         <el-button type="primary" @click="onSubmit">Save</el-button>
       </el-form-item>
+
+      <el-form-item>
+        <amplify-sign-out/>
+      </el-form-item>
     </el-form>
   </div>
 </template>
