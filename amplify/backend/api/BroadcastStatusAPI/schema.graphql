@@ -22,6 +22,36 @@ type Status @model
   broadcastRtmpUri: String
 }
 
+type Execution
+  @model(subscriptions: { level: public })
+  @auth(rules: [
+    { allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [update, read] }
+    { allow: owner, ownerField: "collaborators", provider: userPools, identityClaim: "email", operations: [update, read] }
+    { allow: groups, groupsField: "collaborationGroups", operations: [update, read] }
+    #{ allow: private, provider: userPools }
+    { allow: private, provider: iam }
+  ])
+{
+  id: ID!
+  owner: String!
+  collaborators: [String]
+  collaborationGroups: [String]
+  description: String
+  tags: [String]
+  status: String
+  src_url: String
+  recordingEnabled: Boolean
+  recordingFileUri: AWSURL
+  transcriptionEnabled: Boolean
+  transcriptionLanguageCode: String
+  transcriptionMaxSpeakerLabels: Int
+  transcriptionStatus: String
+  transcriptionMediaFileUri: AWSURL
+  transcriptFileUri: AWSURL
+  broadcastEnabled: Boolean
+  broadcastRtmpUri: String
+}
+
 type TranscriptSpeakerLabel @model
   @auth(rules: [ { allow: private, provider: userPools } ])
 {

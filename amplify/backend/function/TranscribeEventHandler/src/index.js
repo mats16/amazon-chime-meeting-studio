@@ -29,24 +29,26 @@ const client = new AWSAppSyncClient({
     disableOffline: true,
 });
 
-const getStatus = gql(`
-  query GetStatus($id: ID!) {
-    getStatus(id: $id) {
+const getExecution = gql(`
+  query GetExecution($id: ID!) {
+    getExecution(id: $id) {
       transcriptionEnabled
     }
   }
 `);
-const updateStatus = gql(`
-  mutation UpdateStatus($id: ID!, $transcriptionStatus: String, $transcriptFileUri: AWSURL) {
-    updateStatus(input: {
+const updateExecution = gql(`
+  mutation UpdateExecution($id: ID!, $transcriptionStatus: String, $transcriptFileUri: AWSURL) {
+    updateExecution(input: {
       id: $id
       transcriptionStatus: $transcriptionStatus
       transcriptFileUri: $transcriptFileUri
     }) {
       id
-      status
       owner
+      collaborators
+      collaborationGroups
       description
+      status
       src_url
       recordingEnabled
       recordingFileUri
@@ -80,9 +82,9 @@ exports.handler = async (event) => {
       transcriptionStatus: transcriptionJobStatus
     }
     // AppSync に レコードがあるか確認する
-    const data = await client.query({ variables: variables, query: getStatus, fetchPolicy: 'network-only' })
+    const data = await client.query({ variables: variables, query: getExecution, fetchPolicy: 'network-only' })
       .catch((err) => console.log(JSON.stringify(err)));
-    const transcriptionEnabled = data.data.getStatus.transcriptionEnabled;
+    const transcriptionEnabled = data.data.getExecution.transcriptionEnabled;
 
     if (transcriptionEnabled) {
       if (transcriptionJobStatus === 'COMPLETED') {
@@ -103,7 +105,7 @@ exports.handler = async (event) => {
           })
           .catch((err) => console.log(JSON.stringify(err)));
       };
-      await client.mutate({ variables: variables, mutation: updateStatus })
+      await client.mutate({ variables: variables, mutation: updateExecution })
         .then((data) => console.log(JSON.stringify(data)))
         .catch((err) => console.log(JSON.stringify(err)));
     } else {

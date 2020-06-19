@@ -380,29 +380,33 @@ export default {
         this.form.youtube_stream_key = this.currentSettings.youtube_stream_key;
       })
       .catch((err) => console.log(JSON.stringify(err)));
-    // Todo: use delta sync
-    await API.graphql(graphqlOperation(queries.listStatuss))
+    await API.graphql(graphqlOperation(queries.listExecutions))
       .then((data) => {
-        this.tableData = data.data.listStatuss.items
-      });
-    //this.subscription.onCreateStatus = API.graphql(graphqlOperation(subscriptions.onCreateStatus, {owner: this.user.email})).subscribe({
-    this.subscription.onCreateStatus = API.graphql(graphqlOperation(subscriptions.onCreateStatus)).subscribe({
+        this.tableData = data.data.listExecutions.items
+      })
+      .catch((err) => console.log(JSON.stringify(err)));
+    this.subscription.onCreateExecution = API.graphql(graphqlOperation(subscriptions.onCreateExecution)).subscribe({
       next: (eventData) => {
-        console.log(eventData)
-        const data = eventData.value.data.onCreateStatus;
-        this.tableData.push(data);
+        //console.log(eventData)
+        const data = eventData.value.data.onCreateExecution;
+        const isPermitted = this.verifyPermission(data)
+        if (isPermitted) {
+          this.tableData.push(data);
+        }
       }
     });
-    //this.subscription.onUpdateStatus = API.graphql(graphqlOperation(subscriptions.onUpdateStatus, {owner: this.user.email})).subscribe({
-    this.subscription.onUpdateStatus = API.graphql(graphqlOperation(subscriptions.onUpdateStatus)).subscribe({
+    this.subscription.onUpdateExecution = API.graphql(graphqlOperation(subscriptions.onUpdateExecution)).subscribe({
       next: (eventData) => {
-        console.log(eventData)
-        const data = eventData.value.data.onUpdateStatus;
-        const index = this.tableData.findIndex(x => x.id === data.id);
-        if (index === -1) {
-          this.tableData.push(data);
-        } else {
-          this.$set(this.tableData, index, data);
+        //console.log(eventData)
+        const data = eventData.value.data.onUpdateExecution;
+        const isPermitted = this.verifyPermission(data)
+        if (isPermitted) {
+          const index = this.tableData.findIndex(x => x.id === data.id);
+          if (index == -1) {
+            this.tableData.push(data);
+          } else {
+            this.$set(this.tableData, index, data);  // 上書き出来るように、全フィールド飛ばしている
+          }
         }
       }
     });
@@ -449,6 +453,15 @@ export default {
     }
   },
   methods: {
+    verifyPermission(data) {
+      if (data.owner === this.user.email) {
+        return true;
+      } else if ((data.collaborators !== null) && data.collaborators.includes(this.user.email)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     convertToDate(unixtime) {
       const dateTime = new Date(unixtime);
       return `${dateTime.toLocaleDateString()} ${dateTime.toLocaleTimeString()}`;

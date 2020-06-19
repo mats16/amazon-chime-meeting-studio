@@ -183,6 +183,65 @@ export const listStatuss = /* GraphQL */ `
     }
   }
 `;
+export const getExecution = /* GraphQL */ `
+  query GetExecution($id: ID!) {
+    getExecution(id: $id) {
+      id
+      owner
+      collaborators
+      collaborationGroups
+      description
+      tags
+      status
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionLanguageCode
+      transcriptionMaxSpeakerLabels
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listExecutions = /* GraphQL */ `
+  query ListExecutions(
+    $filter: ModelExecutionFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listExecutions(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        owner
+        collaborators
+        collaborationGroups
+        description
+        tags
+        status
+        src_url
+        recordingEnabled
+        recordingFileUri
+        transcriptionEnabled
+        transcriptionLanguageCode
+        transcriptionMaxSpeakerLabels
+        transcriptionStatus
+        transcriptionMediaFileUri
+        transcriptFileUri
+        broadcastEnabled
+        broadcastRtmpUri
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const getVocabulary = /* GraphQL */ `
   query GetVocabulary($id: ID!) {
     getVocabulary(id: $id) {

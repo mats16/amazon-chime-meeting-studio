@@ -46,13 +46,15 @@ const appsyncClient = new AWSAppSyncClient({
   disableOffline: true,
 });
 
-const createStatus = gql(`
-  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $description: String, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionLanguageCode: String, $transcriptionMaxSpeakerLabels: Int, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
-    createStatus(input: {
+const createExecution = gql(`
+  mutation CreateExecution($id: ID!, $owner: String!, $collaborators: [String], $collaborationGroups: [String], $description: String, $status: String!, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionLanguageCode: String, $transcriptionMaxSpeakerLabels: Int, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
+    createExecution(input: {
       id: $id
-      status: $status
       owner: $owner
+      collaborators: $collaborators
+      collaborationGroups: $collaborationGroups
       description: $description
+      status: $status
       src_url: $src_url
       recordingEnabled: $recordingEnabled
       recordingFileUri: $recordingFileUri
@@ -65,9 +67,11 @@ const createStatus = gql(`
       broadcastRtmpUri: $broadcastRtmpUri
     }) {
       id
-      status
       owner
+      collaborators
+      collaborationGroups
       description
+      status
       src_url
       recordingEnabled
       recordingFileUri
@@ -134,11 +138,11 @@ app.post('/executions/new', function(req, res) {
   const gqlVariables = {
     id: requestId,
     status: 'SUBMITTED',
-    //owner: cognitoUsername,
     owner: owner,
+    //collaborators: [owner],
     ...stateMachineInput
   };
-  appsyncClient.mutate({variables: gqlVariables, mutation: createStatus})
+  appsyncClient.mutate({variables: gqlVariables, mutation: createExecution})
     .then((data) => {
       console.log(JSON.stringify(data))
       // StateMachine の実行

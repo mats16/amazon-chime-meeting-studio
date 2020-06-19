@@ -50,26 +50,28 @@ const updateVocabulary = gql(`
     }
   }
 `);
-const getStatus = gql(`
-  query GetStatus($id: ID!) {
-    getStatus(id: $id) {
+const getExecution = gql(`
+  query GetExecution($id: ID!) {
+    getExecution(id: $id) {
       transcriptionEnabled
       transcriptionLanguageCode
       transcriptionMaxSpeakerLabels
     }
   }
 `);
-const updateStatus = gql(`
-  mutation UpdateStatus($id: ID!, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL) {
-    updateStatus(input: {
+const updateExecution = gql(`
+  mutation UpdateExecution($id: ID!, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL) {
+    updateExecution(input: {
       id: $id
       transcriptionStatus: $transcriptionStatus
       transcriptionMediaFileUri: $transcriptionMediaFileUri
     }) {
       id
-      status
       owner
+      collaborators
+      collaborationGroups
       description
+      status
       src_url
       recordingEnabled
       recordingFileUri
@@ -137,9 +139,9 @@ exports.handler = async (event) => {
       id: executionId,
     }
     // Check transcriptionEnabled and config
-    const data = await client.query({ variables: gqlVariables, query: getStatus, fetchPolicy: 'network-only' })
+    const data = await client.query({ variables: gqlVariables, query: getExecution, fetchPolicy: 'network-only' })
       .catch((err) => console.log(JSON.stringify(err)));
-    const { transcriptionEnabled, transcriptionLanguageCode, transcriptionMaxSpeakerLabels } = data.data.getStatus;
+    const { transcriptionEnabled, transcriptionLanguageCode, transcriptionMaxSpeakerLabels } = data.data.getExecution;
 
     if (transcriptionEnabled) {
       const mediaFileUri = `https://s3.${region}.amazonaws.com/${bucket}/${key}`;
@@ -174,7 +176,7 @@ exports.handler = async (event) => {
           console.log(JSON.stringify(err));
           gqlVariables.transcriptionStatus = 'ERROR';
         })
-      await client.mutate({ variables: gqlVariables, mutation: updateStatus })
+      await client.mutate({ variables: gqlVariables, mutation: updateExecution })
         .then((data) => console.log(JSON.stringify(data)))
         .catch((err) => console.log(JSON.stringify(err)));
     }

@@ -241,6 +241,93 @@ export const deleteStatus = /* GraphQL */ `
     }
   }
 `;
+export const createExecution = /* GraphQL */ `
+  mutation CreateExecution(
+    $input: CreateExecutionInput!
+    $condition: ModelExecutionConditionInput
+  ) {
+    createExecution(input: $input, condition: $condition) {
+      id
+      owner
+      collaborators
+      collaborationGroups
+      description
+      tags
+      status
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionLanguageCode
+      transcriptionMaxSpeakerLabels
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateExecution = /* GraphQL */ `
+  mutation UpdateExecution(
+    $input: UpdateExecutionInput!
+    $condition: ModelExecutionConditionInput
+  ) {
+    updateExecution(input: $input, condition: $condition) {
+      id
+      owner
+      collaborators
+      collaborationGroups
+      description
+      tags
+      status
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionLanguageCode
+      transcriptionMaxSpeakerLabels
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteExecution = /* GraphQL */ `
+  mutation DeleteExecution(
+    $input: DeleteExecutionInput!
+    $condition: ModelExecutionConditionInput
+  ) {
+    deleteExecution(input: $input, condition: $condition) {
+      id
+      owner
+      collaborators
+      collaborationGroups
+      description
+      tags
+      status
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionLanguageCode
+      transcriptionMaxSpeakerLabels
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createVocabulary = /* GraphQL */ `
   mutation CreateVocabulary(
     $input: CreateVocabularyInput!
