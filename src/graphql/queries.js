@@ -189,7 +189,7 @@ export const getExecution = /* GraphQL */ `
       id
       owner
       collaborators
-      collaborationGroups
+      groups
       description
       tags
       status
@@ -220,7 +220,7 @@ export const listExecutions = /* GraphQL */ `
         id
         owner
         collaborators
-        collaborationGroups
+        groups
         description
         tags
         status

@@ -47,12 +47,12 @@ const appsyncClient = new AWSAppSyncClient({
 });
 
 const createExecution = gql(`
-  mutation CreateExecution($id: ID!, $owner: String!, $collaborators: [String], $collaborationGroups: [String], $description: String, $status: String!, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionLanguageCode: String, $transcriptionMaxSpeakerLabels: Int, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
+  mutation CreateExecution($id: ID!, $owner: String!, $collaborators: [String], $groups: [String], $description: String, $status: String!, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionLanguageCode: String, $transcriptionMaxSpeakerLabels: Int, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
     createExecution(input: {
       id: $id
       owner: $owner
       collaborators: $collaborators
-      collaborationGroups: $collaborationGroups
+      groups: $groups
       description: $description
       status: $status
       src_url: $src_url
@@ -69,7 +69,7 @@ const createExecution = gql(`
       id
       owner
       collaborators
-      collaborationGroups
+      groups
       description
       status
       src_url

@@ -7,7 +7,7 @@ export const onCreateExecution = /* GraphQL */ `
       id
       owner
       collaborators
-      collaborationGroups
+      groups
       description
       tags
       status
@@ -33,7 +33,7 @@ export const onUpdateExecution = /* GraphQL */ `
       id
       owner
       collaborators
-      collaborationGroups
+      groups
       description
       tags
       status
@@ -59,7 +59,7 @@ export const onDeleteExecution = /* GraphQL */ `
       id
       owner
       collaborators
-      collaborationGroups
+      groups
       description
       tags
       status

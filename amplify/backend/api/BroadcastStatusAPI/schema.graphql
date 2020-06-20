@@ -27,7 +27,7 @@ type Execution
   @auth(rules: [
     { allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [update, read] }
     { allow: owner, ownerField: "collaborators", provider: userPools, identityClaim: "email", operations: [update, read] }
-    { allow: groups, groupsField: "collaborationGroups", operations: [update, read] }
+    { allow: groups, groupsField: "groups", operations: [update, read] }
     #{ allow: private, provider: userPools }
     { allow: private, provider: iam }
   ])
@@ -35,7 +35,7 @@ type Execution
   id: ID!
   owner: String!
   collaborators: [String]
-  collaborationGroups: [String]
+  groups: [String]
   description: String
   tags: [String]
   status: String

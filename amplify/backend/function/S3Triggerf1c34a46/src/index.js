@@ -69,7 +69,7 @@ const updateExecution = gql(`
       id
       owner
       collaborators
-      collaborationGroups
+      groups
       description
       status
       src_url
