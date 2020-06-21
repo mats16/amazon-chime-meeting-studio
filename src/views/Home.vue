@@ -1,8 +1,9 @@
 <template>
   <div class="home">
     <el-alert title="Chime に <Broadcast> ユーザーとして参加します ( Attendees に表示されます )" type="warning" show-icon v-if="(form.src_type === 'chime')"></el-alert>
-    <el-alert title="現状、レコーディング機能は映像と音声に若干のズレが発生します ( 対応中 )" type="warning" show-icon v-if="form.recordingEnabled"></el-alert>
-    <el-alert title="現状、プライベートモードは録画・文字起こしのファイルアクセスについてのみ有効です ( 実行履歴には公開されます )" type="warning" show-icon v-if="form.privateAccess"></el-alert>
+    <el-alert title="現状、レコーディング機能は映像と音声に若干のズレが発生します ( 対応中 )" type="info" show-icon v-if="form.recordingEnabled"></el-alert>
+    <el-alert title="現状、共有するとアカウントを持っている全ユーザーに公開されます ( グループ管理機能は準備中です )" type="info" show-icon v-if="form.shareEnabled"></el-alert>
+    <el-alert title="現状、プライベートモードで保存したファイルを、後から共有することは出来ません" type="warning" show-icon v-if="!(form.shareEnabled)"></el-alert>
     <br>
     <el-form ref="form" :model="form" :rules="rules" label-width="180px">
       <!--<el-alert title="error alert" type="error" show-icon v-if="this.invalid.src"></el-alert>-->
@@ -95,11 +96,11 @@
         </el-form-item>
       </el-form>
 
-      <el-form-item label="Access Level" v-if="form.recordingEnabled || form.transcriptionEnabled">
+      <el-form-item label="Sharing">
         <el-switch
-          v-model="form.privateAccess"
-          active-text="Private"
-          inactive-text="Sharing">
+          v-model="form.shareEnabled"
+          active-text="Enabled"
+          inactive-text="Disabled">
         </el-switch>
       </el-form-item>
 
@@ -338,7 +339,7 @@ export default {
         transcriptionEnabled: true,
         transcriptionLanguageCode: 'ja-JP',
         transcriptionMaxSpeakerLabels: 4,
-        privateAccess: false
+        shareEnabled: true
       },
       rules: {
         meeting_pin: [
@@ -368,9 +369,18 @@ export default {
     }
   },
   async created () {
-    await Auth.currentAuthenticatedUser()
-      .then((cognitoUser) => {
-        this.user = cognitoUser.attributes;
+    //await Auth.currentAuthenticatedUser()
+    //  .then((cognitoUser) => {
+    //    this.user = cognitoUser.attributes;
+    //  });
+    await Auth.currentSession()
+      .then((session) => {
+        const payload = session.idToken.payload;
+        this.user = {
+          sub: payload.sub,
+          email: payload.email,
+          groups: payload['cognito:groups']
+        }
       });
     await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.user.sub}))
       .then((data) => {
@@ -380,29 +390,33 @@ export default {
         this.form.youtube_stream_key = this.currentSettings.youtube_stream_key;
       })
       .catch((err) => console.log(JSON.stringify(err)));
-    // Todo: use delta sync
-    await API.graphql(graphqlOperation(queries.listStatuss))
+    await API.graphql(graphqlOperation(queries.listExecutions))
       .then((data) => {
-        this.tableData = data.data.listStatuss.items
-      });
-    //this.subscription.onCreateStatus = API.graphql(graphqlOperation(subscriptions.onCreateStatus, {owner: this.user.email})).subscribe({
-    this.subscription.onCreateStatus = API.graphql(graphqlOperation(subscriptions.onCreateStatus)).subscribe({
+        this.tableData = data.data.listExecutions.items
+      })
+      .catch((err) => console.log(JSON.stringify(err)));
+    this.subscription.onCreateExecution = API.graphql(graphqlOperation(subscriptions.onCreateExecution)).subscribe({
       next: (eventData) => {
-        console.log(eventData)
-        const data = eventData.value.data.onCreateStatus;
-        this.tableData.push(data);
+        //console.log(eventData)
+        const data = eventData.value.data.onCreateExecution;
+        const isPermitted = this.verifyPermission(data)
+        if (isPermitted) {
+          this.tableData.push(data);
+        }
       }
     });
-    //this.subscription.onUpdateStatus = API.graphql(graphqlOperation(subscriptions.onUpdateStatus, {owner: this.user.email})).subscribe({
-    this.subscription.onUpdateStatus = API.graphql(graphqlOperation(subscriptions.onUpdateStatus)).subscribe({
+    this.subscription.onUpdateExecution = API.graphql(graphqlOperation(subscriptions.onUpdateExecution)).subscribe({
       next: (eventData) => {
-        console.log(eventData)
-        const data = eventData.value.data.onUpdateStatus;
-        const index = this.tableData.findIndex(x => x.id === data.id);
-        if (index === -1) {
-          this.tableData.push(data);
-        } else {
-          this.$set(this.tableData, index, data);
+        //console.log(eventData)
+        const data = eventData.value.data.onUpdateExecution;
+        const isPermitted = this.verifyPermission(data)
+        if (isPermitted) {
+          const index = this.tableData.findIndex(x => x.id === data.id);
+          if (index == -1) {
+            this.tableData.push(data);
+          } else {
+            this.$set(this.tableData, index, data);  // 上書き出来るように、全フィールド飛ばしている
+          }
         }
       }
     });
@@ -421,7 +435,7 @@ export default {
         transcriptionEnabled: this.form.transcriptionEnabled,
         transcriptionLanguageCode: this.form.transcriptionLanguageCode,
         transcriptionMaxSpeakerLabels: this.form.transcriptionMaxSpeakerLabels,
-        privateAccess: this.form.privateAccess,
+        shareEnabled: this.form.shareEnabled,
       }
       if (this.form.description !== '') {
         input.description = this.form.description
@@ -449,6 +463,21 @@ export default {
     }
   },
   methods: {
+    verifyPermission(data) {
+      let permitted = false;
+      if (data.owner === this.user.email) {
+        permitted = true;
+      } else if ((data.collaborators !== null) && data.collaborators.includes(this.user.email)) {
+        permitted = true;
+      } else {
+        for (let group of this.user.groups) {
+          if (data.groups.includes(group)) {
+            permitted = true;
+          }
+        }
+      }
+      return permitted;
+    },
     convertToDate(unixtime) {
       const dateTime = new Date(unixtime);
       return `${dateTime.toLocaleDateString()} ${dateTime.toLocaleTimeString()}`;
@@ -516,9 +545,9 @@ export default {
         broadcast_url: '',
         recordingEnabled: true,
         transcriptionEnabled: true,
-        transcriptionLanguageCode: 'ja-JP',
+        transcriptionLanguageCode: '',
         transcriptionMaxSpeakerLabels: 4,
-        privateAccess: false
+        shareEnabled: true
       }
     },
     stopExecution(row) {

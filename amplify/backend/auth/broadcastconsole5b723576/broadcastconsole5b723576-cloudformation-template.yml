@@ -21,6 +21,16 @@ Parameters:
   
   
   
+  functionbroadcastconsole5b723576PostConfirmationArn: 
+    Type: String
+    Default: functionbroadcastconsole5b723576PostConfirmationArn
+  
+  functionbroadcastconsole5b723576PostConfirmationName: 
+    Type: String
+    Default: functionbroadcastconsole5b723576PostConfirmationName
+  
+  
+  
 
     
   identityPoolName:
@@ -184,6 +194,8 @@ Resources:
         
         
         
+          PostConfirmation: !Ref functionbroadcastconsole5b723576PostConfirmationArn
+        
         
         
           PreSignUp: !Ref functionbroadcastconsole5b723576PreSignupArn
@@ -219,6 +231,15 @@ Resources:
     
   
     
+  
+  UserPoolPostConfirmationLambdaInvokePermission: 
+    Type: "AWS::Lambda::Permission"
+    DependsOn: UserPool
+    Properties: 
+      Action: "lambda:invokeFunction"
+      Principal: "cognito-idp.amazonaws.com"
+      FunctionName: !Ref functionbroadcastconsole5b723576PostConfirmationName
+      SourceArn: !GetAtt UserPool.Arn
     
   
   
@@ -234,6 +255,38 @@ Resources:
    
     
   # Updating lambda role with permissions to Cognito
+  
+  
+  broadcastconsole5b723576PostConfirmationAddToGroupCognito:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: broadcastconsole5b723576PostConfirmationAddToGroupCognito
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+            
+              - cognito-idp:AdminAddUserToGroup
+            
+              - cognito-idp:GetGroup
+            
+              - cognito-idp:CreateGroup
+            
+            
+            
+            Resource: !GetAtt
+            
+              - UserPool
+            
+              - Arn
+            
+            
+            
+
+      Roles:
+        - !Join ['',["broadcastconsole5b723576PostConfirmation", '-', !Ref env]]
+  
   
   
   UserPoolClientWeb:

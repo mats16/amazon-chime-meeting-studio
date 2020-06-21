@@ -30,6 +30,20 @@
                         "Name",
                         "Arn"
                     ]
+                },
+                {
+                    "category": "auth",
+                    "resourceName": "broadcastconsole5b723576",
+                    "attributes": [
+                        "UserPoolId"
+                    ]
+                },
+                {
+                    "category": "auth",
+                    "resourceName": "userPoolGroups",
+                    "attributes": [
+                        "allGroupRole"
+                    ]
                 }
             ]
         }
@@ -128,6 +142,11 @@
             "build": true,
             "providerPlugin": "awscloudformation",
             "service": "Lambda"
+        },
+        "broadcastconsole5b723576PostConfirmation": {
+            "build": true,
+            "providerPlugin": "awscloudformation",
+            "service": "Lambda"
         }
     },
     "auth": {
@@ -143,9 +162,34 @@
                         "Arn",
                         "Name"
                     ]
+                },
+                {
+                    "category": "function",
+                    "resourceName": "broadcastconsole5b723576PostConfirmation",
+                    "triggerProvider": "Cognito",
+                    "attributes": [
+                        "Arn",
+                        "Name"
+                    ]
                 }
             ],
             "customAuth": false
+        },
+        "userPoolGroups": {
+            "service": "Cognito-UserPool-Groups",
+            "providerPlugin": "awscloudformation",
+            "dependsOn": [
+                {
+                    "category": "auth",
+                    "resourceName": "broadcastconsole5b723576",
+                    "attributes": [
+                        "UserPoolId",
+                        "AppClientIDWeb",
+                        "AppClientID",
+                        "IdentityPoolId"
+                    ]
+                }
+            ]
         }
     },
     "statemachine": {
@@ -175,6 +219,20 @@
                         "Name",
                         "Arn",
                         "LambdaExecutionRole"
+                    ]
+                },
+                {
+                    "category": "auth",
+                    "resourceName": "broadcastconsole5b723576",
+                    "attributes": [
+                        "UserPoolId"
+                    ]
+                },
+                {
+                    "category": "auth",
+                    "resourceName": "userPoolGroups",
+                    "attributes": [
+                        "allGroupRole"
                     ]
                 }
             ]

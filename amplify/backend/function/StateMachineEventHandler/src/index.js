@@ -23,16 +23,18 @@ const client = new AWSAppSyncClient({
   disableOffline: true,
 });
 
-const updateStatus = gql(`
-  mutation UpdateStatus($id: ID!, $status: String) {
-    updateStatus(input: {
+const updateExecution = gql(`
+  mutation UpdateExecution($id: ID!, $status: String) {
+    updateExecution(input: {
       id: $id
       status: $status
     }) {
       id
-      status
       owner
+      collaborators
+      groups
       description
+      status
       src_url
       recordingEnabled
       recordingFileUri
@@ -57,7 +59,7 @@ exports.handler = async (event) => {
         id: executionName,
         status: status
     };
-    await client.mutate({ variables: variables, mutation: updateStatus })
+    await client.mutate({ variables: variables, mutation: updateExecution })
       .then((data) => console.log(JSON.stringify(data)))
       .catch((err) => console.log(JSON.stringify(err)));
 };

@@ -1,6 +1,84 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateExecution = /* GraphQL */ `
+  subscription OnCreateExecution {
+    onCreateExecution {
+      id
+      owner
+      collaborators
+      groups
+      description
+      tags
+      status
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionLanguageCode
+      transcriptionMaxSpeakerLabels
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateExecution = /* GraphQL */ `
+  subscription OnUpdateExecution {
+    onUpdateExecution {
+      id
+      owner
+      collaborators
+      groups
+      description
+      tags
+      status
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionLanguageCode
+      transcriptionMaxSpeakerLabels
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteExecution = /* GraphQL */ `
+  subscription OnDeleteExecution {
+    onDeleteExecution {
+      id
+      owner
+      collaborators
+      groups
+      description
+      tags
+      status
+      src_url
+      recordingEnabled
+      recordingFileUri
+      transcriptionEnabled
+      transcriptionLanguageCode
+      transcriptionMaxSpeakerLabels
+      transcriptionStatus
+      transcriptionMediaFileUri
+      transcriptFileUri
+      broadcastEnabled
+      broadcastRtmpUri
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreateTranscriptSpeakerLabel = /* GraphQL */ `
   subscription OnCreateTranscriptSpeakerLabel {
     onCreateTranscriptSpeakerLabel {

@@ -46,13 +46,15 @@ const appsyncClient = new AWSAppSyncClient({
   disableOffline: true,
 });
 
-const createStatus = gql(`
-  mutation CreateStatus($id: ID!, $status: String!, $owner: String!, $description: String, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionLanguageCode: String, $transcriptionMaxSpeakerLabels: Int, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
-    createStatus(input: {
+const createExecution = gql(`
+  mutation CreateExecution($id: ID!, $owner: String!, $collaborators: [String], $groups: [String], $description: String, $status: String!, $src_url: String, $recordingEnabled: Boolean, $recordingFileUri: AWSURL, $transcriptionEnabled: Boolean, $transcriptionLanguageCode: String, $transcriptionMaxSpeakerLabels: Int, $transcriptionStatus: String, $transcriptionMediaFileUri: AWSURL, $broadcastEnabled: Boolean, $broadcastRtmpUri: String) {
+    createExecution(input: {
       id: $id
-      status: $status
       owner: $owner
+      collaborators: $collaborators
+      groups: $groups
       description: $description
+      status: $status
       src_url: $src_url
       recordingEnabled: $recordingEnabled
       recordingFileUri: $recordingFileUri
@@ -65,9 +67,11 @@ const createStatus = gql(`
       broadcastRtmpUri: $broadcastRtmpUri
     }) {
       id
-      status
       owner
+      collaborators
+      groups
       description
+      status
       src_url
       recordingEnabled
       recordingFileUri
@@ -102,8 +106,8 @@ app.post('/executions/new', function(req, res) {
   const { requestId, requestTimeEpoch, identity } = req.apiGateway.event.requestContext
   const cognitoIdentityId = identity.cognitoIdentityId  // for S3 path
   //const cognitoUsername = identity.cognitoAuthenticationProvider.split(':')[2]  // for AppSync Permission
-  const { owner, description, src_url, broadcastEnabled, broadcastRtmpUri, recordingEnabled, transcriptionEnabled, transcriptionLanguageCode, transcriptionMaxSpeakerLabels, privateAccess } = req.body
-  const accessLevel = (privateAccess) ? 'private' : 'protected';
+  const { owner, description, src_url, broadcastEnabled, broadcastRtmpUri, recordingEnabled, transcriptionEnabled, transcriptionLanguageCode, transcriptionMaxSpeakerLabels, shareEnabled } = req.body
+  const accessLevel = (shareEnabled) ? 'protected' : 'private';
   const recordingFileUri = `s3://${bucketName}/${accessLevel}/${cognitoIdentityId}/${requestId}/Meeting.mp4`
   const transcriptionMediaFileUri = `s3://${bucketName}/${accessLevel}/${cognitoIdentityId}/${requestId}/Meeting_AudioOnly.flac`
 
@@ -134,11 +138,14 @@ app.post('/executions/new', function(req, res) {
   const gqlVariables = {
     id: requestId,
     status: 'SUBMITTED',
-    //owner: cognitoUsername,
     owner: owner,
     ...stateMachineInput
   };
-  appsyncClient.mutate({variables: gqlVariables, mutation: createStatus})
+  if (shareEnabled) {
+    //gqlVariables.collaborators = [owner];
+    gqlVariables.groups = ['all'];
+  }
+  appsyncClient.mutate({variables: gqlVariables, mutation: createExecution})
     .then((data) => {
       console.log(JSON.stringify(data))
       // StateMachine の実行
