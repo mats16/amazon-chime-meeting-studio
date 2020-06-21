@@ -2,7 +2,7 @@
   <div class="home">
     <el-alert title="Chime に <Broadcast> ユーザーとして参加します ( Attendees に表示されます )" type="warning" show-icon v-if="(form.src_type === 'chime')"></el-alert>
     <el-alert title="現状、レコーディング機能は映像と音声に若干のズレが発生します ( 対応中 )" type="warning" show-icon v-if="form.recordingEnabled"></el-alert>
-    <el-alert title="現状、プライベートモードは録画・文字起こしのファイルアクセスについてのみ有効です ( 実行履歴には公開されます )" type="warning" show-icon v-if="form.privateAccess"></el-alert>
+    <el-alert title="現状、プライベートモードは録画・文字起こしのファイルアクセスについてのみ有効です ( 実行履歴には公開されます )" type="warning" show-icon v-if="!(form.shareEnabled)"></el-alert>
     <br>
     <el-form ref="form" :model="form" :rules="rules" label-width="180px">
       <!--<el-alert title="error alert" type="error" show-icon v-if="this.invalid.src"></el-alert>-->
@@ -95,11 +95,11 @@
         </el-form-item>
       </el-form>
 
-      <el-form-item label="Access Level" v-if="form.recordingEnabled || form.transcriptionEnabled">
+      <el-form-item label="Sharing">
         <el-switch
-          v-model="form.privateAccess"
-          active-text="Private"
-          inactive-text="Sharing">
+          v-model="form.shareEnabled"
+          active-text="Enabled"
+          inactive-text="Disabled">
         </el-switch>
       </el-form-item>
 
@@ -338,7 +338,7 @@ export default {
         transcriptionEnabled: true,
         transcriptionLanguageCode: 'ja-JP',
         transcriptionMaxSpeakerLabels: 4,
-        privateAccess: false
+        shareEnabled: true
       },
       rules: {
         meeting_pin: [
@@ -368,9 +368,18 @@ export default {
     }
   },
   async created () {
-    await Auth.currentAuthenticatedUser()
-      .then((cognitoUser) => {
-        this.user = cognitoUser.attributes;
+    //await Auth.currentAuthenticatedUser()
+    //  .then((cognitoUser) => {
+    //    this.user = cognitoUser.attributes;
+    //  });
+    await Auth.currentSession()
+      .then((session) => {
+        const payload = session.idToken.payload;
+        this.user = {
+          sub: payload.sub,
+          email: payload.email,
+          groups: payload['cognito:groups']
+        }
       });
     await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.user.sub}))
       .then((data) => {
@@ -425,7 +434,7 @@ export default {
         transcriptionEnabled: this.form.transcriptionEnabled,
         transcriptionLanguageCode: this.form.transcriptionLanguageCode,
         transcriptionMaxSpeakerLabels: this.form.transcriptionMaxSpeakerLabels,
-        privateAccess: this.form.privateAccess,
+        shareEnabled: this.form.shareEnabled,
       }
       if (this.form.description !== '') {
         input.description = this.form.description
@@ -454,13 +463,19 @@ export default {
   },
   methods: {
     verifyPermission(data) {
+      let permitted = false;
       if (data.owner === this.user.email) {
-        return true;
+        permitted = true;
       } else if ((data.collaborators !== null) && data.collaborators.includes(this.user.email)) {
-        return true;
+        permitted = true;
       } else {
-        return false;
+        for (let group of this.user.groups) {
+          if (data.groups.includes(group)) {
+            permitted = true;
+          }
+        }
       }
+      return permitted;
     },
     convertToDate(unixtime) {
       const dateTime = new Date(unixtime);
@@ -529,9 +544,9 @@ export default {
         broadcast_url: '',
         recordingEnabled: true,
         transcriptionEnabled: true,
-        transcriptionLanguageCode: 'ja-JP',
+        transcriptionLanguageCode: '',
         transcriptionMaxSpeakerLabels: 4,
-        privateAccess: false
+        shareEnabled: true
       }
     },
     stopExecution(row) {

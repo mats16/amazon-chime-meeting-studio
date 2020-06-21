@@ -25,7 +25,10 @@
                 },
                 "BroadcastStatusAPI": {},
                 "BroadcastContainer": {},
-                "RecordingStore": {}
+                "RecordingStore": {},
+                "broadcastconsole5b723576PostConfirmation": {
+                    "GROUP": "all"
+                }
             }
         }
     },
@@ -55,7 +58,10 @@
                 },
                 "BroadcastStatusAPI": {},
                 "BroadcastContainer": {},
-                "RecordingStore": {}
+                "RecordingStore": {},
+                "broadcastconsole5b723576PostConfirmation": {
+                    "GROUP": "all"
+                }
             }
         }
     },
@@ -85,7 +91,10 @@
                 },
                 "BroadcastStatusAPI": {},
                 "BroadcastContainer": {},
-                "RecordingStore": {}
+                "RecordingStore": {},
+                "broadcastconsole5b723576PostConfirmation": {
+                    "GROUP": "all"
+                }
             }
         }
     }

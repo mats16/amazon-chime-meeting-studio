@@ -10,7 +10,15 @@
                     "/GET",
                     "/PUT",
                     "/PATCH"
-                ]
+                ],
+                "userPoolGroups": {
+                    "all": [
+                        "/POST",
+                        "/GET",
+                        "/PUT",
+                        "/PATCH"
+                    ]
+                }
             }
         }
     ],
@@ -24,8 +32,8 @@
     "privacy": {
         "auth": 1,
         "unauth": 0,
-        "authRoleName": "amplify-broadcastconsole-dev-220316-authRole",
-        "unAuthRoleName": "amplify-broadcastconsole-dev-220316-unauthRole"
+        "authRoleName": "amplify-chimestudio-dev-152645-authRole",
+        "unAuthRoleName": "amplify-chimestudio-dev-152645-unauthRole"
     },
     "dependsOn": [
         {
@@ -35,7 +43,22 @@
                 "Name",
                 "Arn"
             ]
+        },
+        {
+            "category": "auth",
+            "resourceName": "broadcastconsole5b723576",
+            "attributes": [
+                "UserPoolId"
+            ]
+        },
+        {
+            "category": "auth",
+            "resourceName": "userPoolGroups",
+            "attributes": [
+                "allGroupRole"
+            ]
         }
     ],
-    "uuid": "798b3a34"
+    "uuid": "71082a6d",
+    "authResourceName": "broadcastconsole5b723576"
 }

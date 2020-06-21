@@ -106,8 +106,8 @@ app.post('/executions/new', function(req, res) {
   const { requestId, requestTimeEpoch, identity } = req.apiGateway.event.requestContext
   const cognitoIdentityId = identity.cognitoIdentityId  // for S3 path
   //const cognitoUsername = identity.cognitoAuthenticationProvider.split(':')[2]  // for AppSync Permission
-  const { owner, description, src_url, broadcastEnabled, broadcastRtmpUri, recordingEnabled, transcriptionEnabled, transcriptionLanguageCode, transcriptionMaxSpeakerLabels, privateAccess } = req.body
-  const accessLevel = (privateAccess) ? 'private' : 'protected';
+  const { owner, description, src_url, broadcastEnabled, broadcastRtmpUri, recordingEnabled, transcriptionEnabled, transcriptionLanguageCode, transcriptionMaxSpeakerLabels, shareEnabled } = req.body
+  const accessLevel = (shareEnabled) ? 'protected' : 'private';
   const recordingFileUri = `s3://${bucketName}/${accessLevel}/${cognitoIdentityId}/${requestId}/Meeting.mp4`
   const transcriptionMediaFileUri = `s3://${bucketName}/${accessLevel}/${cognitoIdentityId}/${requestId}/Meeting_AudioOnly.flac`
 
@@ -139,9 +139,12 @@ app.post('/executions/new', function(req, res) {
     id: requestId,
     status: 'SUBMITTED',
     owner: owner,
-    //collaborators: [owner],
     ...stateMachineInput
   };
+  if (shareEnabled) {
+    //gqlVariables.collaborators = [owner];
+    gqlVariables.groups = ['all'];
+  }
   appsyncClient.mutate({variables: gqlVariables, mutation: createExecution})
     .then((data) => {
       console.log(JSON.stringify(data))

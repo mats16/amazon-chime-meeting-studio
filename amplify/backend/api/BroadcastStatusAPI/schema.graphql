@@ -25,7 +25,7 @@ type Status @model
 type Execution
   @model(subscriptions: { level: public })
   @auth(rules: [
-    { allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [update, read] }
+    { allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [create, update, read, delete] }
     { allow: owner, ownerField: "collaborators", provider: userPools, identityClaim: "email", operations: [update, read] }
     { allow: groups, groupsField: "groups", operations: [update, read] }
     #{ allow: private, provider: userPools }
