@@ -97,9 +97,9 @@ export default {
   created() {
     this.executionId = this.$route.query.id;
     // Load transcript file
-    API.graphql(graphqlOperation(queries.getStatus, {id: this.executionId}))
+    API.graphql(graphqlOperation(queries.getExecution, {id: this.executionId}))
       .then((data) => {
-        this.transcriptFileUri = data.data.getStatus.transcriptFileUri;
+        this.transcriptFileUri = data.data.getExecution.transcriptFileUri;
         const { key } = AmazonS3URI(this.transcriptFileUri);
         const accessLevel = key.split('/')[0];
         const identityId = key.split('/')[1];
@@ -111,7 +111,6 @@ export default {
         if (accessLevel === 'protected') { params.identityId = identityId }
         Storage.get(storageFile, params)
           .then((url) => {
-            console.log(url)
             request(url)
               .then((transcriptText) => {
                 const transcriptJson = JSON.parse(transcriptText);
