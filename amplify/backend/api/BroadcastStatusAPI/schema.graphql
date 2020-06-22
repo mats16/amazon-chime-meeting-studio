@@ -1,34 +1,9 @@
-type Status @model
-  @auth(rules: [
-    #{ allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [create, read, update] }
-    { allow: private, provider: userPools }
-    { allow: private, provider: iam }
-  ])
-{
-  id: ID!
-  status: String
-  owner: String
-  description: String
-  src_url: String
-  recordingEnabled: Boolean
-  recordingFileUri: AWSURL
-  transcriptionEnabled: Boolean
-  transcriptionLanguageCode: String
-  transcriptionMaxSpeakerLabels: Int
-  transcriptionStatus: String
-  transcriptionMediaFileUri: AWSURL
-  transcriptFileUri: AWSURL
-  broadcastEnabled: Boolean
-  broadcastRtmpUri: String
-}
-
 type Execution
   @model(subscriptions: { level: public })
   @auth(rules: [
     { allow: owner, ownerField: "owner", provider: userPools, identityClaim: "email", operations: [create, update, read, delete] }
     { allow: owner, ownerField: "collaborators", provider: userPools, identityClaim: "email", operations: [update, read] }
     { allow: groups, groupsField: "groups", operations: [update, read] }
-    #{ allow: private, provider: userPools }
     { allow: private, provider: iam }
   ])
 {
