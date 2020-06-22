@@ -113,9 +113,9 @@ export default {
           .then(url => {
             request(url)
               .then((transcriptText) => {
-                const transcriptJson = JSON.parse(transcriptText)
-                this.genSpeakerLabeledTranscript(transcriptJson.results)
-                this.transcriptResults = transcriptJson.results
+                const transcriptJson = JSON.parse(transcriptText);
+                this.transcriptResults = transcriptJson.results;
+                this.speakerLabeledTranscript = this.genSpeakerLabeledTranscript(transcriptJson.results);
               })
               .catch((err) => console.log(JSON.stringify(err)));
           })
@@ -150,20 +150,20 @@ export default {
         });
     },
     genSpeakerLabeledTranscript(transcriptResults) {
-      const speakerLabeledTranscript = []
-      const speakerLabelsSegments = transcriptResults.speaker_labels.segments
-      let segmentIndex = 0
-      const transcriptList = []
+      const speakerLabeledTranscript = [];
+      const speakerLabelsSegments = transcriptResults.speaker_labels.segments;
+      let segmentIndex = 0;
+      const transcriptList = [];
       const items = transcriptResults.items;
       while(items.length) {
-        const item = items.shift()
-        const itemEndTime = item.end_time
-        const itemContent = item.alternatives[0].content
-        const {speaker_label: segmentSpeakerLabel, start_time: segmentStartTime, end_time: segmentEndTime} = speakerLabelsSegments[segmentIndex]
+        const item = items.shift();
+        const itemEndTime = item.end_time;
+        const itemContent = item.alternatives[0].content;
+        const {speaker_label: segmentSpeakerLabel, start_time: segmentStartTime, end_time: segmentEndTime} = speakerLabelsSegments[segmentIndex];
         if (typeof itemEndTime === 'undefined') {
-          transcriptList.push(itemContent)
+          transcriptList.push(itemContent);
         } else if (Number(itemEndTime) <= Number(segmentEndTime)) {
-          transcriptList.push(itemContent)
+          transcriptList.push(itemContent);
         } else {
           speakerLabeledTranscript.push({
             speaker_label: segmentSpeakerLabel,
@@ -171,19 +171,19 @@ export default {
             end_time: Number(segmentEndTime),
             transcript: transcriptList.join(' ')
           })
-          segmentIndex += 1
-          transcriptList.length = 0
-          transcriptList.push(itemContent)
+          segmentIndex += 1;
+          transcriptList.length = 0;
+          transcriptList.push(itemContent);
         }
       }
-      const {speaker_label: segmentSpeakerLabel, start_time: segmentStartTime, end_time: segmentEndTime} = speakerLabelsSegments[segmentIndex]
+      const {speaker_label: segmentSpeakerLabel, start_time: segmentStartTime, end_time: segmentEndTime} = speakerLabelsSegments[segmentIndex];
       speakerLabeledTranscript.push({
         speaker_label: segmentSpeakerLabel,
         start_time: Number(segmentStartTime),
         end_time: Number(segmentEndTime),
         transcript: transcriptList.join(' ')
       })
-      this.speakerLabeledTranscript = speakerLabeledTranscript
+      return speakerLabeledTranscript;
     },
     timeConvert(time) {
       const sec = Math.floor(time % 60) % 60;
