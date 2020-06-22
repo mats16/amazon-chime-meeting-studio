@@ -130,59 +130,6 @@ export const listVocabularySheets = /* GraphQL */ `
     }
   }
 `;
-export const getStatus = /* GraphQL */ `
-  query GetStatus($id: ID!) {
-    getStatus(id: $id) {
-      id
-      status
-      owner
-      description
-      src_url
-      recordingEnabled
-      recordingFileUri
-      transcriptionEnabled
-      transcriptionLanguageCode
-      transcriptionMaxSpeakerLabels
-      transcriptionStatus
-      transcriptionMediaFileUri
-      transcriptFileUri
-      broadcastEnabled
-      broadcastRtmpUri
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listStatuss = /* GraphQL */ `
-  query ListStatuss(
-    $filter: ModelStatusFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listStatuss(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        status
-        owner
-        description
-        src_url
-        recordingEnabled
-        recordingFileUri
-        transcriptionEnabled
-        transcriptionLanguageCode
-        transcriptionMaxSpeakerLabels
-        transcriptionStatus
-        transcriptionMediaFileUri
-        transcriptFileUri
-        broadcastEnabled
-        broadcastRtmpUri
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const getExecution = /* GraphQL */ `
   query GetExecution($id: ID!) {
     getExecution(id: $id) {
