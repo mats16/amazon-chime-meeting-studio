@@ -110,10 +110,11 @@ export default {
         };
         if (accessLevel === 'protected') { params.identityId = identityId }
         Storage.get(storageFile, params)
-          .then(url => {
+          .then((url) => {
             request(url)
               .then((transcriptText) => {
                 const transcriptJson = JSON.parse(transcriptText);
+                console.log(JSON.stringify(transcriptJson));
                 this.transcriptResults = transcriptJson.results;
                 this.speakerLabeledTranscript = this.genSpeakerLabeledTranscript(transcriptJson.results);
               })
