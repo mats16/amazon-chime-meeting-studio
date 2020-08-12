@@ -85,51 +85,6 @@ export const listAccountSettingss = /* GraphQL */ `
     }
   }
 `;
-export const getVocabularySheet = /* GraphQL */ `
-  query GetVocabularySheet($vocabularyId: ID!, $row: Int!) {
-    getVocabularySheet(vocabularyId: $vocabularyId, row: $row) {
-      vocabularyId
-      row
-      phrase
-      ipa
-      soundsLike
-      displayAs
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listVocabularySheets = /* GraphQL */ `
-  query ListVocabularySheets(
-    $vocabularyId: ID
-    $row: ModelIntKeyConditionInput
-    $filter: ModelVocabularySheetFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listVocabularySheets(
-      vocabularyId: $vocabularyId
-      row: $row
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        vocabularyId
-        row
-        phrase
-        ipa
-        soundsLike
-        displayAs
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const getExecution = /* GraphQL */ `
   query GetExecution($id: ID!) {
     getExecution(id: $id) {
@@ -182,37 +137,6 @@ export const listExecutions = /* GraphQL */ `
         transcriptFileUri
         broadcastEnabled
         broadcastRtmpUri
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const getVocabulary = /* GraphQL */ `
-  query GetVocabulary($id: ID!) {
-    getVocabulary(id: $id) {
-      id
-      name
-      status
-      fileUri
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listVocabularys = /* GraphQL */ `
-  query ListVocabularys(
-    $filter: ModelVocabularyFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listVocabularys(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        status
-        fileUri
         createdAt
         updatedAt
       }

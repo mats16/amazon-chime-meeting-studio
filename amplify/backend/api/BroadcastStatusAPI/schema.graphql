@@ -52,26 +52,26 @@ type AccountSettings @model
   youtube_stream_key: String
 }
 
-type VocabularySheet @model
-  @auth(rules: [ { allow: private, provider: userPools } ])
-  @key(fields: [ "vocabularyId", "row" ])
-{
-  vocabularyId: ID!
-  row: Int!
-  phrase: String!
-  ipa: String
-  soundsLike: String
-  displayAs: String
-}
-
-type Vocabulary @model
-  @auth(rules: [
-    { allow: private, provider: userPools }
-    { allow: private, provider: iam }
-  ])
-{
-  id: ID!
-  name: String!
-  status: String
-  fileUri: AWSURL
-}
+#type VocabularySheet @model
+#  @auth(rules: [ { allow: private, provider: userPools } ])
+#  @key(fields: [ "vocabularyId", "row" ])
+#{
+#  vocabularyId: ID!
+#  row: Int!
+#  phrase: String!
+#  ipa: String
+#  soundsLike: String
+#  displayAs: String
+#}
+#
+#type Vocabulary @model
+#  @auth(rules: [
+#    { allow: private, provider: userPools }
+#    { allow: private, provider: iam }
+#  ])
+#{
+#  id: ID!
+#  name: String!
+#  status: String
+#  fileUri: AWSURL
+#}

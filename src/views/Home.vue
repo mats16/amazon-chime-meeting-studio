@@ -2,8 +2,6 @@
   <div class="home">
     <el-alert title="Chime に <Broadcast> ユーザーとして参加します ( Attendees に表示されます )" type="warning" show-icon v-if="(form.src_type === 'chime')"></el-alert>
     <el-alert title="現状、レコーディング機能は映像と音声に若干のズレが発生します ( 対応中 )" type="info" show-icon v-if="form.recordingEnabled"></el-alert>
-    <el-alert title="現状、共有するとアカウントを持っている全ユーザーに公開されます ( グループ管理機能は準備中です )" type="info" show-icon v-if="form.shareEnabled"></el-alert>
-    <el-alert title="現状、プライベートモードで保存したファイルを、後から共有することは出来ません" type="warning" show-icon v-if="!(form.shareEnabled)"></el-alert>
     <br>
     <el-form ref="form" :model="form" :rules="rules" label-width="180px">
       <!--<el-alert title="error alert" type="error" show-icon v-if="this.invalid.src"></el-alert>-->
@@ -96,14 +94,6 @@
         </el-form-item>
       </el-form>
 
-      <el-form-item label="Sharing">
-        <el-switch
-          v-model="form.shareEnabled"
-          active-text="Enabled"
-          inactive-text="Disabled">
-        </el-switch>
-      </el-form-item>
-
       <el-form-item>
         <el-button type="primary" @click="submitForm('form')">Submit</el-button>
         <el-button @click="onClear">Clear</el-button>
@@ -122,15 +112,6 @@
         width="85">
         <template slot-scope="scope">
           {{ scope.row.id.split('-')[0] }}
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        prop="owner"
-        label="Owner"
-        width="85">
-        <template slot-scope="scope">
-          {{ scope.row.owner.split('@')[0] }}
         </template>
       </el-table-column>
 
@@ -339,7 +320,6 @@ export default {
         transcriptionEnabled: true,
         transcriptionLanguageCode: 'ja-JP',
         transcriptionMaxSpeakerLabels: 4,
-        shareEnabled: true
       },
       rules: {
         meeting_pin: [
@@ -435,7 +415,6 @@ export default {
         transcriptionEnabled: this.form.transcriptionEnabled,
         transcriptionLanguageCode: this.form.transcriptionLanguageCode,
         transcriptionMaxSpeakerLabels: this.form.transcriptionMaxSpeakerLabels,
-        shareEnabled: this.form.shareEnabled,
       }
       if (this.form.description !== '') {
         input.description = this.form.description
@@ -547,7 +526,6 @@ export default {
         transcriptionEnabled: true,
         transcriptionLanguageCode: '',
         transcriptionMaxSpeakerLabels: 4,
-        shareEnabled: true
       }
     },
     stopExecution(row) {

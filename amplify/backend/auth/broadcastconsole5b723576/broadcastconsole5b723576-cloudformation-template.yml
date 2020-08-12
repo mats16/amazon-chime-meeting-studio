@@ -9,28 +9,6 @@ Parameters:
     Type: String
   
   
-  
-  
-  functionbroadcastconsole5b723576PreSignupArn: 
-    Type: String
-    Default: functionbroadcastconsole5b723576PreSignupArn
-  
-  functionbroadcastconsole5b723576PreSignupName: 
-    Type: String
-    Default: functionbroadcastconsole5b723576PreSignupName
-  
-  
-  
-  functionbroadcastconsole5b723576PostConfirmationArn: 
-    Type: String
-    Default: functionbroadcastconsole5b723576PostConfirmationArn
-  
-  functionbroadcastconsole5b723576PostConfirmationName: 
-    Type: String
-    Default: functionbroadcastconsole5b723576PostConfirmationName
-  
-  
-  
 
     
   identityPoolName:
@@ -188,21 +166,6 @@ Resources:
         
       
       
-      LambdaConfig:
-        
-        
-        
-        
-        
-          PostConfirmation: !Ref functionbroadcastconsole5b723576PostConfirmationArn
-        
-        
-        
-          PreSignUp: !Ref functionbroadcastconsole5b723576PreSignupArn
-        
-        
-        
-      
       
       AutoVerifiedAttributes: !Ref autoVerifiedAttributes
       
@@ -231,62 +194,12 @@ Resources:
     
   
     
-  
-  UserPoolPostConfirmationLambdaInvokePermission: 
-    Type: "AWS::Lambda::Permission"
-    DependsOn: UserPool
-    Properties: 
-      Action: "lambda:invokeFunction"
-      Principal: "cognito-idp.amazonaws.com"
-      FunctionName: !Ref functionbroadcastconsole5b723576PostConfirmationName
-      SourceArn: !GetAtt UserPool.Arn
     
   
-  
-  UserPoolPreSignupLambdaInvokePermission: 
-    Type: "AWS::Lambda::Permission"
-    DependsOn: UserPool
-    Properties: 
-      Action: "lambda:invokeFunction"
-      Principal: "cognito-idp.amazonaws.com"
-      FunctionName: !Ref functionbroadcastconsole5b723576PreSignupName
-      SourceArn: !GetAtt UserPool.Arn
   
    
     
   # Updating lambda role with permissions to Cognito
-  
-  
-  broadcastconsole5b723576PostConfirmationAddToGroupCognito:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: broadcastconsole5b723576PostConfirmationAddToGroupCognito
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-            
-              - cognito-idp:AdminAddUserToGroup
-            
-              - cognito-idp:GetGroup
-            
-              - cognito-idp:CreateGroup
-            
-            
-            
-            Resource: !GetAtt
-            
-              - UserPool
-            
-              - Arn
-            
-            
-            
-
-      Roles:
-        - !Join ['',["broadcastconsole5b723576PostConfirmation", '-', !Ref env]]
-  
   
   
   UserPoolClientWeb:
