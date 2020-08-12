@@ -20,15 +20,9 @@
                 "ChimeBroadcastAPI": {},
                 "S3Triggerf1c34a46": {},
                 "TranscribeEventHandler": {},
-                "broadcastconsole5b723576PreSignup": {
-                    "DOMAINWHITELIST": "amazon.co.jp, amazon.com"
-                },
                 "BroadcastStatusAPI": {},
                 "BroadcastContainer": {},
-                "RecordingStore": {},
-                "broadcastconsole5b723576PostConfirmation": {
-                    "GROUP": "all"
-                }
+                "RecordingStore": {}
             }
         }
     },
@@ -53,15 +47,9 @@
                 "ChimeBroadcastAPI": {},
                 "S3Triggerf1c34a46": {},
                 "TranscribeEventHandler": {},
-                "broadcastconsole5b723576PreSignup": {
-                    "DOMAINWHITELIST": "amazon.co.jp, amazon.com"
-                },
                 "BroadcastStatusAPI": {},
                 "BroadcastContainer": {},
-                "RecordingStore": {},
-                "broadcastconsole5b723576PostConfirmation": {
-                    "GROUP": "all"
-                }
+                "RecordingStore": {}
             }
         }
     },
@@ -86,15 +74,9 @@
                 "ChimeBroadcastAPI": {},
                 "S3Triggerf1c34a46": {},
                 "TranscribeEventHandler": {},
-                "broadcastconsole5b723576PreSignup": {
-                    "DOMAINWHITELIST": "amazon.co.jp, amazon.com"
-                },
                 "BroadcastStatusAPI": {},
                 "BroadcastContainer": {},
-                "RecordingStore": {},
-                "broadcastconsole5b723576PostConfirmation": {
-                    "GROUP": "all"
-                }
+                "RecordingStore": {}
             }
         }
     }
