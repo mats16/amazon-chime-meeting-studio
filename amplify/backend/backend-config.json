@@ -54,7 +54,14 @@
                         "GraphQLAPIIdOutput",
                         "GraphQLAPIEndpointOutput"
                     ]
-                }
+                },
+				{
+					"category": "statemachine",
+					"resourceName": "BroadcastContainer",
+					"attributes": [
+						"Arn"
+					]
+				}
             ]
         },
         "ChimeBroadcastAPI": {
@@ -76,7 +83,15 @@
                     "attributes": [
                         "BucketName"
                     ]
-                }
+                },
+				{
+					"category": "statemachine",
+					"resourceName": "BroadcastContainer",
+					"attributes": [
+                        "Arn",
+                        "Name"
+					]
+				}
             ]
         },
         "S3Triggerf1c34a46": {
