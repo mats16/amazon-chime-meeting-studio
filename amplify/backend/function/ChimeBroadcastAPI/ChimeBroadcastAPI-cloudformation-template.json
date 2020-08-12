@@ -85,32 +85,6 @@
 						"API_BROADCASTSTATUSAPI_GRAPHQLAPIENDPOINTOUTPUT": {
 							"Ref": "apiBroadcastStatusAPIGraphQLAPIEndpointOutput"
 						},
-						"API_BROADCASTSTATUSAPI_STATUSTABLE_NAME": {
-							"Fn::ImportValue": {
-								"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:StatusTable:Name"
-							}
-						},
-						"API_BROADCASTSTATUSAPI_STATUSTABLE_ARN": {
-							"Fn::Join": [
-								"",
-								[
-									"arn:aws:dynamodb:",
-									{
-										"Ref": "AWS::Region"
-									},
-									":",
-									{
-										"Ref": "AWS::AccountId"
-									},
-									":table/",
-									{
-										"Fn::ImportValue": {
-											"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:StatusTable:Name"
-										}
-									}
-								]
-							]
-						},
 						"STORAGE_RECORDINGSTORE_BUCKETNAME": {
 							"Ref": "storageRecordingStoreBucketName"
 						},
