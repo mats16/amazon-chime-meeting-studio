@@ -98,10 +98,6 @@
         "authbroadcastconsole5b723576UserPoolId": {
             "Type": "String",
             "Default": "authbroadcastconsole5b723576UserPoolId"
-        },
-        "authuserPoolGroupsallGroupRole": {
-            "Type": "String",
-            "Default": "authuserPoolGroupsallGroupRole"
         }
     },
     "Conditions": {
@@ -287,26 +283,6 @@
                                         {
                                             "Name": "suffix",
                                             "Value": ".flac"
-                                        }
-                                    ]
-                                }
-                            },
-                            "Function": {
-                                "Ref": "functionS3Triggerf1c34a46Arn"
-                            }
-                        },
-                        {
-                            "Event": "s3:ObjectCreated:*",
-                            "Filter": {
-                                "S3Key": {
-                                    "Rules": [
-                                        {
-                                            "Name": "prefix",
-                                            "Value": "public/vocabulary/"
-                                        },
-                                        {
-                                            "Name": "suffix",
-                                            "Value": "/input.txt"
                                         }
                                     ]
                                 }
@@ -842,68 +818,6 @@
                                 ]
                             }
                         ]
-                    ]
-                }
-            }
-        },
-        "allGroupPolicy": {
-            "Type": "AWS::IAM::Policy",
-            "Properties": {
-                "PolicyName": "all-group-s3-policy",
-                "Roles": [
-                    {
-                        "Fn::Join": [
-                            "",
-                            [
-                                {
-                                    "Ref": "authbroadcastconsole5b723576UserPoolId"
-                                },
-                                "-allGroupRole"
-                            ]
-                        ]
-                    }
-                ],
-                "PolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Action": [
-                                "s3:GetObject",
-                                "s3:ListBucket"
-                            ],
-                            "Resource": [
-                                {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "arn:aws:s3:::",
-                                            {
-                                                "Ref": "S3Bucket"
-                                            },
-                                            "/*"
-                                        ]
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": "s3:ListBucket",
-                            "Resource": [
-                                {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "arn:aws:s3:::",
-                                            {
-                                                "Ref": "S3Bucket"
-                                            }
-                                        ]
-                                    ]
-                                }
-                            ]
-                        }
                     ]
                 }
             }

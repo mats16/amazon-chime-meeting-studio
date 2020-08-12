@@ -77,7 +77,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-chimestudio-dev-152645-deployment",
-					"S3Key": "amplify-builds/S3Triggerf1c34a46-2f302f4a5949696b6c73-build.zip"
+					"S3Key": "amplify-builds/S3Triggerf1c34a46-6157526a7a36646f777a-build.zip"
 				}
 			}
 		},

@@ -48,9 +48,7 @@
     "usernameAttributes": [
         "email"
     ],
-    "userPoolGroupList": [
-        "all"
-    ],
+    "userPoolGroupList": [],
     "dependsOn": [],
     "thirdPartyAuth": false,
     "userPoolGroups": false,
