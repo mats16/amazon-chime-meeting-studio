@@ -1,5 +1,7 @@
 # amazon-chime-broadcast-console
 
+![](docs/architecture.png)
+
 ## Project setup
 
 ※ You need to delete `amplify/team-provider-info.json` first.
