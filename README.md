@@ -1,4 +1,4 @@
-# amazon-chime-broadcast-console
+# Amazon Chime Meeting Studio
 
 ![](docs/architecture.png)
 
