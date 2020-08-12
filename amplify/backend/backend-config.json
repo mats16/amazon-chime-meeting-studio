@@ -1,182 +1,167 @@
 {
-	"api": {
-		"BroadcastStatusAPI": {
-			"service": "AppSync",
-			"providerPlugin": "awscloudformation",
-			"output": {
-				"authConfig": {
-					"additionalAuthenticationProviders": [
-						{
-							"authenticationType": "AWS_IAM"
-						}
-					],
-					"defaultAuthentication": {
-						"authenticationType": "AMAZON_COGNITO_USER_POOLS",
-						"userPoolConfig": {
-							"userPoolId": "authbroadcastconsole5b723576"
-						}
-					}
-				}
-			}
-		},
-		"ChimeBroadcastAPI": {
-			"service": "API Gateway",
-			"providerPlugin": "awscloudformation",
-			"dependsOn": [
-				{
-					"category": "function",
-					"resourceName": "ChimeBroadcastAPI",
-					"attributes": [
-						"Name",
-						"Arn"
-					]
-				},
-				{
-					"category": "auth",
-					"resourceName": "broadcastconsole5b723576",
-					"attributes": [
-						"UserPoolId"
-					]
-				}
-			]
-		}
-	},
-	"function": {
-		"StateMachineEventHandler": {
-			"build": true,
-			"providerPlugin": "awscloudformation",
-			"service": "Lambda",
-			"dependsOn": [
-				{
-					"category": "api",
-					"resourceName": "BroadcastStatusAPI",
-					"attributes": [
-						"GraphQLAPIIdOutput",
-						"GraphQLAPIEndpointOutput"
-					]
-				},
-				{
-					"category": "statemachine",
-					"resourceName": "BroadcastContainer",
-					"attributes": [
-						"Arn"
-					]
-				}
-			]
-		},
-		"ChimeBroadcastAPI": {
-			"build": true,
-			"providerPlugin": "awscloudformation",
-			"service": "Lambda",
-			"dependsOn": [
-				{
-					"category": "statemachine",
-					"resourceName": "BroadcastContainer",
-					"attributes": [
-						"Arn",
-						"Name"
-					]
-				},
-				{
-					"category": "storage",
-					"resourceName": "RecordingStore",
-					"attributes": [
-						"BucketName"
-					]
-				},
-				{
-					"category": "api",
-					"resourceName": "BroadcastStatusAPI",
-					"attributes": [
-						"GraphQLAPIIdOutput",
-						"GraphQLAPIEndpointOutput"
-					]
-				}
-			]
-		},
-		"S3Triggerf1c34a46": {
-			"service": "Lambda",
-			"providerPlugin": "awscloudformation",
-			"build": true,
-			"dependsOn": [
-				{
-					"category": "api",
-					"resourceName": "BroadcastStatusAPI",
-					"attributes": [
-						"GraphQLAPIIdOutput",
-						"GraphQLAPIEndpointOutput"
-					]
-				}
-			]
-		},
-		"TranscribeEventHandler": {
-			"build": true,
-			"providerPlugin": "awscloudformation",
-			"service": "Lambda",
-			"dependsOn": [
-				{
-					"category": "api",
-					"resourceName": "BroadcastStatusAPI",
-					"attributes": [
-						"GraphQLAPIIdOutput",
-						"GraphQLAPIEndpointOutput"
-					]
-				},
-				{
-					"category": "storage",
-					"resourceName": "RecordingStore",
-					"attributes": [
-						"BucketName"
-					]
-				}
-			]
-		}
-	},
-	"auth": {
-		"broadcastconsole5b723576": {
-			"service": "Cognito",
-			"providerPlugin": "awscloudformation",
-			"dependsOn": [],
-			"customAuth": false
-		}
-	},
-	"statemachine": {
-		"BroadcastContainer": {
-			"service": "Step Functions",
-			"providerPlugin": "awscloudformation",
-			"dependsOn": [
-				{
-					"category": "storage",
-					"resourceName": "RecordingStore",
-					"attributes": [
-						"BucketName"
-					]
-				}
-			]
-		}
-	},
-	"storage": {
-		"RecordingStore": {
-			"service": "S3",
-			"providerPlugin": "awscloudformation",
-			"dependsOn": [
-				{
-					"category": "function",
-					"resourceName": "S3Triggerf1c34a46",
-					"attributes": [
-						"Name",
-						"Arn",
-						"LambdaExecutionRole"
-					]
-				},
-				{
-					"category": "auth",
-					"resourceName": "broadcastconsole5b723576",
-					"attributes": [
-						"UserPoolId"
-					]
-				}
-			]
-		}
-	}
+    "api": {
+        "BroadcastStatusAPI": {
+            "service": "AppSync",
+            "providerPlugin": "awscloudformation",
+            "output": {
+                "authConfig": {
+                    "additionalAuthenticationProviders": [
+                        {
+                            "authenticationType": "AWS_IAM"
+                        }
+                    ],
+                    "defaultAuthentication": {
+                        "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+                        "userPoolConfig": {
+                            "userPoolId": "authbroadcastconsole5b723576"
+                        }
+                    }
+                }
+            }
+        },
+        "ChimeBroadcastAPI": {
+            "service": "API Gateway",
+            "providerPlugin": "awscloudformation",
+            "dependsOn": [
+                {
+                    "category": "function",
+                    "resourceName": "ChimeBroadcastAPI",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                },
+                {
+                    "category": "auth",
+                    "resourceName": "broadcastconsole5b723576",
+                    "attributes": [
+                        "UserPoolId"
+                    ]
+                }
+            ]
+        }
+    },
+    "function": {
+        "StateMachineEventHandler": {
+            "build": true,
+            "providerPlugin": "awscloudformation",
+            "service": "Lambda",
+            "dependsOn": [
+                {
+                    "category": "api",
+                    "resourceName": "BroadcastStatusAPI",
+                    "attributes": [
+                        "GraphQLAPIIdOutput",
+                        "GraphQLAPIEndpointOutput"
+                    ]
+                }
+            ]
+        },
+        "ChimeBroadcastAPI": {
+            "build": true,
+            "providerPlugin": "awscloudformation",
+            "service": "Lambda",
+            "dependsOn": [
+                {
+                    "category": "api",
+                    "resourceName": "BroadcastStatusAPI",
+                    "attributes": [
+                        "GraphQLAPIIdOutput",
+                        "GraphQLAPIEndpointOutput"
+                    ]
+                },
+                {
+                    "category": "storage",
+                    "resourceName": "RecordingStore",
+                    "attributes": [
+                        "BucketName"
+                    ]
+                }
+            ]
+        },
+        "S3Triggerf1c34a46": {
+            "service": "Lambda",
+            "providerPlugin": "awscloudformation",
+            "build": true,
+            "dependsOn": [
+                {
+                    "category": "api",
+                    "resourceName": "BroadcastStatusAPI",
+                    "attributes": [
+                        "GraphQLAPIIdOutput",
+                        "GraphQLAPIEndpointOutput"
+                    ]
+                }
+            ]
+        },
+        "TranscribeEventHandler": {
+            "build": true,
+            "providerPlugin": "awscloudformation",
+            "service": "Lambda",
+            "dependsOn": [
+                {
+                    "category": "api",
+                    "resourceName": "BroadcastStatusAPI",
+                    "attributes": [
+                        "GraphQLAPIIdOutput",
+                        "GraphQLAPIEndpointOutput"
+                    ]
+                },
+                {
+                    "category": "storage",
+                    "resourceName": "RecordingStore",
+                    "attributes": [
+                        "BucketName"
+                    ]
+                }
+            ]
+        }
+    },
+    "auth": {
+        "broadcastconsole5b723576": {
+            "service": "Cognito",
+            "providerPlugin": "awscloudformation",
+            "dependsOn": [],
+            "customAuth": false
+        }
+    },
+    "statemachine": {
+        "BroadcastContainer": {
+            "service": "Step Functions",
+            "providerPlugin": "awscloudformation",
+            "dependsOn": [
+                {
+                    "category": "storage",
+                    "resourceName": "RecordingStore",
+                    "attributes": [
+                        "BucketName"
+                    ]
+                }
+            ]
+        }
+    },
+    "storage": {
+        "RecordingStore": {
+            "service": "S3",
+            "providerPlugin": "awscloudformation",
+            "dependsOn": [
+                {
+                    "category": "function",
+                    "resourceName": "S3Triggerf1c34a46",
+                    "attributes": [
+                        "Name",
+                        "Arn",
+                        "LambdaExecutionRole"
+                    ]
+                },
+                {
+                    "category": "auth",
+                    "resourceName": "broadcastconsole5b723576",
+                    "attributes": [
+                        "UserPoolId"
+                    ]
+                }
+            ]
+        }
+    }
 }

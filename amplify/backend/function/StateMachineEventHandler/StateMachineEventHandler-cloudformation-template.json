@@ -133,7 +133,8 @@
 				"Code": {
 					"S3Bucket": "amplify-chimestudio-dev-152645-deployment",
 					"S3Key": "amplify-builds/StateMachineEventHandler-7471494c3839656b6237-build.zip"
-				}
+				},
+				"Layers": []
 			}
 		},
 		"LambdaExecutionRole": {

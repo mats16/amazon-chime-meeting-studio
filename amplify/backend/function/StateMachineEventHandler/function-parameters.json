@@ -1,9 +1,19 @@
 {
-    "permissions": {
-        "api": {
-            "BroadcastStatusAPI": [
-                "create"
-            ]
-        }
+  "permissions": {
+    "api": {
+      "BroadcastStatusAPI": [
+        "create"
+      ]
     }
+  },
+  "mutableParametersState": {
+    "permissions": {
+      "api": {
+        "BroadcastStatusAPI": [
+          "create"
+        ]
+      }
+    }
+  },
+  "lambdaLayers": []
 }

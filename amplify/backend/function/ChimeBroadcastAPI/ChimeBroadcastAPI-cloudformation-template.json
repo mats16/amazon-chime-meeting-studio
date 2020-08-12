@@ -113,6 +113,32 @@
 						},
 						"STORAGE_RECORDINGSTORE_BUCKETNAME": {
 							"Ref": "storageRecordingStoreBucketName"
+						},
+						"API_BROADCASTSTATUSAPI_EXECUTIONTABLE_NAME": {
+							"Fn::ImportValue": {
+								"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:ExecutionTable:Name"
+							}
+						},
+						"API_BROADCASTSTATUSAPI_EXECUTIONTABLE_ARN": {
+							"Fn::Join": [
+								"",
+								[
+									"arn:aws:dynamodb:",
+									{
+										"Ref": "AWS::Region"
+									},
+									":",
+									{
+										"Ref": "AWS::AccountId"
+									},
+									":table/",
+									{
+										"Fn::ImportValue": {
+											"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:ExecutionTable:Name"
+										}
+									}
+								]
+							]
 						}
 					}
 				},
@@ -126,8 +152,9 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-chimestudio-dev-152645-deployment",
-					"S3Key": "amplify-builds/ChimeBroadcastAPI-65483539776569507253-build.zip"
-				}
+					"S3Key": "amplify-builds/ChimeBroadcastAPI-2b686c6a764261707a45-build.zip"
+				},
+				"Layers": []
 			}
 		},
 		"LambdaExecutionRole": {
@@ -306,59 +333,6 @@
 												"Ref": "storageRecordingStoreBucketName"
 											},
 											"/*"
-										]
-									]
-								}
-							]
-						},
-						{
-							"Effect": "Allow",
-							"Action": [
-								"dynamodb:Put*",
-								"dynamodb:Create*",
-								"dynamodb:BatchWriteItem"
-							],
-							"Resource": [
-								{
-									"Fn::Join": [
-										"",
-										[
-											"arn:aws:dynamodb:",
-											{
-												"Ref": "AWS::Region"
-											},
-											":",
-											{
-												"Ref": "AWS::AccountId"
-											},
-											":table/",
-											{
-												"Fn::ImportValue": {
-													"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:StatusTable:Name"
-												}
-											}
-										]
-									]
-								},
-								{
-									"Fn::Join": [
-										"",
-										[
-											"arn:aws:dynamodb:",
-											{
-												"Ref": "AWS::Region"
-											},
-											":",
-											{
-												"Ref": "AWS::AccountId"
-											},
-											":table/",
-											{
-												"Fn::ImportValue": {
-													"Fn::Sub": "${apiBroadcastStatusAPIGraphQLAPIIdOutput}:GetAtt:StatusTable:Name"
-												}
-											},
-											"/index/*"
 										]
 									]
 								}

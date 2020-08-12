@@ -1,17 +1,32 @@
 {
-    "permissions": {
-        "api": {
-            "BroadcastStatusAPI": [
-                "create"
-            ]
-        },
-        "storage": {
-            "RecordingStore": [
-                "read"
-            ],
-            "Status:@model(appsync)": [
-                "create"
-            ]
-        }
+  "permissions": {
+    "api": {
+      "BroadcastStatusAPI": [
+        "create"
+      ]
+    },
+    "storage": {
+      "RecordingStore": [
+        "read"
+      ],
+      "Status:@model(appsync)": [
+        "create"
+      ]
     }
+  },
+  "mutableParametersState": {
+    "permissions": {
+      "api": {
+        "BroadcastStatusAPI": [
+          "create"
+        ]
+      },
+      "storage": {
+        "RecordingStore": [
+          "read"
+        ]
+      }
+    }
+  },
+  "lambdaLayers": []
 }

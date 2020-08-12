@@ -290,26 +290,6 @@
                             "Function": {
                                 "Ref": "functionS3Triggerf1c34a46Arn"
                             }
-                        },
-                        {
-                            "Event": "s3:ObjectCreated:*",
-                            "Filter": {
-                                "S3Key": {
-                                    "Rules": [
-                                        {
-                                            "Name": "prefix",
-                                            "Value": "public/vocabulary/"
-                                        },
-                                        {
-                                            "Name": "suffix",
-                                            "Value": "/input.txt"
-                                        }
-                                    ]
-                                }
-                            },
-                            "Function": {
-                                "Ref": "functionS3Triggerf1c34a46Arn"
-                            }
                         }
                     ]
                 }

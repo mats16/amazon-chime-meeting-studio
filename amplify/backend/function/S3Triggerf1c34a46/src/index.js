@@ -26,30 +26,6 @@ const client = new AWSAppSyncClient({
     disableOffline: true,
 });
 
-const getVocabulary = gql(`
-  query GetVocabulary($id: ID!) {
-    getVocabulary(id: $id) {
-      name
-      status
-      fileUri
-    }
-  }
-`);
-const updateVocabulary = gql(`
-  mutation UpdateVocabulary($id: ID!, $status: String) {
-    updateVocabulary(input: {
-      id: $id
-      status: $status
-    }) {
-      id
-      name
-      status
-      fileUri
-      createdAt
-      updatedAt
-    }
-  }
-`);
 const getExecution = gql(`
   query GetExecution($id: ID!) {
     getExecution(id: $id) {
@@ -95,45 +71,7 @@ exports.handler = async (event) => {
   const bucket = event.Records[0].s3.bucket.name;
   const key = event.Records[0].s3.object.key;
   const ext = path.parse(key).ext;
-  if (ext === '.txt') {
-    const vocabularyId = key.split('/')[2]
-    //const data = await client.query({ variables: {id: vocabularyId}, query: getVocabulary, fetchPolicy: 'network-only' });
-    //const { name: vocabularyName, status: oldStatus } = data.data.getVocabulary
-    const vocabularyName = `${env}-${vocabularyId}`;
-    let vocabularyState = null;
-    const params = {
-      LanguageCode: 'ja-JP',
-      VocabularyName: vocabularyName,
-      VocabularyFileUri: `s3://${bucket}/${key}`
-    };
-    await transcribeservice.getVocabulary({ VocabularyName: vocabularyName }).promise()
-      .then(async () => {
-        // あったら更新
-        await transcribeservice.updateVocabulary(params).promise()
-          .then((data) => {
-            vocabularyState = data.VocabularyState;
-          })
-          .catch((err) => console.log(JSON.stringify(err)));
-      })
-      .catch(async () => {
-        // 無かったら作る
-        await transcribeservice.createVocabulary(params).promise()
-          .then((data) => {
-            vocabularyState = data.VocabularyState;
-          })
-          .catch((err) => console.log(JSON.stringify(err)))
-      });
-    if (vocabularyState !== null) {
-      // Update status
-      const gqlVariables = {
-        id: vocabularyId,
-        status: vocabularyState  // Todo: how to catche Ready Status
-      }
-      await client.mutate({ variables: gqlVariables, mutation: updateVocabulary })
-        .then((data) => console.log(JSON.stringify(data)))
-        .catch((err) => console.log(JSON.stringify(err)));
-    }
-  } else if (ext === '.flac') {
+  if (ext === '.flac') {
     const executionId = key.split('/')[2];
     const gqlVariables = {
       id: executionId,
