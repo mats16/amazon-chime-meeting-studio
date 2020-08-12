@@ -10,15 +10,7 @@
                     "/GET",
                     "/PUT",
                     "/PATCH"
-                ],
-                "userPoolGroups": {
-                    "all": [
-                        "/POST",
-                        "/GET",
-                        "/PUT",
-                        "/PATCH"
-                    ]
-                }
+                ]
             }
         }
     ],
@@ -49,13 +41,6 @@
             "resourceName": "broadcastconsole5b723576",
             "attributes": [
                 "UserPoolId"
-            ]
-        },
-        {
-            "category": "auth",
-            "resourceName": "userPoolGroups",
-            "attributes": [
-                "allGroupRole"
             ]
         }
     ],
