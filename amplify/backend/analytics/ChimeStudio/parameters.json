@@ -1,0 +1,21 @@
+{
+    "appName": "ChimeStudio",
+    "roleName": "pinpointLambdaRole10a4dd06",
+    "cloudformationPolicyName": "cloudformationPolicy10a4dd06",
+    "cloudWatchPolicyName": "cloudWatchPolicy10a4dd06",
+    "pinpointPolicyName": "pinpointPolicy10a4dd06",
+    "authPolicyName": "pinpoint_amplify_10a4dd06",
+    "unauthPolicyName": "pinpoint_amplify_10a4dd06",
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "unauthRoleName": {
+        "Ref": "UnauthRoleName"
+    },
+    "authRoleArn": {
+        "Fn::GetAtt": [
+            "AuthRole",
+            "Arn"
+        ]
+    }
+}
