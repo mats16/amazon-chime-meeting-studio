@@ -292,7 +292,7 @@
 </template>
 
 <script>
-import { Auth, API, graphqlOperation, Storage } from 'aws-amplify';
+import { Analytics, Auth, API, graphqlOperation, Storage } from 'aws-amplify';
 import AmazonS3URI from 'amazon-s3-uri';
 import * as queries from '../graphql/queries';
 //import * as mutations from '../graphql/mutations';
@@ -361,7 +361,12 @@ export default {
           sub: payload.sub,
           email: payload.email,
           groups: payload['cognito:groups']
-        }
+        };
+        Analytics.updateEndpoint({
+          attributes: {
+            domains: [ payload.email.split('@')[1] ]
+          }
+        });
       });
     await API.graphql(graphqlOperation(queries.getAccountSettings, {id: this.user.sub}))
       .then((data) => {
@@ -497,13 +502,18 @@ export default {
             body: this.input
           };
           API.post('ChimeBroadcastAPI', '/executions/new', myInit)
-           .then(response => {
-            console.log(response);
-           })
-           .catch(error => {
-             console.log(error.response);
+            .then(response => {
+              console.log(response);
+              Analytics.record({
+                name: 'Submit Job',
+                attributes: { src_type: this.form.src_type }
+              });
+              alert('Submit Job');
+            })
+            .catch(error => {
+              console.log(error.response);
+              alert(error.response);
           });
-          alert('Submit!');
         } else {
           console.log('error submit!!');
           return false;
