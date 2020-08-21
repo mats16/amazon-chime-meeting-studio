@@ -1,6 +1,6 @@
 {
     "identityPoolName": "broadcastconsole5b723576_identitypool_5b723576",
-    "allowUnauthenticatedIdentities": false,
+    "allowUnauthenticatedIdentities": true,
     "resourceNameTruncated": "broadc5b723576",
     "userPoolName": "broadcastconsole5b723576_userpool_5b723576",
     "autoVerifiedAttributes": [

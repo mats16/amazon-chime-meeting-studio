@@ -41,6 +41,7 @@
 
         <el-form-item label="Broadcast Type" prop="broadcastType">
           <el-checkbox-group v-model="form.broadcastType" :disabled="!(form.broadcastEnabled)">
+            <el-checkbox label="ivs" disabled>Amazon Interactive Video Service</el-checkbox>
             <el-checkbox label="twitch">Twitch</el-checkbox>
             <el-checkbox label="youtube">YouTube</el-checkbox>
             <el-checkbox label="custom">Custome RTMP</el-checkbox>

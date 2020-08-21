@@ -112,7 +112,7 @@ Parameters:
                 
   permissions:
     Type: CommaDelimitedList
-                
+    
 Conditions:
   ShouldNotCreateEnvResources: !Equals [ !Ref env, NONE ]
 
