@@ -6,8 +6,8 @@
   "dependencies": {
     "aws-appsync": "^3.0.3",
     "aws-serverless-express": "^3.3.5",
-    "body-parser": "^1.17.1",
-    "express": "^4.15.2",
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2",
     "graphql-tag": "^2.10.3",
     "isomorphic-fetch": "^2.2.1",
     "uuid4": "^1.1.4"
